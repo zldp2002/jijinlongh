@@ -2297,8 +2297,8 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 1;
 }
 
-struct chip_t r528 = {
-	.name = "R528",
+struct chip_t r528_t113 = {
+	.name = "R528/T113",
 	.detect = chip_detect,
 	.reset = chip_reset,
 	.sid = chip_sid,
