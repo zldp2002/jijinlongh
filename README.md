@@ -55,7 +55,7 @@ For 64-bits windows, you can using `x86_64-w64-mingw32-` instead of `i686-w64-mi
 ## Usage
 
 ```shell
-xfel(v1.2.0) - https://github.com/xboot/xfel
+xfel(v1.2.1) - https://github.com/xboot/xfel
 usage:
     xfel version                                - Show chip version
     xfel hexdump <address> <length>             - Dumps memory region in hex
