@@ -377,7 +377,7 @@ static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_pdata_t * p
 
 static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr, uint8_t * buf, uint32_t count)
 {
-	uint32_t granularity, n;
+	int32_t granularity, n;
 	uint8_t tx[5];
 
 	if(pdat->info.read_granularity == 1)
@@ -693,15 +693,17 @@ static void spinor_helper_erase(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr, uint8_t * buf, uint32_t count)
 {
 	uint8_t * cbuf;
-	uint32_t clen;
+	int32_t clen;
 	uint8_t * txbuf;
-	uint32_t txlen;
-	uint32_t granularity, n;
+	int32_t txlen;
+	int32_t granularity, n;
 
 	if(pdat->info.write_granularity == 1)
 		granularity = (count < 0x40000000) ? count : 0x40000000;
 	else
 		granularity = pdat->info.write_granularity;
+	granularity = granularity > (pdat->swaplen - 5) ? (pdat->swaplen - 5) : granularity;
+
 	switch(pdat->info.address_length)
 	{
 	case 3:
@@ -713,7 +715,7 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 			{
 				clen = 0;
 				txlen = 0;
-				while((clen < (pdat->cmdlen - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 4)))
+				while((clen < (pdat->cmdlen - 19 - 1)) && (txlen < ((int32_t)pdat->swaplen - granularity - 4)))
 				{
 					n = count > granularity ? granularity : count;
 					cbuf[clen++] = SPI_CMD_SELECT;
@@ -764,7 +766,7 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 			{
 				clen = 0;
 				txlen = 0;
-				while((clen < (pdat->cmdlen - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 5)))
+				while((clen < (pdat->cmdlen - 19 - 1)) && (txlen < ((int32_t)pdat->swaplen - granularity - 5)))
 				{
 					n = count > granularity ? granularity : count;
 					cbuf[clen++] = SPI_CMD_SELECT;
