@@ -196,6 +196,8 @@ static void sys_spi_transfer(void * txbuf, void * rxbuf, u32_t len)
 		write32(addr + SPI_MBC, n);
 		sys_spi_write_txbuf(tx, n);
 		write32(addr + SPI_TCR, read32(addr + SPI_TCR) | (1 << 31));
+		while(read32(addr + SPI_TCR) & (1 << 31));
+
 		while((read32(addr + SPI_FSR) & 0xff) < n);
 		for(i = 0; i < n; i++)
 		{
