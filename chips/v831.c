@@ -1,5 +1,12 @@
 #include <fel.h>
 
+static int chip_detect(struct xfel_ctx_t * ctx, uint32_t id)
+{
+	if(id == 0x00181700)
+		return 1;
+	return 0;
+}
+
 static int chip_reset(struct xfel_ctx_t * ctx)
 {
 	uint32_t val;
@@ -1333,7 +1340,7 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 
 struct chip_t v831 = {
 	.name = "V831",
-	.id = 0x00181700,
+	.detect = chip_detect,
 	.reset = chip_reset,
 	.sid = chip_sid,
 	.jtag = chip_jtag,

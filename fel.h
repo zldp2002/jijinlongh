@@ -30,8 +30,7 @@ struct xfel_ctx_t {
 
 struct chip_t {
 	char * name;
-	uint32_t id;
-
+	int (*detect)(struct xfel_ctx_t * ctx, uint32_t id);
 	int (*reset)(struct xfel_ctx_t * ctx);
 	int (*sid)(struct xfel_ctx_t * ctx, char * sid);
 	int (*jtag)(struct xfel_ctx_t * ctx);
@@ -59,6 +58,11 @@ enum {
  */
 #define R32(reg)		fel_read32(ctx, reg)
 #define W32(reg, val)	fel_write32(ctx, reg, val)
+
+static inline int fel_chip_detect(struct xfel_ctx_t * ctx, uint32_t id)
+{
+	return ctx->chip->detect(ctx, id);
+}
 
 static inline int fel_chip_reset(struct xfel_ctx_t * ctx)
 {

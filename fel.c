@@ -151,7 +151,7 @@ static inline void read_fel_status(struct xfel_ctx_t * ctx)
 	usb_read(ctx, buf, sizeof(buf));
 }
 
-static inline void fel_version(struct xfel_ctx_t * ctx)
+static inline int fel_version(struct xfel_ctx_t * ctx)
 {
 	int i;
 
@@ -162,15 +162,14 @@ static inline void fel_version(struct xfel_ctx_t * ctx)
 	ctx->version.firmware = le32_to_cpu(ctx->version.firmware);
 	ctx->version.protocol = le16_to_cpu(ctx->version.protocol);
 	ctx->version.scratchpad = le32_to_cpu(ctx->version.scratchpad);
-	ctx->chip = NULL;
 	for(i = 0; i < ARRAY_SIZE(chips); i++)
 	{
-		if(chips[i]->id == ctx->version.id)
-		{
-			ctx->chip = chips[i];
-			break;
-		}
+		ctx->chip = chips[i];
+		if(fel_chip_detect(ctx, ctx->version.id))
+			return 1;
 	}
+	printf("WARNING: Not yet support this device ID 0x%08x\r\n", ctx->version.id);
+	return 0;
 }
 
 int fel_init(struct xfel_ctx_t * ctx)
@@ -205,8 +204,7 @@ int fel_init(struct xfel_ctx_t * ctx)
 					}
 				}
 				libusb_free_config_descriptor(config);
-				fel_version(ctx);
-				return 1;
+				return fel_version(ctx);
 			}
 		}
 	}

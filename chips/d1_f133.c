@@ -56,6 +56,13 @@ struct ddr3_param_t {
 	uint32_t reserve[8];
 };
 
+static int chip_detect(struct xfel_ctx_t * ctx, uint32_t id)
+{
+	if(id == 0x00185900)
+		return 1;
+	return 0;
+}
+
 static int chip_reset(struct xfel_ctx_t * ctx)
 {
 	W32(0x020500a0 + 0x08, (0x16aa << 16) | (0x1 << 0));
@@ -3073,7 +3080,7 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 
 struct chip_t d1_f133 = {
 	.name = "D1/F133",
-	.id = 0x00185900,
+	.detect = chip_detect,
 	.reset = chip_reset,
 	.sid = chip_sid,
 	.jtag = chip_jtag,
