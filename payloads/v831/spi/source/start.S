@@ -28,6 +28,12 @@
 
 	.global _start
 _start:
+	mov r0, #0
+	mcr p15, 0, r0, c8, c7, 0
+	mcr p15, 0, r0, c7, c5, 0
+	mcr p15, 0, r0, c7, c5, 6
+	mcr p15, 0, r0, c7, c10, 4
+	mcr p15, 0, r0, c7, c5, 4
 	b reset
 
 reset:
