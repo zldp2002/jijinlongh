@@ -222,23 +222,21 @@ static void spinand_helper_write(struct xfel_ctx_t * ctx, struct spinand_pdata_t
 	int32_t clen;
 	uint8_t * txbuf;
 	int32_t txlen;
-	int32_t t, n;
+	int32_t granularity, n;
 	uint32_t pa, ca;
 
 	cbuf = malloc(pdat->cmdlen);
 	txbuf = malloc(pdat->swaplen);
 	if(cbuf && txbuf)
 	{
+		granularity = pdat->info.page_size > (pdat->swaplen - 3) ? (pdat->swaplen - 3) : pdat->info.page_size;
 		while(count > 0)
 		{
 			clen = 0;
 			txlen = 0;
-			while(clen < (pdat->cmdlen - 33 - 1))
+			while((clen < (pdat->cmdlen - 33 - 1)) && (txlen < ((int32_t)pdat->swaplen - granularity - 3)))
 			{
-				t = count > pdat->info.page_size ? pdat->info.page_size : count;
-				n = t > ((int32_t)pdat->swaplen - txlen - 3) ? (int32_t)pdat->swaplen - txlen - 3 : t;
-				if(n <= 0)
-					break;
+				n = count > granularity ? granularity : count;
 				pa = addr / pdat->info.page_size;
 				ca = addr & (pdat->info.page_size - 1);
 				cbuf[clen++] = SPI_CMD_SELECT;
