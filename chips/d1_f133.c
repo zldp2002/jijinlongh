@@ -59,7 +59,13 @@ struct ddr3_param_t {
 static int chip_detect(struct xfel_ctx_t * ctx, uint32_t id)
 {
 	if(id == 0x00185900)
-		return 1;
+	{
+		/*
+		 * XuanTie C906 RISC-V
+		 */
+		if(R32(0x00000000) == 0x43014281)
+			return 1;
+	}
 	return 0;
 }
 
