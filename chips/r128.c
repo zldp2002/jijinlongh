@@ -14,7 +14,14 @@ static int chip_reset(struct xfel_ctx_t * ctx)
 
 static int chip_sid(struct xfel_ctx_t * ctx, char * sid)
 {
-	return 0;
+	uint32_t id[4];
+
+	id[0] = R32(0x4004e600 + 0x0);
+	id[1] = R32(0x4004e600 + 0x4);
+	id[2] = R32(0x4004e600 + 0x8);
+	id[3] = R32(0x4004e600 + 0xc);
+	sprintf(sid, "%08x%08x%08x%08x", id[0], id[1], id[2], id[3]);
+	return 1;
 }
 
 static int chip_jtag(struct xfel_ctx_t * ctx)
