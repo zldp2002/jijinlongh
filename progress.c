@@ -60,9 +60,9 @@ void progress_update(struct progress_t * p, uint64_t bytes)
 		for(i = pos; i < 48; i++)
 			putchar(' ');
 		if(p->done < p->total)
-			printf("] %s/s, ETA %s", ssize(buf1, speed), format_eta(eta));
+			printf("] %s/s, ETA %s    \r", ssize(buf1, speed), format_eta(eta));
 		else
-			printf("] %s, %s/s        ", ssize(buf1, p->done), ssize(buf2, speed));
+			printf("] %s, %s/s            \r", ssize(buf1, p->done), ssize(buf2, speed));
 		fflush(stdout);
 	}
 }
