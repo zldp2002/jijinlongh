@@ -45,9 +45,8 @@ _iciallu:
 
 reset:
 	ldr	r0, _adr
-	adr	r1, _val
-	ldr	r2, [r0]
-	str	r2, [r1]
+	ldr	r1, _val
+	str	r1, [r0]
 	bx lr
 	.align 2
 _adr:
