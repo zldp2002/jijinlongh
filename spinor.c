@@ -322,10 +322,87 @@ static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_pdata_t * p
 
 		/* spi select */
 		cbuf[clen++] = SPI_CMD_SELECT;
-		/* write status */
+		/* global block/sector unlock */
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = 0x98;
+		/* spi deselect */
+		cbuf[clen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cbuf[clen++] = SPI_CMD_SELECT;
+		/* wait busy */
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+		/* spi deselect */
+		cbuf[clen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cbuf[clen++] = SPI_CMD_SELECT;
+		/* write enable */
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
+		/* spi deselect */
+		cbuf[clen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cbuf[clen++] = SPI_CMD_SELECT;
+		/* write status 1 */
 		cbuf[clen++] = SPI_CMD_FAST;
 		cbuf[clen++] = 2;
 		cbuf[clen++] = OPCODE_WRSR;
+		cbuf[clen++] = 0;
+		/* spi deselect */
+		cbuf[clen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cbuf[clen++] = SPI_CMD_SELECT;
+		/* wait busy */
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+		/* spi deselect */
+		cbuf[clen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cbuf[clen++] = SPI_CMD_SELECT;
+		/* write enable */
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
+		/* spi deselect */
+		cbuf[clen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cbuf[clen++] = SPI_CMD_SELECT;
+		/* write status 2 */
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 2;
+		cbuf[clen++] = 0x31;
+		cbuf[clen++] = 0;
+		/* spi deselect */
+		cbuf[clen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cbuf[clen++] = SPI_CMD_SELECT;
+		/* wait busy */
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+		/* spi deselect */
+		cbuf[clen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cbuf[clen++] = SPI_CMD_SELECT;
+		/* write enable */
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
+		/* spi deselect */
+		cbuf[clen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cbuf[clen++] = SPI_CMD_SELECT;
+		/* write status 3 */
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 2;
+		cbuf[clen++] = 0x11;
 		cbuf[clen++] = 0;
 		/* spi deselect */
 		cbuf[clen++] = SPI_CMD_DESELECT;
