@@ -269,6 +269,7 @@ static void spinand_helper_read(struct xfel_ctx_t * ctx, struct spinand_pdata_t 
 		tx[2] = (uint8_t)(ca >> 0);
 		tx[3] = 0x0;
 		fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 4, buf, n);
+		spinand_wait_for_busy(ctx, pdat);
 		addr += n;
 		buf += n;
 		count -= n;
