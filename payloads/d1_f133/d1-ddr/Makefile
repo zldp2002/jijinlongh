@@ -2,7 +2,7 @@
 # Top makefile
 #
 
-CROSS		?= ~/Xuantie-900-gcc-elf-newlib-x86_64-V2.0.3/bin/riscv64-unknown-elf-
+CROSS		?= ~/Xuantie-900-gcc-elf-newlib-x86_64-V2.2.4/bin/riscv64-unknown-elf-
 NAME		:= d1-ddr
 
 #

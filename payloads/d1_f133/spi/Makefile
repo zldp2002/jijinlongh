@@ -2,7 +2,7 @@
 # Top makefile
 #
 
-CROSS		?= ~/test/tina-d1-open/prebuilt/gcc/linux-x86/riscv/toolchain-thead-glibc/riscv64-glibc-gcc-thead_20200702/bin/riscv64-unknown-linux-gnu-
+CROSS		?= ~/Xuantie-900-gcc-elf-newlib-x86_64-V2.2.4/bin/riscv64-unknown-elf-
 NAME		:= spi
 
 #

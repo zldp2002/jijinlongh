@@ -2,7 +2,7 @@
 # Top makefile
 #
 
-CROSS		?= ~/Xuantie-900-gcc-linux-5.10.4-musl64-x86_64-V2.4.0/bin/riscv64-unknown-linux-musl-
+CROSS		?= ~/Xuantie-900-gcc-elf-newlib-x86_64-V2.2.4/bin/riscv64-unknown-elf-
 NAME		:= sid
 
 #
