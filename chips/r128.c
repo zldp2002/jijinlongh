@@ -5950,6 +5950,97 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 
 static int chip_extra(struct xfel_ctx_t * ctx, int argc, char * argv[])
 {
+	if(argc > 0)
+	{
+		if(!strcmp(argv[0], "exec"))
+		{
+			argc -= 1;
+			argv += 1;
+			if(!strcmp(argv[0], "riscv") && (argc == 2))
+			{
+				uint64_t addr = strtoull(argv[1], NULL, 0);
+				uint32_t val;
+
+				/* Set cpu voltage to 1100mV */
+				val = payload_read32(ctx, 0x40050000 + 0x44);
+				val &= ~(0x1f << 9);
+				val |= 0x14 << 9;
+				payload_write32(ctx, 0x40050000 + 0x44, val);
+
+				/* Wakeup enable */
+				val = payload_read32(ctx, 0x40051400 + 0x100);
+				val |= 0x1 << 8;
+				payload_write32(ctx, 0x40051400 + 0x100, val);
+
+				/* Enable clk_ck1_c906 */
+				val = payload_read32(ctx, 0x4004c400 + 0xa4);
+				val |= 0x1 << 7;
+				payload_write32(ctx, 0x4004c400 + 0xa4, val);
+
+				/* Set clk_ck1_c906 clk to 480M */
+				val = payload_read32(ctx, 0x4004c400 + 0xa4);
+				val &= ~(0x7 << 4);
+				val |= 0x1 << 4;
+				payload_write32(ctx, 0x4004c400 + 0xa4, val);
+
+				/* Set clk_ck_c906 source to clk_ck1_c906 */
+				val = payload_read32(ctx, 0x4004c400 + 0xe0);
+				val &= ~(0x1 << 17);
+				payload_write32(ctx, 0x4004c400 + 0xe0, val);
+
+				/* Set clk_c906_sel source to clk_ck_c906 */
+				val = payload_read32(ctx, 0x4003c000 + 0x64);
+				val &= ~(0x3 << 4);
+				val |= 0x2 << 4;
+				payload_write32(ctx, 0x4003c000 + 0x64, val);
+
+				/* Set clk_c906_sel source to clk_ck_c906 */
+				val = payload_read32(ctx, 0x4003c000 + 0x64);
+				val |= 1 << 31;
+				payload_write32(ctx, 0x4003c000 + 0x64, val);
+
+				/* Set clk_ck_c906_div to 480M */
+				val = payload_read32(ctx, 0x4003c000 + 0x64);
+				val &= ~(0x3 << 0);
+				val |= 0x0 << 0;
+				payload_write32(ctx, 0x4003c000 + 0x64, val);
+
+				/* Enable riscv clk gating */
+				val = payload_read32(ctx, 0x4003c000 + 0x14);
+				val |= 1 << 19;
+				payload_write32(ctx, 0x4003c000 + 0x14, val);
+
+				/* Riscv clk rst */
+				val = payload_read32(ctx, 0x4003c000 + 0x18);
+				val |= 1 << 19;
+				payload_write32(ctx, 0x4003c000 + 0x18, val);
+
+				/* Riscv sys apb soft rst */
+				val = payload_read32(ctx, 0x4003c000 + 0x18);
+				val |= 1 << 21;
+				payload_write32(ctx, 0x4003c000 + 0x18, val);
+
+				/* Set riscv start address */
+				payload_write32(ctx, 0x40028000 + 0x004, (uint32_t)((addr >>  0) & 0xffffffff));
+				payload_write32(ctx, 0x40028000 + 0x008, (uint32_t)((addr >> 32) & 0x000000ff));
+
+				/* Riscv core reset */
+				val = payload_read32(ctx, 0x4003c000 + 0x18);
+				val |= 1 << 16;
+				payload_write32(ctx, 0x4003c000 + 0x18, val);
+
+				return 1;
+			}
+			else if(!strcmp(argv[0], "dsp") && (argc == 2))
+			{
+				return 0;
+			}
+		}
+	}
+
+	printf("usage:\r\n");
+	printf("    xfel extra exec riscv <address> - Boot riscv and jump to address\r\n");
+	printf("    xfel extra exec dsp <address>   - Boot dsp and jump to address\r\n");
 	return 0;
 }
 
