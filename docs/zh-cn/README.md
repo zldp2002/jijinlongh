@@ -109,6 +109,24 @@ make
 sudo make install
 ```
 
+## macOS
+
+在开始之前，请先安装完成`Command Line Tools`.
+
+使用 [brew](https://brew.sh/) 安装`libusb` 依赖。
+
+```shell
+brew install libusb
+```
+
+然后在程序根目录输入`make`就编译完成了。
+
+```shell
+cd xfel
+make
+```
+
+
 ## Window
 
 Windows 采用交叉编译方法，在 Ubuntu 中安装交叉编译工具链：
