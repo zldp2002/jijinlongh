@@ -107,10 +107,18 @@ int main(int argc, char * argv[])
 {
 	struct xfel_ctx_t ctx;
 
-	if((argc < 2) || ((argc == 2) && (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))))
+	if(argc < 2)
 	{
 		usage();
-		return -1;
+		return 0;
+	}
+	for(int i = 1; i < argc; i++)
+	{
+		if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help"))
+		{
+			usage();
+			return 0;
+		}
 	}
 
 	libusb_init(NULL);
