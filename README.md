@@ -4,9 +4,10 @@
 # XFEL
 Tiny FEL tools for allwinner SOC, support RISC-V D1 chip.
 
-[Examples](https://xboot.github.io/xfel) &mdash;
 [Documentation](https://xboot.github.io/xfel) &mdash;
-[Release](https://github.com/xboot/xfel/releases/)
+[Support Lists](https://xboot.github.io/xfel#/?id=support-lists) &mdash;
+[Examples](https://xboot.github.io/xfel#/?id=examples) &mdash;
+[Releases](https://github.com/xboot/xfel/releases/)
 
 ## How to build
 
@@ -59,7 +60,6 @@ For 64-bits windows, you can using `x86_64-w64-mingw32-` instead of `i686-w64-mi
 ## Usage
 
 ```shell
-xfel(v1.2.3) - https://github.com/xboot/xfel
 usage:
     xfel version                                        - Show chip version
     xfel hexdump <address> <length>                     - Dumps memory region in hex
@@ -85,7 +85,7 @@ usage:
 ## Links
 
 * [The chinese discussion posts](https://whycan.com/t_6546.html)
-* [The  linux-sunxi community](http://sunxi.org/)
+* [The linux-sunxi community](http://sunxi.org/)
 
 ## License
 

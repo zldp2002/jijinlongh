@@ -9,7 +9,7 @@ Tiny FEL tools for Allwinner SOC.
 ## FEL
 FEL is a low-level subroutine contained in the BootROM on Allwinner devices. It is used for initial programming and recovery of devices using USB.
 
-## Support List
+## Support Lists
 
 ✅: Supported — ❌: Not Supported Yet  — ⚠️: Not Fully Supported Yet
 
@@ -48,7 +48,7 @@ FEL is a low-level subroutine contained in the BootROM on Allwinner devices. It 
 | V536 | Dual-Core Cortex-A7 | 0x00181600 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | V831 | Single-core Cortex-A7 800Mhz | 0x00181700 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-## USAGE
+## Usage
 
 ```
 usage:
@@ -73,7 +73,7 @@ usage:
     xfel spinand splwrite <split-size> <address> <file> - Write file to spi nand flash with split support
 ```
 
-## EXAMPLE
+## Examples
 
 #### F1C100s: Write U-Boot to DDR and execute U-Boot
 
