@@ -1,4 +1,6 @@
 #include <fel.h>
+#include <sha256.h>
+#include <ecdsa256.h>
 #include <spinor.h>
 #include <spinand.h>
 
@@ -52,6 +54,22 @@ static void * file_load(const char * filename, uint64_t * len)
 	return buf;
 }
 
+static inline unsigned char hex_to_bin(char c)
+{
+	if((c >= 'a') && (c <= 'f'))
+		return c - 'a' + 10;
+	if((c >= '0') && (c <= '9'))
+		return c - '0';
+	if((c >= 'A') && (c <= 'F'))
+		return c - 'A' + 10;
+	return 0;
+}
+
+static unsigned char hex_string(const char * s, int o)
+{
+	return (hex_to_bin(s[o]) << 4) | hex_to_bin(s[o + 1]);
+}
+
 static void hexdump(uint32_t addr, void * buf, size_t len)
 {
 	unsigned char * p = buf;
@@ -95,6 +113,7 @@ static void usage(void)
 	printf("    xfel sid                                            - Show sid information\r\n");
 	printf("    xfel jtag                                           - Enable jtag debug\r\n");
 	printf("    xfel ddr [type]                                     - Initial ddr controller with optional type\r\n");
+	printf("    xfel sign <public-key> <private-key> <file>         - Generate ecdsa256 signature file for sha256 of sid\r\n");
 	printf("    xfel spinor                                         - Detect spi nor flash\r\n");
 	printf("    xfel spinor erase <address> <length>                - Erase spi nor flash\r\n");
 	printf("    xfel spinor read <address> <length> <file>          - Read spi nor flash to file\r\n");
@@ -278,6 +297,76 @@ int main(int argc, char * argv[])
 			printf("Initial ddr controller succeeded\r\n");
 		else
 			printf("Failed to initial ddr controller\r\n");
+	}
+	else if(!strcmp(argv[1], "sign"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 3)
+		{
+			uint8_t public_key[33] = {
+				0x03, 0xcf, 0xd1, 0x8e, 0x4a, 0x4b, 0x40, 0xd6,
+				0x52, 0x94, 0x48, 0xaa, 0x2d, 0xf8, 0xbb, 0xb6,
+				0x77, 0x12, 0x82, 0x58, 0xb8, 0xfb, 0xfc, 0x5b,
+				0x9e, 0x49, 0x2f, 0xbb, 0xba, 0x4e, 0x84, 0x83,
+				0x2f,
+			};
+			uint8_t private_key[32] = {
+				0xdc, 0x57, 0xb8, 0xa9, 0xe0, 0xe2, 0xb7, 0xf8,
+				0xb4, 0xc9, 0x29, 0xbd, 0x8d, 0xb2, 0x84, 0x4e,
+				0x53, 0xf0, 0x1f, 0x17, 0x1b, 0xbc, 0xdf, 0x6e,
+				0x62, 0x89, 0x08, 0xdb, 0xf2, 0xb2, 0xe6, 0xa9,
+			};
+			char * p = argv[0];
+			if(p && (strcmp(p, "") != 0) && (strlen(p) == sizeof(public_key) * 2))
+			{
+				for(int i = 0; i < sizeof(public_key); i++)
+					public_key[i] = hex_string(p, i * 2);
+			}
+			char * q = argv[1];
+			if(q && (strcmp(q, "") != 0) && (strlen(q) == sizeof(private_key) * 2))
+			{
+				for(int i = 0; i < sizeof(private_key); i++)
+					private_key[i] = hex_string(q, i * 2);
+			}
+			char sid[256];
+			uint8_t sha256[32];
+			uint8_t signature[64];
+			if(fel_chip_sid(&ctx, sid))
+			{
+				sha256_hash(sid, strlen(sid), sha256);
+				ecdsa256_sign(private_key, sha256, signature);
+				printf("Unique ID:\r\n\t");
+				printf("%s\r\n", sid);
+				printf("Sha256 digest:\r\n\t");
+				for(int i = 0; i < sizeof(sha256); i++)
+					printf("%02x", sha256[i]);
+				printf("\r\n");
+				printf("Ecdsa256 public key:\r\n\t");
+				for(int i = 0; i < sizeof(public_key); i++)
+					printf("%02x", public_key[i]);
+				printf("\r\n");
+				printf("Ecdsa256 private key:\r\n\t");
+				for(int i = 0; i < sizeof(private_key); i++)
+					printf("%02x", private_key[i]);
+				printf("\r\n");
+				printf("Ecdsa256 signature:\r\n\t");
+				for(int i = 0; i < sizeof(signature); i++)
+					printf("%02x", signature[i]);
+				printf("\r\n");
+				if(ecdsa256_verify(public_key, sha256, signature))
+				{
+					file_save(argv[2], signature, sizeof(signature));
+					printf("Ecdsa256 signature verify successed and saved to '%s'.\r\n", argv[2]);
+				}
+				else
+					printf("Ecdsa256 signature verify failed, please check the ecdsa256 public and private key.\r\n");
+			}
+			else
+				printf("The '%s' chip don't support sid command\r\n", ctx.chip->name);
+		}
+		else
+			usage();
 	}
 	else if(!strcmp(argv[1], "spinor"))
 	{

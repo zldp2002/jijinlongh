@@ -83,6 +83,7 @@ usage:
     xfel sid                                            - 显示sid信息
     xfel jtag                                           - 启用 jtag 调试
     xfel ddr [type]                                     - 初始化 DDR 控制器
+    xfel sign <public-key> <private-key> <file>         - 依据sid的sha256摘要信息生成ECDSA256签名文件
     xfel spinor                                         - 检测 spi nor flash
     xfel spinor erase <address> <length>                - 擦除 spi nor flash
     xfel spinor read <address> <length> <file>          - 读取 spi nor flash 到文件

@@ -82,6 +82,7 @@ usage:
     xfel sid                                            - Show sid information
     xfel jtag                                           - Enable jtag debug
     xfel ddr [type]                                     - Initial ddr controller with optional type
+    xfel sign <public-key> <private-key> <file>         - Generate ecdsa256 signature file for sha256 of sid
     xfel spinor                                         - Detect spi nor flash
     xfel spinor erase <address> <length>                - Erase spi nor flash
     xfel spinor read <address> <length> <file>          - Read spi nor flash to file
