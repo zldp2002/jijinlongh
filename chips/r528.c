@@ -2089,7 +2089,7 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 	};
 	if(type)
 	{
-		if(strcmp(type, "r528s2") == 0)
+		if(strcmp(type, "r528s3") == 0)
 		{
 			static const struct ddr3_param_t {
 				uint32_t dram_clk;
@@ -2149,7 +2149,7 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 			return 1;
 		}
 	}
-	printf("xfel ddr r528s2 - Initial ddr controller for r528s2\r\n");
+	printf("xfel ddr r528s3 - Initial ddr controller for r528s3\r\n");
 	return 0;
 }
 
