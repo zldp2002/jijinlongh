@@ -9,6 +9,35 @@
 ## 什么是FEL
 FEL 是全志 SOC 中上 BootROM 中包含的低级程序。可以通过它使用 USB OTG 对 SOC 进行编程和恢复。
 
+
+# 使用方法
+
+```
+usage:
+    xfel version                                        - 显示芯片ID
+    xfel hexdump <address> <length>                     - 以HEX文件转储内存区域
+    xfel dump <address> <length>                        - 转储内存区域并输出
+    xfel read32 <address>                               - 从设备内存中读取 32 位值
+    xfel write32 <address> <value>                      - 向设备内存中写入 32 位值
+    xfel read <address> <length> <file>                 - 向文件写入内存
+    xfel write <address> <file>                         - 向内存写入文件
+    xfel exec <address>                                 - 调用函数地址
+    xfel reset                                          - 使用看门狗重置设备
+    xfel sid                                            - 显示sid信息
+    xfel jtag                                           - 启用 jtag 调试
+    xfel ddr [type]                                     - 初始化 DDR 控制器
+    xfel sign <public-key> <private-key> <file>         - 依据sid的sha256摘要信息生成ECDSA256签名文件
+    xfel spinor                                         - 检测 spi nor flash
+    xfel spinor erase <address> <length>                - 擦除 spi nor flash
+    xfel spinor read <address> <length> <file>          - 读取 spi nor flash 到文件
+    xfel spinor write <address> <file>                  - 将文件写入 spi nor flash
+    xfel spinand                                        - 检测 spi nand flash
+    xfel spinand erase <address> <length>               - 擦除 spi nand flash
+    xfel spinand read <address> <length> <file>         - 读取 spi nand flash 到文件
+    xfel spinand write <address> <file>                 - 将文件写入 spi nand flash
+    xfel spinand splwrite <split-size> <address> <file> - 使用拆分支持将文件写入 spi nand flash
+```
+
 # 支持列表
 
 ✅: 已经支持 — ❌: 还未支持  — ⚠️: 还未完全支持
@@ -67,34 +96,6 @@ yay -S xfel
 在 [RELEASE](https://github.com/xboot/xfel/releases/latest) 找到预编译的Windows软件。
 
 
-# 使用方法
-
-```
-usage:
-    xfel version                                        - 显示芯片ID
-    xfel hexdump <address> <length>                     - 以HEX文件转储内存区域
-    xfel dump <address> <length>                        - 转储内存区域并输出
-    xfel read32 <address>                               - 从设备内存中读取 32 位值
-    xfel write32 <address> <value>                      - 向设备内存中写入 32 位值
-    xfel read <address> <length> <file>                 - 向文件写入内存
-    xfel write <address> <file>                         - 向内存写入文件
-    xfel exec <address>                                 - 调用函数地址
-    xfel reset                                          - 使用看门狗重置设备
-    xfel sid                                            - 显示sid信息
-    xfel jtag                                           - 启用 jtag 调试
-    xfel ddr [type]                                     - 初始化 DDR 控制器
-    xfel sign <public-key> <private-key> <file>         - 依据sid的sha256摘要信息生成ECDSA256签名文件
-    xfel spinor                                         - 检测 spi nor flash
-    xfel spinor erase <address> <length>                - 擦除 spi nor flash
-    xfel spinor read <address> <length> <file>          - 读取 spi nor flash 到文件
-    xfel spinor write <address> <file>                  - 将文件写入 spi nor flash
-    xfel spinand                                        - 检测 spi nand flash
-    xfel spinand erase <address> <length>               - 擦除 spi nand flash
-    xfel spinand read <address> <length> <file>         - 读取 spi nand flash 到文件
-    xfel spinand write <address> <file>                 - 将文件写入 spi nand flash
-    xfel spinand splwrite <split-size> <address> <file> - 使用拆分支持将文件写入 spi nand flash
-```
-
 # 编译安装
 
 ## Linux
@@ -112,26 +113,6 @@ cd xfel
 make
 sudo make install
 ```
-
-## macOS
-
-?> _TODO_ Add macOS ARM support
-
-在开始之前，请先安装完成`Command Line Tools`.
-
-使用 [brew](https://brew.sh/) 安装`libusb` 依赖。
-
-```shell
-brew install libusb
-```
-
-然后在程序根目录输入`make`就编译完成了。
-
-```shell
-cd xfel
-make
-```
-
 
 ## Window
 
@@ -161,6 +142,26 @@ CROSS=i686-w64-mingw32- make
 ```
 
 对于交叉编译64位Windows程序，您可以使用 `x86_64-w64-mingw32-` 代替上面的 `i686-w64-mingw32`。
+
+
+## macOS
+
+?> _TODO_ Add macOS ARM support
+
+在开始之前，请先安装完成`Command Line Tools`.
+
+使用 [brew](https://brew.sh/) 安装`libusb` 依赖。
+
+```shell
+brew install libusb
+```
+
+然后在程序根目录输入`make`就编译完成了。
+
+```shell
+cd xfel
+make
+```
 
 # 例子
 

@@ -9,6 +9,34 @@ Tiny FEL tools for Allwinner SOC.
 ## FEL
 FEL is a low-level subroutine contained in the BootROM on Allwinner devices. It is used for initial programming and recovery of devices using USB.
 
+# Usage
+
+```
+usage:
+    xfel version                                        - Show chip version
+    xfel hexdump <address> <length>                     - Dumps memory region in hex
+    xfel dump <address> <length>                        - Binary memory dump to stdout
+    xfel read32 <address>                               - Read 32-bits value from device memory
+    xfel write32 <address> <value>                      - Write 32-bits value to device memory
+    xfel read <address> <length> <file>                 - Read memory to file
+    xfel write <address> <file>                         - Write file to memory
+    xfel exec <address>                                 - Call function address
+    xfel reset                                          - Reset device using watchdog
+    xfel sid                                            - Show sid information
+    xfel jtag                                           - Enable jtag debug
+    xfel ddr [type]                                     - Initial ddr controller with optional type
+    xfel sign <public-key> <private-key> <file>         - Generate ecdsa256 signature file for sha256 of sid
+    xfel spinor                                         - Detect spi nor flash
+    xfel spinor erase <address> <length>                - Erase spi nor flash
+    xfel spinor read <address> <length> <file>          - Read spi nor flash to file
+    xfel spinor write <address> <file>                  - Write file to spi nor flash
+    xfel spinand                                        - Detect spi nand flash
+    xfel spinand erase <address> <length>               - Erase spi nand flash
+    xfel spinand read <address> <length> <file>         - Read spi nand flash to file
+    xfel spinand write <address> <file>                 - Write file to spi nand flash
+    xfel spinand splwrite <split-size> <address> <file> - Write file to spi nand flash with split support
+```
+
 # Support Lists
 
 ✅: Supported — ❌: Not Supported Yet  — ⚠️: Not Fully Supported Yet
@@ -66,34 +94,6 @@ yay -S xfel
 
 Get the latest prebuild at [RELEASE](https://github.com/xboot/xfel/releases/latest)
 
-# Usage
-
-```
-usage:
-    xfel version                                        - Show chip version
-    xfel hexdump <address> <length>                     - Dumps memory region in hex
-    xfel dump <address> <length>                        - Binary memory dump to stdout
-    xfel read32 <address>                               - Read 32-bits value from device memory
-    xfel write32 <address> <value>                      - Write 32-bits value to device memory
-    xfel read <address> <length> <file>                 - Read memory to file
-    xfel write <address> <file>                         - Write file to memory
-    xfel exec <address>                                 - Call function address
-    xfel reset                                          - Reset device using watchdog
-    xfel sid                                            - Show sid information
-    xfel jtag                                           - Enable jtag debug
-    xfel ddr [type]                                     - Initial ddr controller with optional type
-    xfel sign <public-key> <private-key> <file>         - Generate ecdsa256 signature file for sha256 of sid
-    xfel spinor                                         - Detect spi nor flash
-    xfel spinor erase <address> <length>                - Erase spi nor flash
-    xfel spinor read <address> <length> <file>          - Read spi nor flash to file
-    xfel spinor write <address> <file>                  - Write file to spi nor flash
-    xfel spinand                                        - Detect spi nand flash
-    xfel spinand erase <address> <length>               - Erase spi nand flash
-    xfel spinand read <address> <length> <file>         - Read spi nand flash to file
-    xfel spinand write <address> <file>                 - Write file to spi nand flash
-    xfel spinand splwrite <split-size> <address> <file> - Write file to spi nand flash with split support
-```
-
 # Build from source
 
 ## Linux platform
@@ -110,25 +110,6 @@ Then just type `make` at the root directory, you will see a binary program.
 cd xfel
 make
 sudo make install
-```
-
-## macOS platform
-
-?> _TODO_ Add macOS ARM support
-
-Before start, make sure the `Command Line Tools` is installed.
-
-Install `libusb` using [brew](https://brew.sh/)
-
-```shell
-brew install libusb
-```
-
-Then just type `make` at the root directory, you will see a binary program.
-
-```shell
-cd xfel
-make
 ```
 
 ## Window platform
@@ -159,6 +140,25 @@ CROSS=i686-w64-mingw32- make
 ```
 
 For 64-bits windows, you can using `x86_64-w64-mingw32-` instead of `i686-w64-mingw32` above.
+
+## macOS platform
+
+?> _TODO_ Add macOS ARM support
+
+Before start, make sure the `Command Line Tools` is installed.
+
+Install `libusb` using [brew](https://brew.sh/)
+
+```shell
+brew install libusb
+```
+
+Then just type `make` at the root directory, you will see a binary program.
+
+```shell
+cd xfel
+make
+```
 
 # Examples
 
