@@ -134,7 +134,7 @@ int main(int argc, char * argv[])
 	}
 	if(!ctx.chip)
 	{
-		printf("WARNNING: Not yet support this device\r\n");
+		printf("WARNING: Not yet support this device\r\n");
 		printf("%.8s soc=0x%08x 0x%08x ver=0x%04x 0x%02x 0x%02x scratchpad=0x%08x\r\n",
 			ctx.version.magic, ctx.version.id, ctx.version.firmware,
 			ctx.version.protocol, ctx.version.dflag, ctx.version.dlength, ctx.version.scratchpad);
@@ -284,7 +284,7 @@ int main(int argc, char * argv[])
 		argc -= 2;
 		argv += 2;
 		if(fel_chip_ddr(&ctx, (argc == 1) ? argv[0] : NULL))
-			printf("Initial ddr controller sucessed\r\n");
+			printf("Initial ddr controller succeeded\r\n");
 		else
 			printf("Failed to initial ddr controller\r\n");
 	}
