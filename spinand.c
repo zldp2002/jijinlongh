@@ -154,6 +154,7 @@ static const struct spinand_info_t spinand_infos[] = {
 	/* Heyang */
 	{ "HYF1GQ4U",        SPINAND_ID(0xc9, 0x51),       2048, 128,  64, 1024, 1, 1 },
 	{ "HYF2GQ4U",        SPINAND_ID(0xc9, 0x52),       2048, 128,  64, 2048, 1, 1 },
+	{ "HYF4GQ4U",        SPINAND_ID(0xc9, 0x54),       2048, 128,  64, 4096, 1, 1 },
 };
 
 static inline int spinand_info(struct xfel_ctx_t * ctx, struct spinand_pdata_t * pdat)
