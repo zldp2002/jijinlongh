@@ -53,7 +53,7 @@ all : $(NAME)
 
 $(NAME) : $(OBJS)
 	@echo [LD] Linking $@
-	@$(CC) $(LDFLAGS) $(LIBDIRS) -Wl $^ -o $@ $(LIBS)
+	@$(CC) $(LDFLAGS) $(LIBDIRS) $^ -o $@ $(LIBS)
 
 $(SOBJS) : %.o : %.S
 	@echo [AS] $<
