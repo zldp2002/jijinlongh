@@ -1,0 +1,10 @@
+#
+# Normal rules
+#
+*~
+
+#
+# Generated files
+#
+/.obj
+/output
