@@ -79,7 +79,7 @@ static int chip_jtag(struct xfel_ctx_t * ctx)
 
 static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 {
-	static const uint8_t ddr3_payload[] = {
+	static const uint8_t ddr_payload[] = {
 		0xf0, 0x00, 0x00, 0xea, 0x65, 0x47, 0x4f, 0x4e, 0x2e, 0x42, 0x54, 0x30,
 		0x85, 0xb7, 0xae, 0x1a, 0x00, 0x5e, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00,
 		0x33, 0x30, 0x30, 0x30, 0x40, 0x83, 0x02, 0x00, 0x00, 0x80, 0x02, 0x00,
@@ -2087,62 +2087,70 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00
 	};
-	static const struct ddr3_param_t {
-		uint32_t dram_clk;
-		uint32_t dram_type;
-		uint32_t dram_zq;
-		uint32_t dram_odt_en;
-		uint32_t dram_para1;
-		uint32_t dram_para2;
-		uint32_t dram_mr0;
-		uint32_t dram_mr1;
-		uint32_t dram_mr2;
-		uint32_t dram_mr3;
-		uint32_t dram_tpr0;
-		uint32_t dram_tpr1;
-		uint32_t dram_tpr2;
-		uint32_t dram_tpr3;
-		uint32_t dram_tpr4;
-		uint32_t dram_tpr5;
-		uint32_t dram_tpr6;
-		uint32_t dram_tpr7;
-		uint32_t dram_tpr8;
-		uint32_t dram_tpr9;
-		uint32_t dram_tpr10;
-		uint32_t dram_tpr11;
-		uint32_t dram_tpr12;
-		uint32_t dram_tpr13;
-		uint32_t reserve[8];
-	} ddr3 = {
-		.dram_clk = 792,
-		.dram_type = 3,
-		.dram_zq = 0x7b7bfb,
-		.dram_odt_en = 0x00,
-		.dram_para1 = 0x000010d2,
-		.dram_para2 = 0x0000,
-		.dram_mr0 = 0x1c70,
-		.dram_mr1 = 0x042,
-		.dram_mr2 = 0x18,
-		.dram_mr3 = 0x0,
-		.dram_tpr0 = 0x004A2195,
-		.dram_tpr1 = 0x02423190,
-		.dram_tpr2 = 0x0008B061,
-		.dram_tpr3 = 0xB4787896,
-		.dram_tpr4 = 0x0,
-		.dram_tpr5 = 0x48484848,
-		.dram_tpr6 = 0x00000048,
-		.dram_tpr7 = 0x1620121e,
-		.dram_tpr8 = 0x0,
-		.dram_tpr9 = 0x0,
-		.dram_tpr10 = 0x0,
-		.dram_tpr11 = 0x00340000,
-		.dram_tpr12 = 0x00000046,
-		.dram_tpr13 = 0x34000100,
-	};
-	fel_write(ctx, 0x00028000, (void *)&ddr3_payload[0], sizeof(ddr3_payload));
-	fel_write(ctx, 0x00028038, (void *)&ddr3, sizeof(ddr3));
-	fel_exec(ctx, 0x00028000);
-	return 1;
+	if(type)
+	{
+		if(strcmp(type, "r528s2") == 0)
+		{
+			static const struct ddr3_param_t {
+				uint32_t dram_clk;
+				uint32_t dram_type;
+				uint32_t dram_zq;
+				uint32_t dram_odt_en;
+				uint32_t dram_para1;
+				uint32_t dram_para2;
+				uint32_t dram_mr0;
+				uint32_t dram_mr1;
+				uint32_t dram_mr2;
+				uint32_t dram_mr3;
+				uint32_t dram_tpr0;
+				uint32_t dram_tpr1;
+				uint32_t dram_tpr2;
+				uint32_t dram_tpr3;
+				uint32_t dram_tpr4;
+				uint32_t dram_tpr5;
+				uint32_t dram_tpr6;
+				uint32_t dram_tpr7;
+				uint32_t dram_tpr8;
+				uint32_t dram_tpr9;
+				uint32_t dram_tpr10;
+				uint32_t dram_tpr11;
+				uint32_t dram_tpr12;
+				uint32_t dram_tpr13;
+				uint32_t reserve[8];
+			} ddr3 = {
+				.dram_clk = 792,
+				.dram_type = 3,
+				.dram_zq = 0x7b7bfb,
+				.dram_odt_en = 0x00,
+				.dram_para1 = 0x000010d2,
+				.dram_para2 = 0x0000,
+				.dram_mr0 = 0x1c70,
+				.dram_mr1 = 0x042,
+				.dram_mr2 = 0x18,
+				.dram_mr3 = 0x0,
+				.dram_tpr0 = 0x004A2195,
+				.dram_tpr1 = 0x02423190,
+				.dram_tpr2 = 0x0008B061,
+				.dram_tpr3 = 0xB4787896,
+				.dram_tpr4 = 0x0,
+				.dram_tpr5 = 0x48484848,
+				.dram_tpr6 = 0x00000048,
+				.dram_tpr7 = 0x1620121e,
+				.dram_tpr8 = 0x0,
+				.dram_tpr9 = 0x0,
+				.dram_tpr10 = 0x0,
+				.dram_tpr11 = 0x00340000,
+				.dram_tpr12 = 0x00000046,
+				.dram_tpr13 = 0x34000100,
+			};
+			fel_write(ctx, 0x00028000, (void *)&ddr_payload[0], sizeof(ddr_payload));
+			fel_write(ctx, 0x00028038, (void *)&ddr3, sizeof(ddr3));
+			fel_exec(ctx, 0x00028000);
+			return 1;
+		}
+	}
+	printf("xfel ddr r528s2 - Initial ddr controller for r528s2\r\n");
+	return 0;
 }
 
 static int chip_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen, uint32_t * cmdlen)
