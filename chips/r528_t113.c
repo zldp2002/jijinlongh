@@ -4153,7 +4153,7 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 	};
 	if(type)
 	{
-		if(strcmp(type, "r528s3") == 0)
+		if(strcmp(type, "r528-s3") == 0)
 		{
 			static const struct ddr3_param_t ddr3 = {
 				.dram_clk = 792,
@@ -4186,7 +4186,7 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 			fel_exec(ctx, 0x00028000);
 			return 1;
 		}
-		else if(strcmp(type, "t113s3") == 0)
+		else if(strcmp(type, "t113-s3") == 0)
 		{
 			static const struct ddr3_param_t ddr3 = {
 				.dram_clk = 792,
