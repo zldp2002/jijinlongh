@@ -2,18 +2,18 @@
 <h1 align="center">XFEL</h1>
 <p align="center">Tiny FEL tools for Allwinner SOC.</p>
 
-## About XFEL
+# About XFEL
 
 Tiny FEL tools for Allwinner SOC.
 
 ## FEL
 FEL is a low-level subroutine contained in the BootROM on Allwinner devices. It is used for initial programming and recovery of devices using USB.
 
-## Support Lists
+# Support Lists
 
 ✅: Supported — ❌: Not Supported Yet  — ⚠️: Not Fully Supported Yet
 
-| Chip |  CPU  |  ID  |  Basic  |  Reset  | Sid | Jtag | DDR | Spi Nor Flash | Spi Nand Flash |
+| Chip |  CPU  |  ID  |  Basic  |  Reset  | Sid | Jtag | DDR | SPI Nor Flash | SPI Nand Flash |
 | -------- | :----- | :----- | -------- | :------- | -------- | -------- | -------- | -------- | -------- |
 | A10 | ARM Cortex-A8 @ 1Ghz | 0x00162300 |   ✅   | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | A10s | ARM Cortex-A8 @ 1Ghz | 0x00162500 |   ✅   | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -49,7 +49,7 @@ FEL is a low-level subroutine contained in the BootROM on Allwinner devices. It 
 | V536 | Dual-Core Cortex-A7 | 0x00181600 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | V831 | Single-core Cortex-A7 800Mhz | 0x00181700 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-## Usage
+# Usage
 
 ```
 usage:
@@ -74,9 +74,56 @@ usage:
     xfel spinand splwrite <split-size> <address> <file> - Write file to spi nand flash with split support
 ```
 
-## Examples
+# How to build
 
-#### F1C100s: Write U-Boot to DDR and execute U-Boot
+## Linux platform
+
+The xfel tools depends on the `libusb-1.0` library, you need to install `libusb-1.0-0-dev` before compile, for example in ubuntu:
+
+```shell
+sudo apt install libusb-1.0-0-dev
+```
+
+Then just type `make` at the root directory, you will see a binary program.
+
+```shell
+cd xfel
+make
+sudo make install
+```
+
+## Window platform
+
+Windows adopts the cross-compilation method, to install the cross-compilation tool chain in Ubuntu, using:
+
+```shell
+sudo apt install mingw-w64
+sudo apt install autoconf
+sudo apt install libtool-bin
+```
+And build libusb for cross-compilation.
+
+```shell
+git clone https://github.com/libusb/libusb.git
+cd libusb
+./autogen.sh
+./configure --host=i686-w64-mingw32 --prefix=/usr/i686-w64-mingw32/
+make
+sudo make install
+```
+
+Build xfel source code
+
+```shell
+cd xfel
+CROSS=i686-w64-mingw32- make
+```
+
+For 64-bits windows, you can using `x86_64-w64-mingw32-` instead of `i686-w64-mingw32` above.
+
+# Examples
+
+## F1C100s: Write U-Boot to DDR and execute U-Boot
 
 ```
 xfel ddr                               # Initial ddr controller
@@ -84,8 +131,7 @@ xfel write 0x81700000 u-boot.bin       # write uboot to 0x81700000
 xfel exec 0x81700000                   # Call the function and exectue
 ```
 
-#### F133: Write OpenSBI to DDR and execute it
-
+## F133: Write OpenSBI to DDR and execute it
 
 ```
 xfel ddr ddr2                          # Initial ddr controller with ddr2 type
@@ -93,3 +139,4 @@ xfel write 0x80200000 opensbi.bin      # write opensbi to 0x80200000
 xfel exec 0x80200000                   # Call the function and exectue
 ```
 
+?> _TODO_ Want to add more examples? Using the pull requests at [https://github.com/xboot/xfel/pulls](https://github.com/xboot/xfel/pulls)

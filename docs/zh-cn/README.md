@@ -2,18 +2,18 @@
 <h1 align="center">XFEL</h1>
 <p align="center">Tiny FEL tools for Allwinner SOC.</p>
 
-## 关于 XFEL
+# 关于 XFEL
 
 面向全志 SOC 的 FEL 工具。
 
 ## 什么是FEL
 FEL 是全志 SOC 中上 BootROM 中包含的低级程序。可以通过它使用 USB OTG 对 SOC 进行编程和恢复。
 
-## 支持列表
+# 支持列表
 
 ✅: 已经支持 — ❌: 还未支持  — ⚠️: 还未完全支持
 
-| Chip |  CPU  |  ID  |  Basic  |  Reset  | Sid | Jtag | DDR | Spi Nor Flash | Spi Nand Flash |
+| Chip |  CPU  |  ID  |  Basic  |  Reset  | Sid | Jtag | DDR | SPI Nor Flash | SPI Nand Flash |
 | -------- | :----- | :----- | -------- | :------- | -------- | -------- | -------- | -------- | -------- |
 | A10 | ARM Cortex-A8 @ 1Ghz | 0x00162300 |   ✅   | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | A10s | ARM Cortex-A8 @ 1Ghz | 0x00162500 |   ✅   | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -49,7 +49,7 @@ FEL 是全志 SOC 中上 BootROM 中包含的低级程序。可以通过它使�
 | V536 | Dual-Core Cortex-A7 | 0x00181600 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | V831 | Single-core Cortex-A7 800Mhz | 0x00181700 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-## 使用方法
+# 使用方法
 
 ```
 usage:
@@ -74,9 +74,56 @@ usage:
     xfel spinand splwrite <split-size> <address> <file> - 使用拆分支持将文件写入 spi nand flash
 ```
 
-## 例子
+# 编译安装
 
-#### F1C100s: 使用XEFL写入 U-Boot 并运行
+## Linux
+
+xfel 工具依赖于`libusb-1.0` 库，编译前需要安装`libusb-1.0-0-dev`，在Ubuntu系统中：
+
+```shell
+sudo apt install libusb-1.0-0-dev
+```
+
+然后在根目录输入`make`与`sudo make install`，就安装完成了。
+
+```shell
+cd xfel
+make
+sudo make install
+```
+
+## Window
+
+Windows 采用交叉编译方法，在 Ubuntu 中安装交叉编译工具链：
+
+```shell
+sudo apt install mingw-w64
+sudo apt install autoconf
+sudo apt install libtool-bin
+```
+克隆`libusb`源码，编译Windows下的libusb库。
+
+```shell
+git clone https://github.com/libusb/libusb.git
+cd libusb
+./autogen.sh
+./configure --host=i686-w64-mingw32 --prefix=/usr/i686-w64-mingw32/
+make
+sudo make install
+```
+
+编译xfel工具
+
+```shell
+cd xfel
+CROSS=i686-w64-mingw32- make
+```
+
+对于交叉编译64位Windows程序，您可以使用 `x86_64-w64-mingw32-` 代替上面的 `i686-w64-mingw32`。
+
+# 例子
+
+## F1C100s: 使用XEFL写入 U-Boot 并运行
 
 ```
 xfel ddr                               # 初始化DDR控制器
@@ -84,7 +131,7 @@ xfel write 0x81700000 u-boot.bin       # 将uboot写入0x81700000
 xfel exec 0x81700000                   # 调用函数地址运行
 ```
 
-#### F133: 使用XEFL写入 OpenSBI 并运行
+## F133: 使用XEFL写入 OpenSBI 并运行
 
 
 ```
@@ -93,3 +140,4 @@ xfel write 0x80200000 opensbi.bin      # 将opensbi写入0x80200000
 xfel exec 0x80200000                   # 调用函数地址运行
 ```
 
+?> _TODO_ 还想添加其他例子? 请给我们提交 Pull Requests [https://github.com/xboot/xfel/pulls](https://github.com/xboot/xfel/pulls)
