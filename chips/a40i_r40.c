@@ -9,12 +9,26 @@ static int chip_detect(struct xfel_ctx_t * ctx, uint32_t id)
 
 static int chip_reset(struct xfel_ctx_t * ctx)
 {
-	return 0;
+	uint32_t val;
+
+	val = R32(0x01c20c00 + 0x94);
+	val &= ~(0xf << 3);
+	val |= (1 << 3) | (0x1 << 1) | (0x1 << 0);
+	W32(0x01c20c00 + 0x94, val);
+	W32(0x01c20c00 + 0x90, (0xa57 << 1) | (1 << 0));
+	return 1;
 }
 
 static int chip_sid(struct xfel_ctx_t * ctx, char * sid)
 {
-	return 0;
+	uint32_t id[4];
+
+	id[0] = R32(0x01c1b200 + 0x0);
+	id[1] = R32(0x01c1b200 + 0x4);
+	id[2] = R32(0x01c1b200 + 0x8);
+	id[3] = R32(0x01c1b200 + 0xc);
+	sprintf(sid, "%08x%08x%08x%08x", id[0], id[1], id[2], id[3]);
+	return 1;
 }
 
 static int chip_jtag(struct xfel_ctx_t * ctx)
