@@ -2,8 +2,8 @@
 # Top makefile
 #
 
-CROSS		?= ~/test/tina-d1-open/prebuilt/gcc/linux-x86/riscv/toolchain-thead-glibc/riscv64-glibc-gcc-thead_20200702/bin/riscv64-unknown-linux-gnu-
-NAME		:= ddr
+CROSS		?= ~/Xuantie-900-gcc-elf-newlib-x86_64-V2.0.3/bin/riscv64-unknown-elf-
+NAME		:= d1-ddr
 
 #
 # System environment variable.
