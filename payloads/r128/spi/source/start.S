@@ -44,7 +44,7 @@ _iciallu:
 
 reset:
 	push.w { lr }
-	ldr r0, =0x040b1000
-	bl sys_spi_run
+	ldr.w r0, =0x040b1000
+	bl.w sys_spi_run
 	pop.w { lr }
 	bx lr
