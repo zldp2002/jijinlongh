@@ -81,7 +81,7 @@ static void hexdump(uint32_t addr, void * buf, size_t len)
 
 static void usage(void)
 {
-	printf("xfel(v1.2.4-alpha) - https://github.com/xboot/xfel\r\n");
+	printf("xfel(v1.2.4) - https://github.com/xboot/xfel\r\n");
 	printf("usage:\r\n");
 	printf("    xfel version                                        - Show chip version\r\n");
 	printf("    xfel hexdump <address> <length>                     - Dumps memory region in hex\r\n");
@@ -96,9 +96,11 @@ static void usage(void)
 	printf("    xfel jtag                                           - Enable jtag debug\r\n");
 	printf("    xfel ddr [type]                                     - Initial ddr controller with optional type\r\n");
 	printf("    xfel spinor                                         - Detect spi nor flash\r\n");
+	printf("    xfel spinor erase <address> <length>                - Erase spi nor flash\r\n");
 	printf("    xfel spinor read <address> <length> <file>          - Read spi nor flash to file\r\n");
 	printf("    xfel spinor write <address> <file>                  - Write file to spi nor flash\r\n");
 	printf("    xfel spinand                                        - Detect spi nand flash\r\n");
+	printf("    xfel spinand erase <address> <length>               - Erase spi nand flash\r\n");
 	printf("    xfel spinand read <address> <length> <file>         - Read spi nand flash to file\r\n");
 	printf("    xfel spinand write <address> <file>                 - Write file to spi nand flash\r\n");
 	printf("    xfel spinand splwrite <split-size> <address> <file> - Write file to spi nand flash with split support\r\n");
@@ -293,7 +295,16 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			if(!strcmp(argv[0], "read") && (argc == 4))
+			if(!strcmp(argv[0], "erase") && (argc == 3))
+			{
+				argc -= 1;
+				argv += 1;
+				uint64_t addr = strtoull(argv[0], NULL, 0);
+				uint64_t len = strtoull(argv[1], NULL, 0);
+				if(!spinor_erase(&ctx, addr, len))
+					printf("Can't erase spi nor flash\r\n");
+			}
+			else if(!strcmp(argv[0], "read") && (argc == 4))
 			{
 				argc -= 1;
 				argv += 1;
@@ -343,7 +354,16 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			if(!strcmp(argv[0], "read") && (argc == 4))
+			if(!strcmp(argv[0], "erase") && (argc == 3))
+			{
+				argc -= 1;
+				argv += 1;
+				uint64_t addr = strtoull(argv[0], NULL, 0);
+				uint64_t len = strtoull(argv[1], NULL, 0);
+				if(!spinand_erase(&ctx, addr, len))
+					printf("Can't erase spi nand flash\r\n");
+			}
+			else if(!strcmp(argv[0], "read") && (argc == 4))
 			{
 				argc -= 1;
 				argv += 1;

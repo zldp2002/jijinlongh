@@ -829,6 +829,44 @@ int spinor_detect(struct xfel_ctx_t * ctx, char * name, uint64_t * capacity)
 	return 0;
 }
 
+int spinor_erase(struct xfel_ctx_t * ctx, uint64_t addr, uint64_t len)
+{
+	struct spinor_pdata_t pdat;
+	struct progress_t p;
+	uint64_t base, n;
+	int64_t cnt;
+	uint32_t esize, emask;
+
+	if(spinor_helper_init(ctx, &pdat))
+	{
+		if(pdat.info.opcode_erase_4k != 0)
+			esize = 4096;
+		else if(pdat.info.opcode_erase_32k != 0)
+			esize = 32768;
+		else if(pdat.info.opcode_erase_32k != 0)
+			esize = 65536;
+		else if(pdat.info.opcode_erase_32k != 0)
+			esize = 262144;
+		else
+			return 0;
+		emask = esize - 1;
+		base = addr & ~emask;
+		cnt = ((addr & emask) + len + esize) & ~emask;
+		progress_start(&p, cnt);
+		while(cnt > 0)
+		{
+			n = cnt > 262144 ? 262144 : cnt;
+			spinor_helper_erase(ctx, &pdat, base, n);
+			base += n;
+			cnt -= n;
+			progress_update(&p, n);
+		}
+		progress_stop(&p);
+		return 1;
+	}
+	return 0;
+}
+
 int spinor_read(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t len)
 {
 	struct spinor_pdata_t pdat;
