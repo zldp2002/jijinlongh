@@ -73,5 +73,11 @@ install:
 	install -Dm0644 LICENSE /usr/share/licenses/xfel/LICENSE
 	udevadm control --reload
 
+uninstall:
+	rm -f /usr/local/bin/xfel
+	rm -f /etc/udev/rules.d/99-xfel.rules
+	rm -f /usr/share/licenses/xfel/LICENSE
+	udevadm control --reload
+
 clean:
 	@$(RM) $(DEPS) $(OBJS) $(NAME).exe $(NAME) *~
