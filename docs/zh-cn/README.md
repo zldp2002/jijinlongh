@@ -83,11 +83,11 @@ usage:
     xfel jtag                                           - 启用 jtag 调试
     xfel ddr [type]                                     - 初始化 DDR 控制器
     xfel spinor                                         - 检测 spi nor flash
-    xfel spinor erase                                   - 擦除 spi nor flash
+    xfel spinor erase <address> <length>                - 擦除 spi nor flash
     xfel spinor read <address> <length> <file>          - 读取 spi nor flash 到文件
     xfel spinor write <address> <file>                  - 将文件写入 spi nor flash
     xfel spinand                                        - 检测 spi nand flash
-    xfel spinand erase                                  - 擦除 spi nand flash
+    xfel spinand erase <address> <length>               - 擦除 spi nand flash
     xfel spinand read <address> <length> <file>         - 读取 spi nand flash 到文件
     xfel spinand write <address> <file>                 - 将文件写入 spi nand flash
     xfel spinand splwrite <split-size> <address> <file> - 使用拆分支持将文件写入 spi nand flash
