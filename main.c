@@ -240,7 +240,7 @@ int main(int argc, char * argv[])
 		if(argc == 2)
 		{
 			uint32_t addr = strtoul(argv[0], NULL, 0);
-			size_t len;
+			uint64_t len;
 			void * buf = file_load(argv[1], &len);
 			if(buf)
 			{
