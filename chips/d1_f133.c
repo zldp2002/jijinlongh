@@ -56,41 +56,6 @@ struct ddr3_param_t {
 	uint32_t reserve[8];
 };
 
-struct lpddr3_param_t {
-	uint32_t dram_clk;
-	uint32_t dram_type;
-	uint32_t dram_dx_odt;
-	uint32_t dram_dx_dri;
-	uint32_t dram_ca_dri;
-	uint32_t dram_para0;
-	uint32_t dram_para1;
-	uint32_t dram_para2;
-	uint32_t dram_mr0;
-	uint32_t dram_mr1;
-	uint32_t dram_mr2;
-	uint32_t dram_mr3;
-	uint32_t dram_mr4;
-	uint32_t dram_mr5;
-	uint32_t dram_mr6;
-	uint32_t dram_mr11;
-	uint32_t dram_mr12;
-	uint32_t dram_mr13;
-	uint32_t dram_mr14;
-	uint32_t dram_mr16;
-	uint32_t dram_mr17;
-	uint32_t dram_mr22;
-	uint32_t dram_tpr0;
-	uint32_t dram_tpr1;
-	uint32_t dram_tpr2;
-	uint32_t dram_tpr3;
-	uint32_t dram_tpr6;
-	uint32_t dram_tpr10;
-	uint32_t dram_tpr11;
-	uint32_t dram_tpr12;
-	uint32_t dram_tpr13;
-	uint32_t dram_tpr14;
-};
-
 static int chip_reset(struct xfel_ctx_t * ctx)
 {
 	W32(0x020500a0 + 0x08, (0x16aa << 16) | (0x1 << 0));
@@ -1521,7 +1486,7 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 		0x61, 0x62, 0x6c, 0x65, 0x20, 0x41, 0x75, 0x74, 0x6f, 0x20, 0x53, 0x52,
 		0x0d, 0x0a, 0x00, 0x00
 	};
-	static const uint8_t ddr3_lpddr3_payload[] = {
+	static const uint8_t ddr3_payload[] = {
 		0x37, 0x03, 0x40, 0x00, 0x73, 0x20, 0x03, 0x7c, 0x37, 0x03, 0x03, 0x00,
 		0x1b, 0x03, 0x33, 0x01, 0x73, 0x20, 0x23, 0x7c, 0x6f, 0x00, 0x40, 0x08,
 		0x18, 0x03, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0xfb, 0x7b, 0x7b, 0x00,
@@ -2969,56 +2934,14 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 				.dram_tpr12 = 0x00000024,
 				.dram_tpr13 = 0x34050100,
 			};
-			fel_write(ctx, 0x00020000, (void *)&ddr3_lpddr3_payload[0], sizeof(ddr3_lpddr3_payload));
+			fel_write(ctx, 0x00020000, (void *)&ddr3_payload[0], sizeof(ddr3_payload));
 			fel_write(ctx, 0x00020018, (void *)&ddr3, sizeof(ddr3));
 			fel_exec(ctx, 0x00020000);
 			return 1;
 		}
-		else if(strcmp(type, "lpddr3") == 0)
-		{
-			const struct lpddr3_param_t lpddr3 = {
-				.dram_clk = 672,
-				.dram_type = 7,
-				.dram_dx_odt = 0x06060606,
-				.dram_dx_dri = 0x0c0c0c0c,
-				.dram_ca_dri = 0x1919,
-				.dram_para0 = 0x16171411,
-				.dram_para1 = 0x30eb,
-				.dram_para2 = 0x0000,
-				.dram_mr0 = 0x0,
-				.dram_mr1 = 0xc3,
-				.dram_mr2 = 0x6,
-				.dram_mr3 = 0x2,
-				.dram_mr4 = 0x0,
-				.dram_mr5 = 0x0,
-				.dram_mr6 = 0x0,
-				.dram_mr11 = 0x0,
-				.dram_mr12 = 0x0,
-				.dram_mr13 = 0x0,
-				.dram_mr14 = 0x0,
-				.dram_mr16 = 0x0,
-				.dram_mr17 = 0x0,
-				.dram_mr22 = 0x0,
-				.dram_tpr0 = 0x0,
-				.dram_tpr1 = 0x0,
-				.dram_tpr2 = 0x0,
-				.dram_tpr3 = 0x0,
-				.dram_tpr6 = 0x2fb48080,
-				.dram_tpr10 = 0x002f876b,
-				.dram_tpr11 = 0x10120c05,
-				.dram_tpr12 = 0x12121111,
-				.dram_tpr13 = 0x61,
-				.dram_tpr14 = 0x211e1e22,
-			};
-			fel_write(ctx, 0x00020000, (void *)&ddr3_lpddr3_payload[0], sizeof(ddr3_lpddr3_payload));
-			fel_write(ctx, 0x00020018, (void *)&lpddr3, sizeof(lpddr3));
-			fel_exec(ctx, 0x00020000);
-			return 1;
-		}
 	}
-	printf("xfel ddr ddr2	- Initial ddr controller with ddr2(F133)\r\n");
-	printf("xfel ddr ddr3	- Initial ddr controller with ddr3(D1)\r\n");
-	printf("xfel ddr lpddr3	- Initial ddr controller with lpddr3\r\n");
+	printf("xfel ddr ddr2 - Initial ddr controller with ddr2(F133)\r\n");
+	printf("xfel ddr ddr3 - Initial ddr controller with ddr3(D1)\r\n");
 	return 0;
 }
 
