@@ -42,7 +42,7 @@ FEL is a low-level subroutine contained in the BootROM on Allwinner devices. It 
 | H616 | Quad-Core ARM Cortex-A53 | 0x00182300 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | R328 | Dual-Core Cortex-A7 | 0x00182100 | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | R329 | Dual-Core Cortex-A53 | 0x00185100 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| R528 | Dual-Core Cortex-A7 | 0x00185900 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| R528 | Dual-Core Cortex-A7 | 0x00185900 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | T507 | Quad-Core ARM Cortex-A53 | 0x00182300 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | V3s | Single-core Cortex-A7 | 0x00168100 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | S3 | Single-core Cortex-A7 | 0x00168100 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
