@@ -78,7 +78,7 @@ usage:
 #### F1C100s: Write U-Boot to DDR and execute U-Boot
 
 ```
-xfel ddr ddr2                          # Initial ddr controller with ddr2 type
+xfel ddr                               # Initial ddr controller
 xfel write 0x81700000 u-boot.bin       # write uboot to 0x81700000
 xfel exec 0x81700000                   # Call the function and exectue
 ```

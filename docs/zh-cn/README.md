@@ -78,8 +78,8 @@ usage:
 #### F1C100s: 使用XEFL写入 U-Boot 并运行
 
 ```
-xfel ddr ddr2                          # 使用 ddr2 方式初始化 DDR 控制器
-xfel write 0x81700000 u-boot.bin       # 将 uboot 写入 0x81700000
+xfel ddr                               # 初始化DDR控制器
+xfel write 0x81700000 u-boot.bin       # 将uboot写入0x81700000
 xfel exec 0x81700000                   # 调用函数地址运行
 ```
 
@@ -87,8 +87,8 @@ xfel exec 0x81700000                   # 调用函数地址运行
 
 
 ```
-xfel ddr ddr2                          # 使用 ddr2 方式初始化 DDR 控制器
-xfel write 0x80200000 opensbi.bin      # 将 opensbi 写入 0x80200000
+xfel ddr ddr2                          # 使用ddr2方式初始化DDR控制器
+xfel write 0x80200000 opensbi.bin      # 将opensbi写入0x80200000
 xfel exec 0x80200000                   # 调用函数地址运行
 ```
 
