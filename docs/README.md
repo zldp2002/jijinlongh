@@ -82,9 +82,11 @@ usage:
     xfel jtag                                           - Enable jtag debug
     xfel ddr [type]                                     - Initial ddr controller with optional type
     xfel spinor                                         - Detect spi nor flash
+    xfel spinor erase <address> <length>                - Erase spi nor flash
     xfel spinor read <address> <length> <file>          - Read spi nor flash to file
     xfel spinor write <address> <file>                  - Write file to spi nor flash
     xfel spinand                                        - Detect spi nand flash
+    xfel spinand erase <address> <length>               - Erase spi nand flash
     xfel spinand read <address> <length> <file>         - Read spi nand flash to file
     xfel spinand write <address> <file>                 - Write file to spi nand flash
     xfel spinand splwrite <split-size> <address> <file> - Write file to spi nand flash with split support
