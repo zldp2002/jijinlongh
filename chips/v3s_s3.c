@@ -19,23 +19,15 @@ static int chip_reset(struct xfel_ctx_t * ctx)
 	return 1;
 }
 
-static uint32_t fel_read32_fixed(struct xfel_ctx_t * ctx, uint32_t addr)
+static uint32_t payload_arm_read32(struct xfel_ctx_t * ctx, uint32_t addr)
 {
 	uint32_t payload[] = {
-		cpu_to_le32(0xe59f0020),		/* ldr r0, [pc, #32] ; ldr r0,[read_addr]  */
-		cpu_to_le32(0xe28f1024),		/* add r1, pc, #36   ; adr r1, read_data   */
-		cpu_to_le32(0xe59f201c),		/* ldr r2, [pc, #28] ; ldr r2,[read_count] */
-		cpu_to_le32(0xe3520000 + 208),	/* cmp r2, #208 */
-		cpu_to_le32(0xc3a02000 + 208),	/* movgt r2, #208 */
-		/* read_loop: */
-		cpu_to_le32(0xe2522001),		/* subs r2, r2, #1   ; r2 -= 1             */
-		cpu_to_le32(0x412fff1e),		/* bxmi lr           ; return if (r2 < 0)  */
-		cpu_to_le32(0xe4903004),		/* ldr r3, [r0], #4  ; load and post-inc   */
-		cpu_to_le32(0xe4813004),		/* str r3, [r1], #4  ; store and post-inc  */
-		cpu_to_le32(0xeafffffa),		/* b read_loop                             */
-		cpu_to_le32(addr),				/* read_addr */
-		cpu_to_le32(0x1)				/* read_count */
-		/* read_data values go here */
+		cpu_to_le32(0xe59f000c), /* ldr r0, [pc, #12] */
+		cpu_to_le32(0xe28f100c), /* add r1, pc, #12   */
+		cpu_to_le32(0xe4902000), /* ldr r2, [r0], #0  */
+		cpu_to_le32(0xe4812000), /* str r2, [r1], #0  */
+		cpu_to_le32(0xe12fff1e), /* bx lr             */
+		cpu_to_le32(addr),
 	};
 	uint32_t val;
 
@@ -49,10 +41,10 @@ static int chip_sid(struct xfel_ctx_t * ctx, char * sid)
 {
 	uint32_t id[4];
 
-	id[0] = fel_read32_fixed(ctx, 0x01c23800 + 0x0);
-	id[1] = fel_read32_fixed(ctx, 0x01c23800 + 0x4);
-	id[2] = fel_read32_fixed(ctx, 0x01c23800 + 0x8);
-	id[3] = fel_read32_fixed(ctx, 0x01c23800 + 0xc);
+	id[0] = payload_arm_read32(ctx, 0x01c23800 + 0x0);
+	id[1] = payload_arm_read32(ctx, 0x01c23800 + 0x4);
+	id[2] = payload_arm_read32(ctx, 0x01c23800 + 0x8);
+	id[3] = payload_arm_read32(ctx, 0x01c23800 + 0xc);
 	sprintf(sid, "%08x%08x%08x%08x", id[0], id[1], id[2], id[3]);
 	return 1;
 }
