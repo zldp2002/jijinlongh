@@ -140,7 +140,6 @@ static const struct spinand_info_t spinand_infos[] = {
 	{ "EM73C044SNG",     SPINAND_ID(0xd5, 0x0c),       2048, 120,  64, 1024, 1, 1 },
 	{ "EM73D044VCN",     SPINAND_ID(0xd5, 0x0f),       2048,  64,  64, 2048, 1, 1 },
 
-
 	/* Elnec */
 	{ "FM35Q1GA",        SPINAND_ID(0xe5, 0x71),       2048,  64,  64, 1024, 1, 1 },
 
