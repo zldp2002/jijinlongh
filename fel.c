@@ -185,6 +185,10 @@ int fel_init(struct xfel_ctx_t * ctx)
 		const struct libusb_interface * iface;
 		const struct libusb_interface_descriptor * setting;
 		const struct libusb_endpoint_descriptor * ep;
+
+		if(libusb_kernel_driver_active(ctx->hdl, 0))
+			libusb_detach_kernel_driver(ctx->hdl, 0);
+
 		if(libusb_claim_interface(ctx->hdl, 0) == 0)
 		{
 			if(libusb_get_active_config_descriptor(libusb_get_device(ctx->hdl), &config) == 0)
