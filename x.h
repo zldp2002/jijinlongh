@@ -5,6 +5,12 @@
 extern "C" {
 #endif
 
+#ifdef __VSF__
+// __VSF__ should be checked before __WINDOWS__
+//  because even if vsf running on Windows, it emulates a linux
+# undef _WIN32
+# define __linux__
+#endif
 #if (defined(_WIN16) || defined(_WIN32) || defined(_WIN64)) && !defined(__WINDOWS__)
 # define __WINDOWS__
 #endif
