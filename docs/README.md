@@ -108,6 +108,23 @@ make
 sudo make install
 ```
 
+## macOS platform
+
+Before start, make sure the `Command Line Tools` is installed.
+
+Install `libusb` using [brew](https://brew.sh/)
+
+```shell
+brew install libusb
+```
+
+Then just type `make` at the root directory, you will see a binary program.
+
+```shell
+cd xfel
+make
+```
+
 ## Window platform
 
 Windows adopts the cross-compilation method, to install the cross-compilation tool chain in Ubuntu, using:
