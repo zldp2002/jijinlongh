@@ -71,7 +71,7 @@ usage:
 | H5 | Quad-Core ARM Cortex-A53 | 0x00171800 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | H6 | Quad-Core ARM Cortex-A53 @ 1.8GHz | 0x00172800 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | H616 | Quad-Core ARM Cortex-A53 | 0x00182300 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| R128 | ARM Cortex-M33 and C906 RISC-V | 0x00188300 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| R128 | ARM Cortex-M33 and C906 RISC-V | 0x00188300 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | R328 | Dual-Core Cortex-A7 | 0x00182100 | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | R329 | Dual-Core Cortex-A53 | 0x00185100 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | R528 | Dual-Core Cortex-A7 | 0x00185900 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
