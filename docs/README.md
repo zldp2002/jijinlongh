@@ -49,6 +49,22 @@ FEL is a low-level subroutine contained in the BootROM on Allwinner devices. It 
 | V536 | Dual-Core Cortex-A7 | 0x00181600 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | V831 | Single-core Cortex-A7 800Mhz | 0x00181700 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
+# Download and install
+
+## Linux platform
+
+### ArchLinux
+
+The xfel now avaliable at [AUR](https://aur.archlinux.org/packages/xfel/), You can use any AUR helper like `yay` to download.
+
+```shell
+yay -S xfel
+```
+
+## Windows platform
+
+Get the latest prebuild at [RELEASE](https://github.com/xboot/xfel/releases/latest)
+
 # Usage
 
 ```
@@ -74,7 +90,7 @@ usage:
     xfel spinand splwrite <split-size> <address> <file> - Write file to spi nand flash with split support
 ```
 
-# How to build
+# Build from source
 
 ## Linux platform
 
