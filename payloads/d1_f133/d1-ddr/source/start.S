@@ -71,6 +71,8 @@ reset:
 	sd ra, 24(sp)
 	mv s0, a0
 
+	li t0, 0x07090108
+	sw zero, (t0)
 	jal sys_uart_init
 	jal sys_clock_init
 	la a0, ddr_param
