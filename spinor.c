@@ -70,8 +70,9 @@ struct sfdp_t {
 };
 
 static const struct spinor_info_t spinor_infos[] = {
-	{ "W25X40",   0xef3013, 512 * 1024, 4096, 1, 256, 3, OPCODE_READ, OPCODE_PROG, OPCODE_WREN, OPCODE_E4K,           0, OPCODE_E64K, 0 },
-	{ "GD25D10B", 0xc84011, 128 * 1024, 4096, 1, 256, 3, OPCODE_READ, OPCODE_PROG, OPCODE_WREN, OPCODE_E4K, OPCODE_E32K, OPCODE_E64K, 0 },
+	{ "W25X40",       0xef3013,       512 * 1024, 4096, 1, 256, 3, OPCODE_READ, OPCODE_PROG, OPCODE_WREN, OPCODE_E4K,           0, OPCODE_E64K, 0 },
+	{ "W25Q128JVEIQ", 0xefc018, 16 * 1024 * 1024, 4096, 1, 256, 3, OPCODE_READ, OPCODE_PROG, OPCODE_WREN, OPCODE_E4K, OPCODE_E32K, OPCODE_E64K, 0 },
+	{ "GD25D10B",     0xc84011,       128 * 1024, 4096, 1, 256, 3, OPCODE_READ, OPCODE_PROG, OPCODE_WREN, OPCODE_E4K, OPCODE_E32K, OPCODE_E64K, 0 },
 };
 
 static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, uint32_t cmdlen, struct sfdp_t * sfdp)
