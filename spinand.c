@@ -609,7 +609,8 @@ int spinand_splwrite(struct xfel_ctx_t * ctx, uint32_t splitsz, uint64_t addr, v
 		}
 		uint8_t * pnbuf = nbuf;
 		base = 0 & ~emask;
-		cnt = ((0 + nlen + esize - 1) & ~emask) - base;
+		cnt = (0 & emask) + nlen;
+		cnt = (cnt + ((cnt & emask) ? esize : 0)) & ~emask;
 		progress_start(&p, cnt);
 		while(cnt > 0)
 		{
