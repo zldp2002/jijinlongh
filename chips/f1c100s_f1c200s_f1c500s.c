@@ -540,6 +540,11 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 1;
 }
 
+static int chip_extra(struct xfel_ctx_t * ctx, int argc, char * argv[])
+{
+	return 0;
+}
+
 struct chip_t f1c100s_f1c200s_f1c500s = {
 	.name = "F1C100S/F1C200S/F1C500S",
 	.detect = chip_detect,
@@ -549,4 +554,5 @@ struct chip_t f1c100s_f1c200s_f1c500s = {
 	.ddr = chip_ddr,
 	.spi_init = chip_spi_init,
 	.spi_run = chip_spi_run,
+	.extra = chip_extra,
 };

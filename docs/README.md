@@ -35,6 +35,7 @@ usage:
     xfel spinand read <address> <length> <file>         - Read spi nand flash to file
     xfel spinand write <address> <file>                 - Write file to spi nand flash
     xfel spinand splwrite <split-size> <address> <file> - Write file to spi nand flash with split support
+    xfel extra [...]                                    - The extra commands
 ```
 
 # Support Lists
@@ -69,7 +70,7 @@ usage:
 | H5 | Quad-Core ARM Cortex-A53 | 0x00171800 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | H6 | Quad-Core ARM Cortex-A53 @ 1.8GHz | 0x00172800 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | H616 | Quad-Core ARM Cortex-A53 | 0x00182300 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| R128 | ARM Cortex-M33 and C906 RISC-V | 0x00188300 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| R128 | ARM Cortex-M33 and C906 RISC-V | 0x00188300 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
 | R328 | Dual-Core Cortex-A7 | 0x00182100 | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | R329 | Dual-Core Cortex-A53 | 0x00185100 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | R528 | Dual-Core Cortex-A7 | 0x00185900 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -80,22 +81,6 @@ usage:
 | V536 | Dual-Core Cortex-A7 | 0x00181600 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | V831 | Single-core Cortex-A7 800Mhz | 0x00181700 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | V853 | Single-core Cortex-A7 1Ghz + E907 RISC-V | 0x00188600 | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
-
-# Download and install
-
-## Linux platform
-
-### ArchLinux
-
-The xfel now avaliable at [AUR](https://aur.archlinux.org/packages/xfel/), You can use any AUR helper like `yay` to download.
-
-```shell
-yay -S xfel
-```
-
-## Windows platform
-
-Get the latest prebuild at [RELEASE](https://github.com/xboot/xfel/releases/latest)
 
 # Build from source
 
@@ -163,6 +148,12 @@ cd xfel
 make
 ```
 
+# Download and install
+
+## Windows platform
+
+Get the latest prebuild at [RELEASE](https://github.com/xboot/xfel/releases/latest)
+
 # Examples
 
 ## F1C100s: Write U-Boot to DDR and execute U-Boot
@@ -191,6 +182,4 @@ xfel write 0x80200000 opensbi.bin      # write opensbi to 0x80200000
 xfel exec 0x80200000                   # Call the function and exectue
 ```
 
-
-
-?> _TODO_ Want to add more examples? Using the pull requests at [https://github.com/xboot/xfel/pulls](https://github.com/xboot/xfel/pulls)
+?> Want to add more examples? Using the pull requests at [https://github.com/xboot/xfel/pulls](https://github.com/xboot/xfel/pulls)

@@ -37,6 +37,7 @@ struct chip_t {
 	int (*ddr)(struct xfel_ctx_t * ctx, const char * type);
 	int (*spi_init)(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen, uint32_t * cmdlen);
 	int (*spi_run)(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen);
+	int (*extra)(struct xfel_ctx_t * ctx, int argc, char * argv[]);
 };
 
 enum {
@@ -61,37 +62,58 @@ enum {
 
 static inline int fel_chip_detect(struct xfel_ctx_t * ctx, uint32_t id)
 {
-	return ctx->chip->detect(ctx, id);
+	if(ctx->chip->detect)
+		return ctx->chip->detect(ctx, id);
+	return 0;
 }
 
 static inline int fel_chip_reset(struct xfel_ctx_t * ctx)
 {
-	return ctx->chip->reset(ctx);
+	if(ctx->chip->reset)
+		return ctx->chip->reset(ctx);
+	return 0;
 }
 
 static inline int fel_chip_sid(struct xfel_ctx_t * ctx, char * sid)
 {
-	return ctx->chip->sid(ctx, sid);
+	if(ctx->chip->sid)
+		return ctx->chip->sid(ctx, sid);
+	return 0;
 }
 
 static inline int fel_chip_jtag(struct xfel_ctx_t * ctx)
 {
-	return ctx->chip->jtag(ctx);
+	if(ctx->chip->jtag)
+		return ctx->chip->jtag(ctx);
+	return 0;
 }
 
 static inline int fel_chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 {
-	return ctx->chip->ddr(ctx, type);
+	if(ctx->chip->ddr)
+		return ctx->chip->ddr(ctx, type);
+	return 0;
 }
 
 static inline int fel_chip_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen, uint32_t * cmdlen)
 {
-	return ctx->chip->spi_init(ctx, swapbuf, swaplen, cmdlen);
+	if(ctx->chip->spi_init)
+		return ctx->chip->spi_init(ctx, swapbuf, swaplen, cmdlen);
+	return 0;
 }
 
 static inline int fel_chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 {
-	return ctx->chip->spi_run(ctx, cbuf, clen);
+	if(ctx->chip->spi_run)
+		return ctx->chip->spi_run(ctx, cbuf, clen);
+	return 0;
+}
+
+static inline int fel_chip_extra(struct xfel_ctx_t * ctx, int argc, char * argv[])
+{
+	if(ctx->chip->extra)
+		return ctx->chip->extra(ctx, argc, argv);
+	return 0;
 }
 
 int fel_init(struct xfel_ctx_t * ctx);

@@ -37,6 +37,11 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 0;
 }
 
+static int chip_extra(struct xfel_ctx_t * ctx, int argc, char * argv[])
+{
+	return 0;
+}
+
 struct chip_t a13_a10s_r8 = {
 	.name = "A13/A10S/R8",
 	.detect = chip_detect,
@@ -46,4 +51,5 @@ struct chip_t a13_a10s_r8 = {
 	.ddr = chip_ddr,
 	.spi_init = chip_spi_init,
 	.spi_run = chip_spi_run,
+	.extra = chip_extra,
 };

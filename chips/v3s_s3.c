@@ -1107,6 +1107,11 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 1;
 }
 
+static int chip_extra(struct xfel_ctx_t * ctx, int argc, char * argv[])
+{
+	return 0;
+}
+
 struct chip_t v3s_s3 = {
 	.name = "V3S/S3",
 	.detect = chip_detect,
@@ -1116,4 +1121,5 @@ struct chip_t v3s_s3 = {
 	.ddr = chip_ddr,
 	.spi_init = chip_spi_init,
 	.spi_run = chip_spi_run,
+	.extra = chip_extra,
 };

@@ -36,6 +36,7 @@ usage:
     xfel spinand read <address> <length> <file>         - 读取 spi nand flash 到文件
     xfel spinand write <address> <file>                 - 将文件写入 spi nand flash
     xfel spinand splwrite <split-size> <address> <file> - 使用拆分支持将文件写入 spi nand flash
+    xfel extra [...]                                    - 扩展命令
 ```
 
 # 支持列表
@@ -70,7 +71,7 @@ usage:
 | H5 | Quad-Core ARM Cortex-A53 | 0x00171800 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | H6 | Quad-Core ARM Cortex-A53 @ 1.8GHz | 0x00172800 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | H616 | Quad-Core ARM Cortex-A53 | 0x00182300 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| R128 | ARM Cortex-M33 and C906 RISC-V | 0x00188300 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| R128 | ARM Cortex-M33 and C906 RISC-V | 0x00188300 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
 | R328 | Dual-Core Cortex-A7 | 0x00182100 | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | R329 | Dual-Core Cortex-A53 | 0x00185100 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | R528 | Dual-Core Cortex-A7 | 0x00185900 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -81,23 +82,6 @@ usage:
 | V536 | Dual-Core Cortex-A7 | 0x00181600 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | V831 | Single-core Cortex-A7 800Mhz | 0x00181700 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | V853 | Single-core Cortex-A7 1Ghz + E907 RISC-V | 0x00188600 | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
-
-# 下载安装
-
-## Linux
-
-### ArchLinux
-
-xfel 现在可以在 [AUR](https://aur.archlinux.org/packages/xfel/) 下载到, 对于 ArchLinux 只需要使用 AUR 管理器就可以安装。例如`yay`。
-
-```shell
-yay -S xfel
-```
-
-## Windows
-
-在 [RELEASE](https://github.com/xboot/xfel/releases/latest) 找到预编译的Windows软件。
-
 
 # 编译安装
 
@@ -166,6 +150,13 @@ cd xfel
 make
 ```
 
+# 下载安装
+
+## Windows
+
+在 [RELEASE](https://github.com/xboot/xfel/releases/latest) 找到预编译的Windows软件。
+
+
 # 例子
 
 ## F1C100s: 使用XEFL写入 U-Boot 并运行
@@ -186,7 +177,6 @@ xfel spinand write 0x100000 kernel.itb
 xfel spinand write 0x600000 rootfs.squashfs
 ```
 
-
 ## F133: 使用XEFL写入 OpenSBI 并运行
 
 
@@ -196,4 +186,4 @@ xfel write 0x80200000 opensbi.bin      # 将opensbi写入0x80200000
 xfel exec 0x80200000                   # 调用函数地址运行
 ```
 
-?> _TODO_ 还想添加其他例子? 请给我们提交 Pull Requests [https://github.com/xboot/xfel/pulls](https://github.com/xboot/xfel/pulls)
+?> 还想添加其他例子? 请给我们提交 Pull Requests [https://github.com/xboot/xfel/pulls](https://github.com/xboot/xfel/pulls)

@@ -124,6 +124,7 @@ static void usage(void)
 	printf("    xfel spinand read <address> <length> <file>         - Read spi nand flash to file\r\n");
 	printf("    xfel spinand write <address> <file>                 - Write file to spi nand flash\r\n");
 	printf("    xfel spinand splwrite <split-size> <address> <file> - Write file to spi nand flash with split support\r\n");
+	printf("    xfel extra [...]                                    - The extra commands\r\n");
 }
 
 int main(int argc, char * argv[])
@@ -524,6 +525,13 @@ int main(int argc, char * argv[])
 			else
 				usage();
 		}
+	}
+	else if(!strcmp(argv[1], "extra"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(!fel_chip_extra(&ctx, argc, argv))
+			printf("Not support any extra commands\r\n");
 	}
 	else
 		usage();
