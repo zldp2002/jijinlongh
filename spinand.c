@@ -346,7 +346,7 @@ int spinand_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t l
 		while(cnt > 0)
 		{
 			n = cnt > esize ? esize : cnt;
-			spinand_helper_erase(ctx, &pdat, base, cnt);
+			spinand_helper_erase(ctx, &pdat, base, n);
 			base += n;
 			cnt -= n;
 			progress_update(&p, n);
