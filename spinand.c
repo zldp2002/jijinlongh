@@ -302,7 +302,8 @@ static void spinand_helper_erase(struct xfel_ctx_t * ctx, struct spinand_pdata_t
 	esize = pdat->info.page_size * pdat->info.pages_per_block;
 	emask = esize - 1;
 	base = addr & ~emask;
-	cnt = ((addr + count + esize - 1) & ~emask) - base;
+	cnt = (addr & emask) + count;
+	cnt = (cnt + ((cnt & emask) ? esize : 0)) & ~emask;
 	while(cnt > 0)
 	{
 		pa = base / pdat->info.page_size;
@@ -439,7 +440,8 @@ int spinand_erase(struct xfel_ctx_t * ctx, uint64_t addr, uint64_t len)
 		esize = pdat.info.page_size * pdat.info.pages_per_block;
 		emask = esize - 1;
 		base = addr & ~emask;
-		cnt = ((addr + len + esize - 1) & ~emask) - base;
+		cnt = (addr & emask) + len;
+		cnt = (cnt + ((cnt & emask) ? esize : 0)) & ~emask;
 		progress_start(&p, cnt);
 		while(cnt > 0)
 		{
@@ -492,7 +494,8 @@ int spinand_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t l
 		esize = pdat.info.page_size * pdat.info.pages_per_block;
 		emask = esize - 1;
 		base = addr & ~emask;
-		cnt = ((addr + len + esize - 1) & ~emask) - base;
+		cnt = (addr & emask) + len;
+		cnt = (cnt + ((cnt & emask) ? esize : 0)) & ~emask;
 		progress_start(&p, cnt);
 		while(cnt > 0)
 		{
