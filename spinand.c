@@ -48,6 +48,7 @@ static const struct spinand_info_t spinand_infos[] = {
 
 	/* Gigadevice */
 	{ "GD5F1GQ4UAWxx",   SPINAND_ID(0xc8, 0x10),       2048,  64,  64, 1024, 1, 1 },
+	{ "GD5F1GQ5UExxG",   SPINAND_ID(0xc8, 0x51),       2048, 128,  64, 1024, 1, 1 },
 	{ "GD5F1GQ4UExIG",   SPINAND_ID(0xc8, 0xd1),       2048, 128,  64, 1024, 1, 1 },
 	{ "GD5F1GQ4UExxH",   SPINAND_ID(0xc8, 0xd9),       2048,  64,  64, 1024, 1, 1 },
 	{ "GD5F1GQ4xAYIG",   SPINAND_ID(0xc8, 0xf1),       2048,  64,  64, 1024, 1, 1 },
@@ -138,6 +139,7 @@ static const struct spinand_info_t spinand_infos[] = {
 	{ "EM73E044SNE",     SPINAND_ID(0xd5, 0x0e),       4096, 256,  64, 4096, 1, 1 },
 	{ "EM73C044SNG",     SPINAND_ID(0xd5, 0x0c),       2048, 120,  64, 1024, 1, 1 },
 	{ "EM73D044VCN",     SPINAND_ID(0xd5, 0x0f),       2048,  64,  64, 2048, 1, 1 },
+
 
 	/* Elnec */
 	{ "FM35Q1GA",        SPINAND_ID(0xe5, 0x71),       2048,  64,  64, 1024, 1, 1 },
