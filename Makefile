@@ -68,13 +68,11 @@ install:
 	install -Dm0755 xfel $(DESTDIR)$(PREFIX)/bin/xfel
 	install -Dm0644 99-xfel.rules $(DESTDIR)/lib/udev/rules.d/99-xfel.rules
 	install -Dm0644 LICENSE $(DESTDIR)$(PREFIX)/share/licenses/xfel/LICENSE
-	udevadm control --reload
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/xfel
 	rm -f $(DESTDIR)/lib/udev/rules.d/99-xfel.rules
 	rm -f $(DESTDIR)$(PREFIX)/share/licenses/xfel/LICENSE
-	udevadm control --reload
 
 clean:
 	@$(RM) $(DEPS) $(OBJS) $(NAME).exe $(NAME) *~
