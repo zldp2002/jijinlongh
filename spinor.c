@@ -642,8 +642,8 @@ static inline void spinor_sector_erase_256k(struct xfel_ctx_t * ctx, struct spin
 
 static void spinor_helper_erase(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint64_t addr, uint64_t count)
 {
-	uint64_t base = addr;
-	int64_t cnt = count;
+	uint64_t base;
+	int64_t cnt;
 	uint32_t esize, emask;
 	uint32_t len;
 
@@ -659,8 +659,8 @@ static void spinor_helper_erase(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 		return;
 	emask = esize - 1;
 
-	cnt += (base & emask);
-	base &= (~emask);
+	base = addr & ~emask;
+	cnt = ((addr & emask) + count + esize) & ~emask;
 	while(cnt > 0)
 	{
 		if((pdat->info.opcode_erase_256k != 0) && ((base & 0x3ffff) == 0) && (cnt >= 262144))
@@ -851,9 +851,9 @@ int spinor_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t le
 {
 	struct spinor_pdata_t pdat;
 	struct progress_t p;
+	uint64_t base, n;
+	int64_t cnt;
 	uint32_t esize, emask;
-	uint64_t base, cnt;
-	uint64_t n;
 
 	if(spinor_helper_init(ctx, &pdat))
 	{
@@ -869,7 +869,7 @@ int spinor_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t le
 			return 0;
 		emask = esize - 1;
 		base = addr & ~emask;
-		cnt = len + (addr & emask);
+		cnt = ((addr & emask) + len + esize) & ~emask;
 		progress_start(&p, cnt);
 		while(cnt > 0)
 		{
