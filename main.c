@@ -107,11 +107,12 @@ int main(int argc, char * argv[])
 {
 	struct xfel_ctx_t ctx;
 
-	if(argc < 2)
+	if((argc < 2) || ((argc == 2) && (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))))
 	{
 		usage();
 		return -1;
 	}
+
 	libusb_init(NULL);
 	ctx.hdl = libusb_open_device_with_vid_pid(NULL, 0x1f3a, 0xefe8);
 	if(!fel_init(&ctx))
