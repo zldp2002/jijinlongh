@@ -143,7 +143,7 @@ static inline int spinor_info(struct xfel_ctx_t * ctx, struct spinor_pdata_t * p
 
 	if(spinor_read_sfdp(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, &sfdp))
 	{
-		pdat->info.name = "";
+		pdat->info.name = "SFDP";
 		pdat->info.id = 0;
 		/* Basic flash parameter table 2th dword */
 		v = (sfdp.bt.table[7] << 24) | (sfdp.bt.table[6] << 16) | (sfdp.bt.table[5] << 8) | (sfdp.bt.table[4] << 0);
@@ -814,12 +814,18 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 	}
 }
 
-uint64_t spinor_detect(struct xfel_ctx_t * ctx)
+int spinor_detect(struct xfel_ctx_t * ctx, char * name, uint64_t * capacity)
 {
 	struct spinor_pdata_t pdat;
 
 	if(spinor_helper_init(ctx, &pdat))
-		return pdat.info.capacity;
+	{
+		if(name)
+			strcpy(name, pdat.info.name);
+		if(capacity)
+			*capacity = pdat.info.capacity;
+		return 1;
+	}
 	return 0;
 }
 

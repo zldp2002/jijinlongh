@@ -397,12 +397,18 @@ static void spinand_helper_write(struct xfel_ctx_t * ctx, struct spinand_pdata_t
 		free(txbuf);
 }
 
-uint64_t spinand_detect(struct xfel_ctx_t * ctx)
+int spinand_detect(struct xfel_ctx_t * ctx, char * name, uint64_t * capacity)
 {
 	struct spinand_pdata_t pdat;
 
 	if(spinand_helper_init(ctx, &pdat))
-		return (pdat.info.page_size * pdat.info.pages_per_block * pdat.info.blocks_per_die * pdat.info.ndies);
+	{
+		if(name)
+			strcpy(name, pdat.info.name);
+		if(capacity)
+			*capacity = pdat.info.page_size * pdat.info.pages_per_block * pdat.info.blocks_per_die * pdat.info.ndies;
+		return 1;
+	}
 	return 0;
 }
 

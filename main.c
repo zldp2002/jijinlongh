@@ -284,9 +284,11 @@ int main(int argc, char * argv[])
 		argv += 2;
 		if(argc == 0)
 		{
-			uint64_t cap = spinor_detect(&ctx);
-			if(cap > 0)
-				printf("Found spi nor flash with %lld bytes\r\n", (long long)cap);
+			char name[128];
+			uint64_t capacity;
+
+			if(spinor_detect(&ctx, name, &capacity))
+				printf("Found spi nor flash '%s' with %lld bytes\r\n", name, (long long)capacity);
 			else
 				printf("Can't detect any spi nor flash\r\n");
 		}
@@ -332,9 +334,11 @@ int main(int argc, char * argv[])
 		argv += 2;
 		if(argc == 0)
 		{
-			uint64_t cap = spinand_detect(&ctx);
-			if(cap > 0)
-				printf("Found spi nand flash with %lld bytes\r\n", (long long)cap);
+			char name[128];
+			uint64_t capacity;
+
+			if(spinand_detect(&ctx, name, &capacity))
+				printf("Found spi nand flash '%s' with %lld bytes\r\n", name, (long long)capacity);
 			else
 				printf("Can't detect any spi nand flash\r\n");
 		}

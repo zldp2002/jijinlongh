@@ -7,7 +7,7 @@ extern "C" {
 
 #include <fel.h>
 
-uint64_t spinor_detect(struct xfel_ctx_t * ctx);
+int spinor_detect(struct xfel_ctx_t * ctx, char * name, uint64_t * capacity);
 int spinor_read(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t len);
 int spinor_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t len);
 
