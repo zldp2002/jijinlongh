@@ -3,6 +3,7 @@
 #include <ecdsa256.h>
 #include <spinor.h>
 #include <spinand.h>
+#include <libusb.h>
 
 static uint64_t file_save(const char * filename, void * buf, uint64_t len)
 {
@@ -128,6 +129,8 @@ static void usage(void)
 int main(int argc, char * argv[])
 {
 	struct xfel_ctx_t ctx;
+    libusb_context *context = NULL;
+
 
 	if(argc < 2)
 	{
@@ -143,8 +146,29 @@ int main(int argc, char * argv[])
 		}
 	}
 
-	libusb_init(NULL);
-	ctx.hdl = libusb_open_device_with_vid_pid(NULL, 0x1f3a, 0xefe8);
+	libusb_device **list = NULL;
+	libusb_init(&context);
+	int count = libusb_get_device_list(context, &list);
+	assert(count > 0);
+
+	for (size_t i = 0; i < count; ++i) {
+		libusb_device *device = list[i];
+		struct libusb_device_descriptor desc;
+		int rc = libusb_get_device_descriptor(device, &desc);
+		if(rc != 0)
+			{
+			printf("ERROR: Can't get device list: %d\r\n", rc);
+		}
+		if(desc.idVendor == 0x1f3a && desc.idProduct == 0xefe8) {
+			int rc = libusb_open(device, &ctx.hdl);
+			if(rc != 0)
+			{
+				printf("ERROR: Can't connect to device: %d\r\n", rc);
+			}
+			break;
+		}
+	}
+
 	if(!fel_init(&ctx))
 	{
 		printf("ERROR: Can't found any FEL device\r\n");
