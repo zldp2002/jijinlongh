@@ -4237,10 +4237,44 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 			fel_exec(ctx, 0x00028000);
 			return 1;
 		}
+		else if(strcmp(type, "t113-s4") == 0)
+		{
+			static const struct ddr3_param_t ddr3 = {
+				.dram_clk = 936,
+				.dram_type = 3,
+				.dram_zq = 0x7b7bfb,
+				.dram_odt_en = 0x00,
+				.dram_para1 = 0x000010d2,
+				.dram_para2 = 0x0000,
+				.dram_mr0 = 0x1c70,
+				.dram_mr1 = 0x042,
+				.dram_mr2 = 0x18,
+				.dram_mr3 = 0x0,
+				.dram_tpr0 = 0x004A2195,
+				.dram_tpr1 = 0x02423190,
+				.dram_tpr2 = 0x0008B061,
+				.dram_tpr3 = 0xB4787896,
+				.dram_tpr4 = 0x0,
+				.dram_tpr5 = 0x48484848,
+				.dram_tpr6 = 0x00000048,
+				.dram_tpr7 = 0x1620121e,
+				.dram_tpr8 = 0x0,
+				.dram_tpr9 = 0x0,
+				.dram_tpr10 = 0x0,
+				.dram_tpr11 = 0x00340000,
+				.dram_tpr12 = 0x00000046,
+				.dram_tpr13 = 0x34000100,
+			};
+			fel_write(ctx, 0x00028000, (void *)&t113_ddr_payload[0], sizeof(t113_ddr_payload));
+			fel_write(ctx, 0x00028038, (void *)&ddr3, sizeof(ddr3));
+			fel_exec(ctx, 0x00028000);
+			return 1;
+		}
 	}
 	printf("usage:\r\n");
 	printf("    xfel ddr r528-s3 - Initial ddr controller for R528-S3\r\n");
 	printf("    xfel ddr t113-s3 - Initial ddr controller for T113-S3\r\n");
+	printf("    xfel ddr t113-s4 - Initial ddr controller for T113-S4\r\n");
 	return 0;
 }
 
