@@ -110,6 +110,8 @@ sudo make install
 
 ## macOS platform
 
+?> _TODO_ Add macOS ARM support
+
 Before start, make sure the `Command Line Tools` is installed.
 
 Install `libusb` using [brew](https://brew.sh/)
