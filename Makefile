@@ -53,7 +53,7 @@ all : $(NAME)
 
 $(NAME) : $(OBJS)
 	@echo [LD] Linking $@
-	@$(CC) $(LDFLAGS) $(LIBDIRS) -Wl,--cref,-Map=$@.map $^ -o $@ $(LIBS)
+	@$(CC) $(LDFLAGS) $(LIBDIRS) -Wl $^ -o $@ $(LIBS)
 
 $(SOBJS) : %.o : %.S
 	@echo [AS] $<
@@ -73,4 +73,4 @@ install:
 	install -Dm0644 LICENSE /usr/share/licenses/xfel/LICENSE
 
 clean:
-	@$(RM) $(DEPS) $(OBJS) $(NAME).map $(NAME).exe $(NAME) *~
+	@$(RM) $(DEPS) $(OBJS) $(NAME).exe $(NAME) *~

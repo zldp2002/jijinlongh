@@ -10,6 +10,8 @@ extern "C" {
 #endif
 #if defined(__linux__) || defined(__CYGWIN__)
 # include <endian.h>
+#elif defined(__MACH__)
+# include <sys/types.h>
 #elif defined(__OpenBSD__) || defined(__NetBSD__) || defined(__FreeBSD__) || defined(__DragonFly__)
 # include <sys/endian.h>
 #elif defined(__WINDOWS__)
