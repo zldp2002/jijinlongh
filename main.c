@@ -295,7 +295,7 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			if(!strcmp(argv[0], "erase") && (argc == 2))
+			if(!strcmp(argv[0], "erase") && (argc == 3))
 			{
 				argc -= 1;
 				argv += 1;
@@ -354,7 +354,7 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			if(!strcmp(argv[0], "erase") && (argc == 2))
+			if(!strcmp(argv[0], "erase") && (argc == 3))
 			{
 				argc -= 1;
 				argv += 1;
