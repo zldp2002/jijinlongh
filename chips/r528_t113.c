@@ -4442,8 +4442,49 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 1;
 }
 
+static const struct sid_section_t {
+	char * name;
+	uint32_t offset;
+	uint32_t size_bits;
+} sids[] = {
+	{ "chipid",  0x0000,  128 },
+	{ "unknown", 0x0010, 1920 },
+};
+
 static int chip_extra(struct xfel_ctx_t * ctx, int argc, char * argv[])
 {
+	if(argc > 0)
+	{
+		if(!strcmp(argv[0], "efuse"))
+		{
+			argc -= 1;
+			argv += 1;
+			if(argc > 0)
+			{
+				if(!strcmp(argv[0], "dump") && (argc == 1))
+				{
+					uint32_t buffer[2048 / 4];
+					for(int n = 0; n < ARRAY_SIZE(sids); n++)
+					{
+						uint32_t count = sids[n].size_bits / 32;
+						for(int i = 0; i < count; i++)
+							buffer[i] = payload_read32(ctx, 0x03006200 + sids[n].offset + i * 4);
+						printf("%s:", sids[n].name);
+						for(int i = 0; i < count; i++)
+						{
+							if(i >= 0 && ((i % 8) == 0))
+								printf("\r\n%-4s", "");
+							printf("%08x ", buffer[i]);
+						}
+						printf("\r\n");
+					}
+					return 1;
+				}
+			}
+		}
+	}
+	printf("usage:\r\n");
+	printf("    xfel extra efuse dump - Dump all of the SID eFuses\r\n");
 	return 0;
 }
 
