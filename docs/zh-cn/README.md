@@ -81,8 +81,8 @@ usage:
 | S3 | Single-core Cortex-A7 | 0x00168100 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | V536 | Dual-Core Cortex-A7 | 0x00181600 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | V831 | Single-core Cortex-A7 800Mhz | 0x00181700 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| V851 | Single-core Cortex-A7 1Ghz + E907 RISC-V | 0x00188600 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| V853 | Single-core Cortex-A7 1Ghz + E907 RISC-V | 0x00188600 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| V851 | Single-core Cortex-A7 1Ghz + E907 RISC-V | 0x00188600 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| V853 | Single-core Cortex-A7 1Ghz + E907 RISC-V | 0x00188600 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 # 编译安装
 
