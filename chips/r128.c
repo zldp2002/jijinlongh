@@ -5958,193 +5958,233 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 1;
 }
 
+static const struct sid_section_t {
+	char * name;
+	uint32_t offset;
+	uint32_t size_bits;
+} sids[] = {
+	{ "chipid",  0x0000,  128 },
+	{ "unknown", 0x0010, 1920 },
+};
+
 static int chip_extra(struct xfel_ctx_t * ctx, int argc, char * argv[])
 {
 	if(argc > 0)
 	{
-		if(!strcmp(argv[0], "exec"))
+		if(!strcmp(argv[0], "efuse"))
 		{
 			argc -= 1;
 			argv += 1;
-			if(!strcmp(argv[0], "riscv") && (argc == 2))
+			if(argc > 0)
 			{
-				uint64_t addr = strtoull(argv[1], NULL, 0);
-				uint32_t val;
-
-				/* Set cpu voltage to 1100mV */
-				val = payload_read32(ctx, 0x40050000 + 0x44);
-				val &= ~(0x1f << 9);
-				val |= 0x14 << 9;
-				payload_write32(ctx, 0x40050000 + 0x44, val);
-
-				/* Wakeup enable */
-				val = payload_read32(ctx, 0x40051400 + 0x100);
-				val |= 0x1 << 8;
-				payload_write32(ctx, 0x40051400 + 0x100, val);
-
-				/* Enable clk_ck1_c906 */
-				val = payload_read32(ctx, 0x4004c400 + 0xa4);
-				val |= 0x1 << 7;
-				payload_write32(ctx, 0x4004c400 + 0xa4, val);
-
-				/* Set clk_ck1_c906 clk to 480M */
-				val = payload_read32(ctx, 0x4004c400 + 0xa4);
-				val &= ~(0x7 << 4);
-				val |= 0x1 << 4;
-				payload_write32(ctx, 0x4004c400 + 0xa4, val);
-
-				/* Set clk_ck_c906 source to clk_ck1_c906 */
-				val = payload_read32(ctx, 0x4004c400 + 0xe0);
-				val &= ~(0x1 << 17);
-				payload_write32(ctx, 0x4004c400 + 0xe0, val);
-
-				/* Set clk_c906_sel source to clk_ck_c906 */
-				val = payload_read32(ctx, 0x4003c000 + 0x64);
-				val &= ~(0x3 << 4);
-				val |= 0x2 << 4;
-				payload_write32(ctx, 0x4003c000 + 0x64, val);
-
-				/* Set clk_c906_sel source to clk_ck_c906 */
-				val = payload_read32(ctx, 0x4003c000 + 0x64);
-				val |= 1 << 31;
-				payload_write32(ctx, 0x4003c000 + 0x64, val);
-
-				/* Set clk_ck_c906_div to 480M */
-				val = payload_read32(ctx, 0x4003c000 + 0x64);
-				val &= ~(0x3 << 0);
-				val |= 0x0 << 0;
-				payload_write32(ctx, 0x4003c000 + 0x64, val);
-
-				/* Enable riscv clk gating */
-				val = payload_read32(ctx, 0x4003c000 + 0x14);
-				val |= 1 << 19;
-				payload_write32(ctx, 0x4003c000 + 0x14, val);
-
-				/* Riscv clk rst */
-				val = payload_read32(ctx, 0x4003c000 + 0x18);
-				val |= 1 << 19;
-				payload_write32(ctx, 0x4003c000 + 0x18, val);
-
-				/* Riscv sys apb soft rst */
-				val = payload_read32(ctx, 0x4003c000 + 0x18);
-				val |= 1 << 21;
-				payload_write32(ctx, 0x4003c000 + 0x18, val);
-
-				/* Set riscv start address */
-				payload_write32(ctx, 0x40028000 + 0x004, (uint32_t)((addr >>  0) & 0xffffffff));
-				payload_write32(ctx, 0x40028000 + 0x008, (uint32_t)((addr >> 32) & 0x000000ff));
-
-				/* Riscv core reset */
-				val = payload_read32(ctx, 0x4003c000 + 0x18);
-				val |= 1 << 16;
-				payload_write32(ctx, 0x4003c000 + 0x18, val);
-
-				return 1;
+				if(!strcmp(argv[0], "dump") && (argc == 1))
+				{
+					uint32_t buffer[2048 / 4];
+					for(int n = 0; n < ARRAY_SIZE(sids); n++)
+					{
+						uint32_t count = sids[n].size_bits / 32;
+						for(int i = 0; i < count; i++)
+							buffer[i] = payload_read32(ctx, 0x4004e600 + sids[n].offset + i * 4);
+						printf("%s:", sids[n].name);
+						for(int i = 0; i < count; i++)
+						{
+							if(i >= 0 && ((i % 8) == 0))
+								printf("\r\n%-4s", "");
+							printf("%08x ", buffer[i]);
+						}
+						printf("\r\n");
+					}
+					return 1;
+				}
 			}
-			else if(!strcmp(argv[0], "dsp") && (argc == 2))
+		}
+		else if(!strcmp(argv[0], "exec"))
+		{
+			argc -= 1;
+			argv += 1;
+			if(argc > 0)
 			{
-				uint64_t addr = strtoull(argv[1], NULL, 0);
-				uint32_t val;
+				if(!strcmp(argv[0], "riscv") && (argc == 2))
+				{
+					uint64_t addr = strtoull(argv[1], NULL, 0);
+					uint32_t val;
 
-				/* Set cpu voltage to 1100mV */
-				val = payload_read32(ctx, 0x40050000 + 0x44);
-				val &= ~(0x1f << 9);
-				val |= 0x14 << 9;
-				payload_write32(ctx, 0x40050000 + 0x44, val);
+					/* Set cpu voltage to 1100mV */
+					val = payload_read32(ctx, 0x40050000 + 0x44);
+					val &= ~(0x1f << 9);
+					val |= 0x14 << 9;
+					payload_write32(ctx, 0x40050000 + 0x44, val);
 
-				/* Set dsp voltage to 1200mV */
-				val = payload_read32(ctx, 0x40050000 + 0x4c);
-				val &= ~(0x1f << 4);
-				val |= 0x18 << 4;
-				payload_write32(ctx, 0x40050000 + 0x4c, val);
+					/* Wakeup enable */
+					val = payload_read32(ctx, 0x40051400 + 0x100);
+					val |= 0x1 << 8;
+					payload_write32(ctx, 0x40051400 + 0x100, val);
 
-				/* Wakeup enable */
-				val = payload_read32(ctx, 0x40051400 + 0x100);
-				val |= 0x1 << 12;
-				payload_write32(ctx, 0x40051400 + 0x100, val);
+					/* Enable clk_ck1_c906 */
+					val = payload_read32(ctx, 0x4004c400 + 0xa4);
+					val |= 0x1 << 7;
+					payload_write32(ctx, 0x4004c400 + 0xa4, val);
 
-				/* Enable clk_ck1_hifi5 */
-				val = payload_read32(ctx, 0x4004c400 + 0xa4);
-				val |= 0x1 << 11;
-				payload_write32(ctx, 0x4004c400 + 0xa4, val);
+					/* Set clk_ck1_c906 clk to 480M */
+					val = payload_read32(ctx, 0x4004c400 + 0xa4);
+					val &= ~(0x7 << 4);
+					val |= 0x1 << 4;
+					payload_write32(ctx, 0x4004c400 + 0xa4, val);
 
-				/* Enable clk_ck3_hifi5 */
-				val = payload_read32(ctx, 0x4004c400 + 0xa8);
-				val |= 0x1 << 11;
-				payload_write32(ctx, 0x4004c400 + 0xa8, val);
+					/* Set clk_ck_c906 source to clk_ck1_c906 */
+					val = payload_read32(ctx, 0x4004c400 + 0xe0);
+					val &= ~(0x1 << 17);
+					payload_write32(ctx, 0x4004c400 + 0xe0, val);
 
-				/* Set clk_ck3_hifi5 clk to 400M */
-				val = payload_read32(ctx, 0x4004c400 + 0xa8);
-				val &= ~(0x7 << 8);
-				val |= 0x3 << 8;
-				payload_write32(ctx, 0x4004c400 + 0xa8, val);
+					/* Set clk_c906_sel source to clk_ck_c906 */
+					val = payload_read32(ctx, 0x4003c000 + 0x64);
+					val &= ~(0x3 << 4);
+					val |= 0x2 << 4;
+					payload_write32(ctx, 0x4003c000 + 0x64, val);
 
-				/* Set clk_ck_hifi5 source to clk_ck3_hifi5 */
-				val = payload_read32(ctx, 0x4004c400 + 0xe0);
-				val |= 0x1 << 18;
-				payload_write32(ctx, 0x4004c400 + 0xe0, val);
+					/* Set clk_c906_sel source to clk_ck_c906 */
+					val = payload_read32(ctx, 0x4003c000 + 0x64);
+					val |= 1 << 31;
+					payload_write32(ctx, 0x4003c000 + 0x64, val);
 
-				/* Set clk_ck_hifi5_div source to clk_ck_hifi5 */
-				val = payload_read32(ctx, 0x4003c000 + 0x68);
-				val &= ~(0x3 << 4);
-				val |= 0x2 << 4;
-				payload_write32(ctx, 0x4003c000 + 0x68, val);
+					/* Set clk_ck_c906_div to 480M */
+					val = payload_read32(ctx, 0x4003c000 + 0x64);
+					val &= ~(0x3 << 0);
+					val |= 0x0 << 0;
+					payload_write32(ctx, 0x4003c000 + 0x64, val);
 
-				/* Set dsp_clk_hifi5_div to clk_ck_hifi5 / 1 */
-				val = payload_read32(ctx, 0x4003c000 + 0x68);
-				val &= ~(0x3 << 0);
-				val |= 0x0 << 0;
-				payload_write32(ctx, 0x4003c000 + 0x68, val);
+					/* Enable riscv clk gating */
+					val = payload_read32(ctx, 0x4003c000 + 0x14);
+					val |= 1 << 19;
+					payload_write32(ctx, 0x4003c000 + 0x14, val);
 
-				/* Hifi5 core clk enable */
-				val = payload_read32(ctx, 0x4003c000 + 0x68);
-				val |= 1 << 31;
-				payload_write32(ctx, 0x4003c000 + 0x68, val);
+					/* Riscv clk rst */
+					val = payload_read32(ctx, 0x4003c000 + 0x18);
+					val |= 1 << 19;
+					payload_write32(ctx, 0x4003c000 + 0x18, val);
 
-				/* Hifi5 clk gating */
-				val = payload_read32(ctx, 0x4003c000 + 0x14);
-				val |= 1 << 11;
-				payload_write32(ctx, 0x4003c000 + 0x14, val);
+					/* Riscv sys apb soft rst */
+					val = payload_read32(ctx, 0x4003c000 + 0x18);
+					val |= 1 << 21;
+					payload_write32(ctx, 0x4003c000 + 0x18, val);
 
-				/* Hifi5 config reset */
-				val = payload_read32(ctx, 0x4003c000 + 0x18);
-				val |= 1 << 11;
-				payload_write32(ctx, 0x4003c000 + 0x18, val);
+					/* Set riscv start address */
+					payload_write32(ctx, 0x40028000 + 0x004, (uint32_t)((addr >>  0) & 0xffffffff));
+					payload_write32(ctx, 0x40028000 + 0x008, (uint32_t)((addr >> 32) & 0x000000ff));
 
-				/* Set dsp address */
-				val = payload_read32(ctx, 0x40023c00 + 0x04);
-				val |= 1 << 1;
-				payload_write32(ctx, 0x40023c00 + 0x04, val);
-				usleep(1000);
-				payload_write32(ctx, 0x40023c00 + 0x00, (uint32_t)((addr >>  0) & 0xffffffff));
-				val = payload_read32(ctx, 0x40023c00 + 0x04);
-				val |= 1 << 0;
-				payload_write32(ctx, 0x40023c00 + 0x04, val);
+					/* Riscv core reset */
+					val = payload_read32(ctx, 0x4003c000 + 0x18);
+					val |= 1 << 16;
+					payload_write32(ctx, 0x4003c000 + 0x18, val);
 
-				/* Dsp debug reset */
-				val = payload_read32(ctx, 0x4003c000 + 0x18);
-				val |= 1 << 14;
-				payload_write32(ctx, 0x4003c000 + 0x18, val);
+					return 1;
+				}
+				else if(!strcmp(argv[0], "dsp") && (argc == 2))
+				{
+					uint64_t addr = strtoull(argv[1], NULL, 0);
+					uint32_t val;
 
-				/* Dsp core reset */
-				val = payload_read32(ctx, 0x4003c000 + 0x18);
-				val &= ~(1 << 8);
-				payload_write32(ctx, 0x4003c000 + 0x18, val);
-				usleep(10000);
-				val = payload_read32(ctx, 0x4003c000 + 0x18);
-				val |= 1 << 8;
-				payload_write32(ctx, 0x4003c000 + 0x18, val);
+					/* Set cpu voltage to 1100mV */
+					val = payload_read32(ctx, 0x40050000 + 0x44);
+					val &= ~(0x1f << 9);
+					val |= 0x14 << 9;
+					payload_write32(ctx, 0x40050000 + 0x44, val);
 
-				/* Run */
-				val = payload_read32(ctx, 0x40023c00 + 0x04);
-				val &= ~(1 << 0);
-				payload_write32(ctx, 0x40023c00 + 0x04, val);
+					/* Set dsp voltage to 1200mV */
+					val = payload_read32(ctx, 0x40050000 + 0x4c);
+					val &= ~(0x1f << 4);
+					val |= 0x18 << 4;
+					payload_write32(ctx, 0x40050000 + 0x4c, val);
 
-				return 1;
+					/* Wakeup enable */
+					val = payload_read32(ctx, 0x40051400 + 0x100);
+					val |= 0x1 << 12;
+					payload_write32(ctx, 0x40051400 + 0x100, val);
+
+					/* Enable clk_ck1_hifi5 */
+					val = payload_read32(ctx, 0x4004c400 + 0xa4);
+					val |= 0x1 << 11;
+					payload_write32(ctx, 0x4004c400 + 0xa4, val);
+
+					/* Enable clk_ck3_hifi5 */
+					val = payload_read32(ctx, 0x4004c400 + 0xa8);
+					val |= 0x1 << 11;
+					payload_write32(ctx, 0x4004c400 + 0xa8, val);
+
+					/* Set clk_ck3_hifi5 clk to 400M */
+					val = payload_read32(ctx, 0x4004c400 + 0xa8);
+					val &= ~(0x7 << 8);
+					val |= 0x3 << 8;
+					payload_write32(ctx, 0x4004c400 + 0xa8, val);
+
+					/* Set clk_ck_hifi5 source to clk_ck3_hifi5 */
+					val = payload_read32(ctx, 0x4004c400 + 0xe0);
+					val |= 0x1 << 18;
+					payload_write32(ctx, 0x4004c400 + 0xe0, val);
+
+					/* Set clk_ck_hifi5_div source to clk_ck_hifi5 */
+					val = payload_read32(ctx, 0x4003c000 + 0x68);
+					val &= ~(0x3 << 4);
+					val |= 0x2 << 4;
+					payload_write32(ctx, 0x4003c000 + 0x68, val);
+
+					/* Set dsp_clk_hifi5_div to clk_ck_hifi5 / 1 */
+					val = payload_read32(ctx, 0x4003c000 + 0x68);
+					val &= ~(0x3 << 0);
+					val |= 0x0 << 0;
+					payload_write32(ctx, 0x4003c000 + 0x68, val);
+
+					/* Hifi5 core clk enable */
+					val = payload_read32(ctx, 0x4003c000 + 0x68);
+					val |= 1 << 31;
+					payload_write32(ctx, 0x4003c000 + 0x68, val);
+
+					/* Hifi5 clk gating */
+					val = payload_read32(ctx, 0x4003c000 + 0x14);
+					val |= 1 << 11;
+					payload_write32(ctx, 0x4003c000 + 0x14, val);
+
+					/* Hifi5 config reset */
+					val = payload_read32(ctx, 0x4003c000 + 0x18);
+					val |= 1 << 11;
+					payload_write32(ctx, 0x4003c000 + 0x18, val);
+
+					/* Set dsp address */
+					val = payload_read32(ctx, 0x40023c00 + 0x04);
+					val |= 1 << 1;
+					payload_write32(ctx, 0x40023c00 + 0x04, val);
+					usleep(1000);
+					payload_write32(ctx, 0x40023c00 + 0x00, (uint32_t)((addr >>  0) & 0xffffffff));
+					val = payload_read32(ctx, 0x40023c00 + 0x04);
+					val |= 1 << 0;
+					payload_write32(ctx, 0x40023c00 + 0x04, val);
+
+					/* Dsp debug reset */
+					val = payload_read32(ctx, 0x4003c000 + 0x18);
+					val |= 1 << 14;
+					payload_write32(ctx, 0x4003c000 + 0x18, val);
+
+					/* Dsp core reset */
+					val = payload_read32(ctx, 0x4003c000 + 0x18);
+					val &= ~(1 << 8);
+					payload_write32(ctx, 0x4003c000 + 0x18, val);
+					usleep(10000);
+					val = payload_read32(ctx, 0x4003c000 + 0x18);
+					val |= 1 << 8;
+					payload_write32(ctx, 0x4003c000 + 0x18, val);
+
+					/* Run */
+					val = payload_read32(ctx, 0x40023c00 + 0x04);
+					val &= ~(1 << 0);
+					payload_write32(ctx, 0x40023c00 + 0x04, val);
+
+					return 1;
+				}
 			}
 		}
 	}
 	printf("usage:\r\n");
+	printf("    xfel extra efuse dump           - Dump all of the efuse information\r\n");
 	printf("    xfel extra exec riscv <address> - Boot riscv and jump to address\r\n");
 	printf("    xfel extra exec dsp <address>   - Boot dsp and jump to address\r\n");
 	return 0;
