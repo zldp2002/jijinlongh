@@ -168,6 +168,16 @@ xfel write 0x81700000 u-boot.bin       # write uboot to 0x81700000
 xfel exec 0x81700000                   # Call the function and exectue
 ```
 
+## F1C200s: Write System to SPI NAND Flash
+```
+xfel spinand
+xfel spinand erase 0x000000 134217728
+xfel spinand write 0x000000 u-boot-sunxi-with-nand-spl.bin 
+xfel spinand write 0x80000 splash.bmp 
+xfel spinand write 0x100000 kernel.itb 
+xfel spinand write 0x600000 rootfs.squashfs
+```
+
 ## F133: Write OpenSBI to DDR and execute it
 
 ```
@@ -175,5 +185,7 @@ xfel ddr ddr2                          # Initial ddr controller with ddr2 type
 xfel write 0x80200000 opensbi.bin      # write opensbi to 0x80200000
 xfel exec 0x80200000                   # Call the function and exectue
 ```
+
+
 
 ?> _TODO_ Want to add more examples? Using the pull requests at [https://github.com/xboot/xfel/pulls](https://github.com/xboot/xfel/pulls)

@@ -170,6 +170,17 @@ xfel write 0x81700000 u-boot.bin       # 将uboot写入0x81700000
 xfel exec 0x81700000                   # 调用函数地址运行
 ```
 
+## F1C200s: 向 SPI NAND 写入系统
+```
+xfel spinand
+xfel spinand erase 0x000000 134217728
+xfel spinand write 0x000000 u-boot-sunxi-with-nand-spl.bin 
+xfel spinand write 0x80000 splash.bmp 
+xfel spinand write 0x100000 kernel.itb 
+xfel spinand write 0x600000 rootfs.squashfs
+```
+
+
 ## F133: 使用XEFL写入 OpenSBI 并运行
 
 
