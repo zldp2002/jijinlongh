@@ -1424,7 +1424,41 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 		fel_exec(ctx, 0x00008000);
 		return 1;
 	}
-	printf("xfel ddr ddr3 - Initial ddr controller for DDR3\r\n");
+	else if(strcmp(type, "lpddr3") == 0)
+	{
+		static const struct ddr3_param_t lpddr3 = {
+			.dram_clk = 648,
+			.dram_type = 7,
+			.dram_zq = 0x3b3bfb,
+			.dram_odt_en = 0x31,
+			.dram_para1 = 0x10e410e4,
+			.dram_para2 = 0x1000,
+			.dram_mr0 = 0x1840,
+			.dram_mr1 = 0x40,
+			.dram_mr2 = 0x18,
+			.dram_mr3 = 0x2,
+			.dram_tpr0 = 0x0048a192,
+			.dram_tpr1 = 0x01b1a94b,
+			.dram_tpr2 = 0x00061043,
+			.dram_tpr3 = 0xb47d7d96,
+			.dram_tpr4 = 0x0000,
+			.dram_tpr5 = 0x0,
+			.dram_tpr6 = 100,
+			.dram_tpr7 = 0x1e08a1e0,
+			.dram_tpr8 = 0x0,
+			.dram_tpr9 = 0x0,
+			.dram_tpr10 = 0x0008,
+			.dram_tpr11 = 0x44450000,
+			.dram_tpr12 = 0x9777,
+			.dram_tpr13 = 0xc0929d0,
+		};
+		fel_write(ctx, 0x00008000, (void *)&ddr3_payload[0], sizeof(ddr3_payload));
+		fel_write(ctx, 0x00008038, (void *)&lpddr3, sizeof(lpddr3));
+		fel_exec(ctx, 0x00008000);
+		return 1;
+	}
+	printf("xfel ddr ddr3   - Initial ddr controller for DDR3\r\n");
+	printf("xfel ddr lpddr3 - Initial ddr controller for LPDDR3\r\n");
 	return 0;
 }
 
