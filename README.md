@@ -2,7 +2,7 @@
 
 ***
 # XFEL
-Tiny FEL tools for allwinner SOC, support RISC-V D1 chip.
+Tiny FEL tools for allwinner SOC.
 
 [Documentation](https://xboot.github.io/xfel) &mdash;
 [Support Lists](https://xboot.github.io/xfel#/?id=support-lists) &mdash;
@@ -89,5 +89,5 @@ usage:
 
 ## License
 
-This library is free software; you can redistribute it and or modify it under the terms of the MIT license. See [MIT License](LICENSE) for details.
+This software is free software; you can redistribute it and or modify it under the terms of the MIT license. See [MIT License](LICENSE) for details.
 
