@@ -25,7 +25,7 @@ extern struct chip_t t507;
 extern struct chip_t v3s_s3;
 extern struct chip_t v536;
 extern struct chip_t v831;
-extern struct chip_t v853;
+extern struct chip_t v851_v853;
 
 static struct chip_t * chips[] = {
 	&a10,
@@ -53,7 +53,7 @@ static struct chip_t * chips[] = {
 	&v3s_s3,
 	&v536,
 	&v831,
-	&v853,
+	&v851_v853,
 };
 
 struct usb_request_t {
