@@ -851,7 +851,7 @@ int spinor_erase(struct xfel_ctx_t * ctx, uint64_t addr, uint64_t len)
 			return 0;
 		emask = esize - 1;
 		base = addr & ~emask;
-		cnt = ((addr & emask) + len + esize) & ~emask;
+		cnt = ((addr & emask) + len + ((addr == base) && (len >= esize)) ? 0 : esize) & ~emask;
 		progress_start(&p, cnt);
 		while(cnt > 0)
 		{
@@ -913,7 +913,7 @@ int spinor_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t le
 			return 0;
 		emask = esize - 1;
 		base = addr & ~emask;
-		cnt = ((addr & emask) + len + esize) & ~emask;
+		cnt = ((addr & emask) + len + ((addr == base) && (len >= esize)) ? 0 : esize) & ~emask;
 		progress_start(&p, cnt);
 		while(cnt > 0)
 		{
