@@ -420,128 +420,6 @@ static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_pdata_t * 
 	}
 }
 
-static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr, uint8_t * buf, uint32_t count)
-{
-	uint8_t * cbuf;
-	uint32_t clen;
-	uint8_t * txbuf;
-	uint32_t txlen;
-	uint32_t granularity, n;
-
-	if(pdat->info.write_granularity == 1)
-		granularity = (count < 0x7fffffff) ? count : 0x7fffffff;
-	else
-		granularity = pdat->info.write_granularity;
-	switch(pdat->info.address_length)
-	{
-	case 3:
-		cbuf = malloc(pdat->cmdlen);
-		txbuf = malloc(pdat->swaplen);
-		if(cbuf && txbuf)
-		{
-			while(count > 0)
-			{
-				clen = 0;
-				txlen = 0;
-				while((clen < (pdat->cmdlen - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 4)))
-				{
-					n = count > granularity ? granularity : count;
-					cbuf[clen++] = SPI_CMD_SELECT;
-					cbuf[clen++] = SPI_CMD_FAST;
-					cbuf[clen++] = 1;
-					cbuf[clen++] = pdat->info.opcode_write_enable;
-					cbuf[clen++] = SPI_CMD_DESELECT;
-					cbuf[clen++] = SPI_CMD_SELECT;
-					cbuf[clen++] = SPI_CMD_TXBUF;
-					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  0) & 0xff;
-					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  8) & 0xff;
-					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 16) & 0xff;
-					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 24) & 0xff;
-					cbuf[clen++] = ((n + 4) >>  0) & 0xff;
-					cbuf[clen++] = ((n + 4) >>  8) & 0xff;
-					cbuf[clen++] = ((n + 4) >> 16) & 0xff;
-					cbuf[clen++] = ((n + 4) >> 24) & 0xff;
-					cbuf[clen++] = SPI_CMD_DESELECT;
-					cbuf[clen++] = SPI_CMD_SELECT;
-					cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
-					cbuf[clen++] = SPI_CMD_DESELECT;
-					txbuf[txlen++] = pdat->info.opcode_write;
-					txbuf[txlen++] = (uint8_t)(addr >> 16);
-					txbuf[txlen++] = (uint8_t)(addr >> 8);
-					txbuf[txlen++] = (uint8_t)(addr >> 0);
-					memcpy(&txbuf[txlen], buf, n);
-					txlen += n;
-					addr += n;
-					buf += n;
-					count -= n;
-				}
-				cbuf[clen++] = SPI_CMD_END;
-				fel_write(ctx, pdat->swapbuf, txbuf, txlen);
-				fel_chip_spi_run(ctx, cbuf, clen);
-			}
-		}
-		if(cbuf)
-			free(cbuf);
-		if(txbuf)
-			free(txbuf);
-		break;
-	case 4:
-		cbuf = malloc(pdat->cmdlen);
-		txbuf = malloc(pdat->swaplen);
-		if(cbuf && txbuf)
-		{
-			while(count > 0)
-			{
-				clen = 0;
-				txlen = 0;
-				while((clen < (pdat->cmdlen - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 5)))
-				{
-					n = count > granularity ? granularity : count;
-					cbuf[clen++] = SPI_CMD_SELECT;
-					cbuf[clen++] = SPI_CMD_FAST;
-					cbuf[clen++] = 1;
-					cbuf[clen++] = pdat->info.opcode_write_enable;
-					cbuf[clen++] = SPI_CMD_DESELECT;
-					cbuf[clen++] = SPI_CMD_SELECT;
-					cbuf[clen++] = SPI_CMD_TXBUF;
-					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  0) & 0xff;
-					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  8) & 0xff;
-					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 16) & 0xff;
-					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 24) & 0xff;
-					cbuf[clen++] = ((n + 5) >>  0) & 0xff;
-					cbuf[clen++] = ((n + 5) >>  8) & 0xff;
-					cbuf[clen++] = ((n + 5) >> 16) & 0xff;
-					cbuf[clen++] = ((n + 5) >> 24) & 0xff;
-					cbuf[clen++] = SPI_CMD_DESELECT;
-					cbuf[clen++] = SPI_CMD_SELECT;
-					cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
-					cbuf[clen++] = SPI_CMD_DESELECT;
-					txbuf[txlen++] = pdat->info.opcode_write;
-					txbuf[txlen++] = (uint8_t)(addr >> 24);
-					txbuf[txlen++] = (uint8_t)(addr >> 16);
-					txbuf[txlen++] = (uint8_t)(addr >> 8);
-					txbuf[txlen++] = (uint8_t)(addr >> 0);
-					memcpy(&txbuf[txlen], buf, n);
-					txlen += n;
-					addr += n;
-					buf += n;
-					count -= n;
-				}
-				cbuf[clen++] = SPI_CMD_END;
-				fel_write(ctx, pdat->swapbuf, txbuf, txlen);
-				fel_chip_spi_run(ctx, cbuf, clen);
-			}
-		}
-		if(cbuf)
-			free(cbuf);
-		if(txbuf)
-			free(txbuf);
-		break;
-	default:
-		break;
-	}
-}
-
 static inline void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
 {
 	uint8_t cbuf[256];
@@ -762,126 +640,176 @@ static inline void spinor_sector_erase_256k(struct xfel_ctx_t * ctx, struct spin
 	}
 }
 
-static uint64_t spinor_block_read(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint8_t * buf, uint64_t blkno, uint64_t blkcnt)
+static void spinor_helper_erase(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint64_t addr, uint64_t count)
 {
-	spinor_helper_read(ctx, pdat, blkno * pdat->info.blksz, buf, blkcnt * pdat->info.blksz);
-	return blkcnt;
-}
-
-static uint64_t spinor_block_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint8_t * buf, uint64_t blkno, uint64_t blkcnt)
-{
-	uint64_t addr = blkno * pdat->info.blksz;
-	int64_t cnt = blkcnt * pdat->info.blksz;
+	uint64_t base = addr;
+	int64_t cnt = count;
+	uint32_t esize, emask;
 	uint32_t len;
 
+	if(pdat->info.opcode_erase_4k != 0)
+		esize = 4096;
+	else if(pdat->info.opcode_erase_32k != 0)
+		esize = 32768;
+	else if(pdat->info.opcode_erase_32k != 0)
+		esize = 65536;
+	else if(pdat->info.opcode_erase_32k != 0)
+		esize = 262144;
+	else
+		return;
+	emask = esize - 1;
+
+	cnt += (base & emask);
+	base &= (~emask);
 	while(cnt > 0)
 	{
-		if((pdat->info.opcode_erase_256k != 0) && ((addr & 0x3ffff) == 0) && (cnt >= 262144))
+		if((pdat->info.opcode_erase_256k != 0) && ((base & 0x3ffff) == 0) && (cnt >= 262144))
 		{
 			len = 262144;
-			spinor_sector_erase_256k(ctx, pdat, addr);
+			spinor_sector_erase_256k(ctx, pdat, base);
 		}
-		else if((pdat->info.opcode_erase_64k != 0) && ((addr & 0xffff) == 0) && (cnt >= 65536))
+		else if((pdat->info.opcode_erase_64k != 0) && ((base & 0xffff) == 0) && (cnt >= 65536))
 		{
 			len = 65536;
-			spinor_sector_erase_64k(ctx, pdat, addr);
+			spinor_sector_erase_64k(ctx, pdat, base);
 		}
-		else if((pdat->info.opcode_erase_32k != 0) && ((addr & 0x7fff) == 0) && (cnt >= 32768))
+		else if((pdat->info.opcode_erase_32k != 0) && ((base & 0x7fff) == 0) && (cnt >= 32768))
 		{
 			len = 32768;
-			spinor_sector_erase_32k(ctx, pdat, addr);
+			spinor_sector_erase_32k(ctx, pdat, base);
 		}
-		else if((pdat->info.opcode_erase_4k != 0) && ((addr & 0xfff) == 0) && (cnt >= 4096))
+		else if((pdat->info.opcode_erase_4k != 0) && ((base & 0xfff) == 0) && (cnt >= 4096))
 		{
 			len = 4096;
-			spinor_sector_erase_4k(ctx, pdat, addr);
+			spinor_sector_erase_4k(ctx, pdat, base);
 		}
 		else
-		{
-			return 0;
-		}
-		addr += len;
+			return;
+		base += len;
 		cnt -= len;
 	}
-	spinor_helper_write(ctx, pdat, blkno * pdat->info.blksz, buf, blkcnt * pdat->info.blksz);
-	return blkcnt;
 }
 
-static uint64_t block_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint64_t offset, void * buf, uint64_t count)
+static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr, uint8_t * buf, uint32_t count)
 {
-	uint64_t blkno, blksz, blkcnt, capacity;
-	uint64_t len, tmp;
-	uint64_t ret = 0;
-	uint8_t * p;
+	uint8_t * cbuf;
+	uint32_t clen;
+	uint8_t * txbuf;
+	uint32_t txlen;
+	uint32_t granularity, n;
 
-	blksz = pdat->info.blksz;
-	blkcnt = pdat->info.capacity / pdat->info.blksz;
-	if(!blksz || !blkcnt)
-		return 0;
-	capacity = pdat->info.capacity;
-	if(offset >= capacity)
-		return 0;
-	tmp = capacity - offset;
-	if(count > tmp)
-		count = tmp;
-	p = malloc(blksz);
-	if(!p)
-		return 0;
-	blkno = offset / blksz;
-	tmp = offset % blksz;
-	if(tmp > 0)
+	if(pdat->info.write_granularity == 1)
+		granularity = (count < 0x7fffffff) ? count : 0x7fffffff;
+	else
+		granularity = pdat->info.write_granularity;
+	switch(pdat->info.address_length)
 	{
-		len = blksz - tmp;
-		if(count < len)
-			len = count;
-		if(spinor_block_read(ctx, pdat, p, blkno, 1) != 1)
+	case 3:
+		cbuf = malloc(pdat->cmdlen);
+		txbuf = malloc(pdat->swaplen);
+		if(cbuf && txbuf)
 		{
-			free(p);
-			return ret;
+			while(count > 0)
+			{
+				clen = 0;
+				txlen = 0;
+				while((clen < (pdat->cmdlen - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 4)))
+				{
+					n = count > granularity ? granularity : count;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_FAST;
+					cbuf[clen++] = 1;
+					cbuf[clen++] = pdat->info.opcode_write_enable;
+					cbuf[clen++] = SPI_CMD_DESELECT;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_TXBUF;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  0) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  8) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 16) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 24) & 0xff;
+					cbuf[clen++] = ((n + 4) >>  0) & 0xff;
+					cbuf[clen++] = ((n + 4) >>  8) & 0xff;
+					cbuf[clen++] = ((n + 4) >> 16) & 0xff;
+					cbuf[clen++] = ((n + 4) >> 24) & 0xff;
+					cbuf[clen++] = SPI_CMD_DESELECT;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+					cbuf[clen++] = SPI_CMD_DESELECT;
+					txbuf[txlen++] = pdat->info.opcode_write;
+					txbuf[txlen++] = (uint8_t)(addr >> 16);
+					txbuf[txlen++] = (uint8_t)(addr >> 8);
+					txbuf[txlen++] = (uint8_t)(addr >> 0);
+					memcpy(&txbuf[txlen], buf, n);
+					txlen += n;
+					addr += n;
+					buf += n;
+					count -= n;
+				}
+				cbuf[clen++] = SPI_CMD_END;
+				fel_write(ctx, pdat->swapbuf, txbuf, txlen);
+				fel_chip_spi_run(ctx, cbuf, clen);
+			}
 		}
-		memcpy((void *)(&p[tmp]), (const void *)buf, len);
-		if(spinor_block_write(ctx, pdat, p, blkno, 1) != 1)
+		if(cbuf)
+			free(cbuf);
+		if(txbuf)
+			free(txbuf);
+		break;
+	case 4:
+		cbuf = malloc(pdat->cmdlen);
+		txbuf = malloc(pdat->swaplen);
+		if(cbuf && txbuf)
 		{
-			free(p);
-			return ret;
+			while(count > 0)
+			{
+				clen = 0;
+				txlen = 0;
+				while((clen < (pdat->cmdlen - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 5)))
+				{
+					n = count > granularity ? granularity : count;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_FAST;
+					cbuf[clen++] = 1;
+					cbuf[clen++] = pdat->info.opcode_write_enable;
+					cbuf[clen++] = SPI_CMD_DESELECT;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_TXBUF;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  0) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  8) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 16) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 24) & 0xff;
+					cbuf[clen++] = ((n + 5) >>  0) & 0xff;
+					cbuf[clen++] = ((n + 5) >>  8) & 0xff;
+					cbuf[clen++] = ((n + 5) >> 16) & 0xff;
+					cbuf[clen++] = ((n + 5) >> 24) & 0xff;
+					cbuf[clen++] = SPI_CMD_DESELECT;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+					cbuf[clen++] = SPI_CMD_DESELECT;
+					txbuf[txlen++] = pdat->info.opcode_write;
+					txbuf[txlen++] = (uint8_t)(addr >> 24);
+					txbuf[txlen++] = (uint8_t)(addr >> 16);
+					txbuf[txlen++] = (uint8_t)(addr >> 8);
+					txbuf[txlen++] = (uint8_t)(addr >> 0);
+					memcpy(&txbuf[txlen], buf, n);
+					txlen += n;
+					addr += n;
+					buf += n;
+					count -= n;
+				}
+				cbuf[clen++] = SPI_CMD_END;
+				fel_write(ctx, pdat->swapbuf, txbuf, txlen);
+				fel_chip_spi_run(ctx, cbuf, clen);
+			}
 		}
-		buf += len;
-		count -= len;
-		ret += len;
-		blkno += 1;
+		if(cbuf)
+			free(cbuf);
+		if(txbuf)
+			free(txbuf);
+		break;
+	default:
+		break;
 	}
-	tmp = count / blksz;
-	if(tmp > 0)
-	{
-		len = tmp * blksz;
-		if(spinor_block_write(ctx, pdat, buf, blkno, tmp) != tmp)
-		{
-			free(p);
-			return ret;
-		}
-		buf += len;
-		count -= len;
-		ret += len;
-		blkno += tmp;
-	}
-	if(count > 0)
-	{
-		len = count;
-		if(spinor_block_read(ctx, pdat, p, blkno, 1) != 1)
-		{
-			free(p);
-			return ret;
-		}
-		memcpy((void *)(&p[0]), (const void *)buf, len);
-		if(spinor_block_write(ctx, pdat, p, blkno, 1) != 1)
-		{
-			free(p);
-			return ret;
-		}
-		ret += len;
-	}
-	free(p);
-	return ret;
 }
 
 uint64_t spinor_detect(struct xfel_ctx_t * ctx)
@@ -907,8 +835,8 @@ int spinor_read(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t len
 			n = len > 65536 ? 65536 : len;
 			spinor_helper_read(ctx, &pdat, addr, buf, n);
 			addr += n;
-			buf += n;
 			len -= n;
+			buf += n;
 			progress_update(&p, n);
 		}
 		progress_stop(&p);
@@ -921,18 +849,44 @@ int spinor_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t le
 {
 	struct spinor_pdata_t pdat;
 	struct progress_t p;
+	uint32_t esize, emask;
+	uint64_t base, cnt;
 	uint64_t n;
 
 	if(spinor_helper_init(ctx, &pdat))
 	{
-		progress_start(&p, len);
-		while(len > 0)
+		if(pdat.info.opcode_erase_4k != 0)
+			esize = 4096;
+		else if(pdat.info.opcode_erase_32k != 0)
+			esize = 32768;
+		else if(pdat.info.opcode_erase_32k != 0)
+			esize = 65536;
+		else if(pdat.info.opcode_erase_32k != 0)
+			esize = 262144;
+		else
+			return 0;
+		emask = esize - 1;
+		base = addr & ~emask;
+		cnt = len + (addr & emask);
+		progress_start(&p, cnt);
+		while(cnt > 0)
 		{
-			n = len > 65536 ? 65536 : len;
-			block_write(ctx, &pdat, addr, buf, n);
-			addr += n;
+			n = cnt > 262144 ? 262144 : cnt;
+			spinor_helper_erase(ctx, &pdat, base, n);
+			base += n;
+			cnt -= n;
+			progress_update(&p, n);
+		}
+		base = addr;
+		cnt = len;
+		progress_start(&p, cnt);
+		while(cnt > 0)
+		{
+			n = cnt > 65536 ? 65536 : cnt;
+			spinor_helper_write(ctx, &pdat, base, buf, n);
+			base += n;
+			cnt -= n;
 			buf += n;
-			len -= n;
 			progress_update(&p, n);
 		}
 		progress_stop(&p);
