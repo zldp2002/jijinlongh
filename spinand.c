@@ -22,8 +22,9 @@ enum {
 	OPCODE_RDID					= 0x9f,
 	OPCODE_GET_FEATURE			= 0x0f,
 	OPCODE_SET_FEATURE			= 0x1f,
+	OPCODE_FEATURE_PROTECT		= 0xa0,
+	OPCODE_FEATURE_CONFIG		= 0xb0,
 	OPCODE_FEATURE_STATUS		= 0xc0,
-	OPCODE_FEATURE_LOCK			= 0xa0,
 	OPCODE_READ_PAGE_TO_CACHE	= 0x13,
 	OPCODE_READ_PAGE_FROM_CACHE	= 0x03,
 	OPCODE_WRITE_ENABLE			= 0x06,
@@ -35,16 +36,16 @@ enum {
 
 static const struct spinand_info_t spinand_infos[] = {
 	/* Macronix */
-	{ "mx35lf2ge4ad",   0xc226, 2048,  64,  64, 2048, 1, 1 },
-	{ "mx35lf4ge4ad",   0xc237, 4096, 128,  64, 2048, 1, 1 },
+	{ "MX35LF2GE4AD",   0xc226, 2048,  64,  64, 2048, 1, 1 },
+	{ "MX35LF4GE4AD",   0xc237, 4096, 128,  64, 2048, 1, 1 },
 
 	/* Micron */
-	{ "mt29f1g01aaadd", 0x2c12, 2048,  64,  64, 1024, 1, 1 },
-	{ "mt29f1g01abafd", 0x2c14, 2048, 128,  64, 1024, 1, 1 },
-	{ "mt29f2g01abagd", 0x2c24, 2048, 128,  64, 2048, 2, 1 },
-	{ "mt29f4g01abafd", 0x2c34, 4096, 256,  64, 2048, 1, 1 },
-	{ "mt29f4g01adagd", 0x2c36, 2048, 128,  64, 2048, 2, 2 },
-	{ "mt29f8g01adafd", 0x2c46, 4096, 256,  64, 2048, 1, 2 },
+	{ "MT29F1G01AAADD", 0x2c12, 2048,  64,  64, 1024, 1, 1 },
+	{ "MT29F1G01ABAFD", 0x2c14, 2048, 128,  64, 1024, 1, 1 },
+	{ "MT29F2G01ABAGD", 0x2c24, 2048, 128,  64, 2048, 2, 1 },
+	{ "MT29F4G01ABAFD", 0x2c34, 4096, 256,  64, 2048, 1, 1 },
+	{ "MT29F4G01ADAGD", 0x2c36, 2048, 128,  64, 2048, 2, 2 },
+	{ "MT29F8G01ADAFD", 0x2c46, 4096, 256,  64, 2048, 1, 2 },
 };
 
 static inline int spinand_read_id(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, uint32_t cmdlen, uint32_t * id)
@@ -141,9 +142,9 @@ static int spinand_helper_init(struct xfel_ctx_t * ctx, struct spinand_pdata_t *
 	{
 		spinand_reset(ctx, pdat);
 		spinand_wait_for_busy(ctx, pdat);
-		if(spinand_get_feature(ctx, pdat, OPCODE_FEATURE_LOCK, &val) && (val & 0x38))
+		if(spinand_get_feature(ctx, pdat, OPCODE_FEATURE_PROTECT, &val) && (val & 0x38))
 		{
-			spinand_set_feature(ctx, pdat, OPCODE_FEATURE_LOCK, val & ~0x38);
+			spinand_set_feature(ctx, pdat, OPCODE_FEATURE_PROTECT, val & ~0x38);
 			spinand_wait_for_busy(ctx, pdat);
 		}
 		return 1;
