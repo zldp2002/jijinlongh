@@ -89,7 +89,7 @@ static inline int spinand_reset(struct xfel_ctx_t * ctx, struct spinand_pdata_t 
 	tx[0] = OPCODE_RESET;
 	if(!fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 1, 0, 0))
 		return 0;
-	usleep(10 * 1000);
+	usleep(100 * 1000);
 	return 1;
 }
 
@@ -142,7 +142,10 @@ static int spinand_helper_init(struct xfel_ctx_t * ctx, struct spinand_pdata_t *
 		spinand_reset(ctx, pdat);
 		spinand_wait_for_busy(ctx, pdat);
 		if(spinand_get_feature(ctx, pdat, OPCODE_FEATURE_LOCK, &val) && (val & 0x38))
+		{
 			spinand_set_feature(ctx, pdat, OPCODE_FEATURE_LOCK, val & ~0x38);
+			spinand_wait_for_busy(ctx, pdat);
+		}
 		return 1;
 	}
 	return 0;
