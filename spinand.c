@@ -298,6 +298,9 @@ static void spinand_helper_erase(struct xfel_ctx_t * ctx, struct spinand_pdata_t
 		cbuf[clen++] = OPCODE_WRITE_ENABLE;
 		cbuf[clen++] = SPI_CMD_DESELECT;
 		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SPINAND_WAIT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
 		cbuf[clen++] = SPI_CMD_FAST;
 		cbuf[clen++] = 4;
 		cbuf[clen++] = OPCODE_BLOCK_ERASE;
