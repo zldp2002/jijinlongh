@@ -6033,7 +6033,104 @@ static int chip_extra(struct xfel_ctx_t * ctx, int argc, char * argv[])
 			}
 			else if(!strcmp(argv[0], "dsp") && (argc == 2))
 			{
-				return 0;
+				uint64_t addr = strtoull(argv[1], NULL, 0);
+				uint32_t val;
+
+				/* Set cpu voltage to 1100mV */
+				val = payload_read32(ctx, 0x40050000 + 0x44);
+				val &= ~(0x1f << 9);
+				val |= 0x14 << 9;
+				payload_write32(ctx, 0x40050000 + 0x44, val);
+
+				/* Set dsp voltage to 1200mV */
+				val = payload_read32(ctx, 0x40050000 + 0x4c);
+				val &= ~(0x1f << 4);
+				val |= 0x18 << 4;
+				payload_write32(ctx, 0x40050000 + 0x4c, val);
+
+				/* Wakeup enable */
+				val = payload_read32(ctx, 0x40051400 + 0x100);
+				val |= 0x1 << 12;
+				payload_write32(ctx, 0x40051400 + 0x100, val);
+
+				/* Enable clk_ck1_hifi5 */
+				val = payload_read32(ctx, 0x4004c400 + 0xa4);
+				val |= 0x1 << 11;
+				payload_write32(ctx, 0x4004c400 + 0xa4, val);
+
+				/* Enable clk_ck3_hifi5 */
+				val = payload_read32(ctx, 0x4004c400 + 0xa8);
+				val |= 0x1 << 11;
+				payload_write32(ctx, 0x4004c400 + 0xa8, val);
+
+				/* Set clk_ck3_hifi5 clk to 400M */
+				val = payload_read32(ctx, 0x4004c400 + 0xa8);
+				val &= ~(0x7 << 8);
+				val |= 0x3 << 8;
+				payload_write32(ctx, 0x4004c400 + 0xa8, val);
+
+				/* Set clk_ck_hifi5 source to clk_ck3_hifi5 */
+				val = payload_read32(ctx, 0x4004c400 + 0xe0);
+				val |= 0x1 << 18;
+				payload_write32(ctx, 0x4004c400 + 0xe0, val);
+
+				/* Set clk_ck_hifi5_div source to clk_ck_hifi5 */
+				val = payload_read32(ctx, 0x4003c000 + 0x68);
+				val &= ~(0x3 << 4);
+				val |= 0x2 << 4;
+				payload_write32(ctx, 0x4003c000 + 0x68, val);
+
+				/* Set dsp_clk_hifi5_div to clk_ck_hifi5 / 1 */
+				val = payload_read32(ctx, 0x4003c000 + 0x68);
+				val &= ~(0x3 << 0);
+				val |= 0x0 << 0;
+				payload_write32(ctx, 0x4003c000 + 0x68, val);
+
+				/* Hifi5 core clk enable */
+				val = payload_read32(ctx, 0x4003c000 + 0x68);
+				val |= 1 << 31;
+				payload_write32(ctx, 0x4003c000 + 0x68, val);
+
+				/* Hifi5 clk gating */
+				val = payload_read32(ctx, 0x4003c000 + 0x14);
+				val |= 1 << 11;
+				payload_write32(ctx, 0x4003c000 + 0x14, val);
+
+				/* Hifi5 config reset */
+				val = payload_read32(ctx, 0x4003c000 + 0x18);
+				val |= 1 << 11;
+				payload_write32(ctx, 0x4003c000 + 0x18, val);
+
+				/* Set dsp address */
+				val = payload_read32(ctx, 0x40023c00 + 0x04);
+				val |= 1 << 1;
+				payload_write32(ctx, 0x40023c00 + 0x04, val);
+				usleep(1000);
+				payload_write32(ctx, 0x40023c00 + 0x00, (uint32_t)((addr >>  0) & 0xffffffff));
+				val = payload_read32(ctx, 0x40023c00 + 0x04);
+				val |= 1 << 0;
+				payload_write32(ctx, 0x40023c00 + 0x04, val);
+
+				/* Dsp debug reset */
+				val = payload_read32(ctx, 0x4003c000 + 0x18);
+				val |= 1 << 14;
+				payload_write32(ctx, 0x4003c000 + 0x18, val);
+
+				/* Dsp core reset */
+				val = payload_read32(ctx, 0x4003c000 + 0x18);
+				val &= ~(1 << 8);
+				payload_write32(ctx, 0x4003c000 + 0x18, val);
+				usleep(10000);
+				val = payload_read32(ctx, 0x4003c000 + 0x18);
+				val |= 1 << 8;
+				payload_write32(ctx, 0x4003c000 + 0x18, val);
+
+				/* Run */
+				val = payload_read32(ctx, 0x40023c00 + 0x04);
+				val &= ~(1 << 0);
+				payload_write32(ctx, 0x40023c00 + 0x04, val);
+
+				return 1;
 			}
 		}
 	}
