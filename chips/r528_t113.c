@@ -4484,7 +4484,7 @@ static int chip_extra(struct xfel_ctx_t * ctx, int argc, char * argv[])
 		}
 	}
 	printf("usage:\r\n");
-	printf("    xfel extra efuse dump - Dump all of the SID eFuses\r\n");
+	printf("    xfel extra efuse dump - Dump all of the efuse information\r\n");
 	return 0;
 }
 
