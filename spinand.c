@@ -488,3 +488,119 @@ int spinand_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t l
 	}
 	return 0;
 }
+
+int spinand_splwrite(struct xfel_ctx_t * ctx, uint32_t pagesz, uint64_t addr, void * buf, uint64_t len)
+{
+	struct spinand_pdata_t pdat;
+	struct progress_t p;
+	uint64_t base, n;
+	int64_t cnt;
+	uint32_t esize, emask;
+	void * nbuf;
+	uint64_t nlen;
+
+	if(spinand_helper_init(ctx, &pdat))
+	{
+		esize = pdat.info.page_size * pdat.info.pages_per_block;
+		emask = esize - 1;
+		if((pagesz <= 0) || (pagesz > pdat.info.page_size))
+			pagesz = pdat.info.page_size;
+		if(pagesz & 0x3ff)
+		{
+			printf("The valid page size is not 1k alignable and thus not supported\r\n");
+			return 0;
+		}
+		uint8_t * pbuf = buf;
+		if(memcmp(&pbuf[4], "eGON.BT0", 8) != 0)
+		{
+			printf("Invalid a eGON boot image\r\n");
+			return 0;
+		}
+		uint32_t splsz = (pbuf[19] << 24) | (pbuf[18] << 16) | (pbuf[17] << 8) | (pbuf[16] << 0);
+		if(splsz > len)
+		{
+			printf("The spl size is too large, please check!\r\n");
+			return 0;
+		}
+		uint32_t tsplsz = (splsz * pdat.info.page_size / pagesz + esize) & ~emask;
+		if(addr >= tsplsz)
+		{
+			int copies = 0;
+			nlen = 0;
+			while(nlen < addr)
+			{
+				nlen += tsplsz;
+				copies++;
+			}
+			nlen += len;
+			nbuf = malloc(nlen);
+			if(nbuf)
+			{
+				uint8_t * pb = buf;
+				uint8_t * pnb = nbuf;
+				memset(pnb, 0xff, nlen);
+				for(int i = 0; i < splsz; i += pagesz)
+				{
+					memcpy(pnb, pb, pagesz);
+					pb += pagesz;
+					pnb += pdat.info.page_size;
+				}
+				for(int i = 1; i < copies; i++)
+				{
+					memcpy(nbuf + tsplsz * i, nbuf, tsplsz);
+				}
+				memcpy(nbuf + (nlen - len), buf, len);
+			}
+			else
+				return 0;
+		}
+		else
+		{
+			nlen = tsplsz;
+			nbuf = malloc(nlen);
+			if(nbuf)
+			{
+				uint8_t * pb = buf;
+				uint8_t * pnb = nbuf;
+				memset(pnb, 0xff, nlen);
+				for(int i = 0; i < splsz; i += pagesz)
+				{
+					memcpy(pnb, pb, pagesz);
+					pb += pagesz;
+					pnb += pdat.info.page_size;
+				}
+			}
+			else
+				return 0;
+		}
+		uint8_t * pnbuf = nbuf;
+		base = 0 & ~emask;
+		cnt = ((0 & emask) + nlen + esize) & ~emask;
+		progress_start(&p, cnt);
+		while(cnt > 0)
+		{
+			n = cnt > esize ? esize : cnt;
+			spinand_helper_erase(ctx, &pdat, base, n);
+			base += n;
+			cnt -= n;
+			progress_update(&p, n);
+		}
+		base = 0;
+		cnt = nlen;
+		progress_start(&p, cnt);
+		while(cnt > 0)
+		{
+			n = cnt > 65536 ? 65536 : cnt;
+			spinand_helper_write(ctx, &pdat, base, pnbuf, n);
+			base += n;
+			cnt -= n;
+			pnbuf += n;
+			progress_update(&p, n);
+		}
+		progress_stop(&p);
+		if(nbuf)
+			free(nbuf);
+		return 1;
+	}
+	return 0;
+}
