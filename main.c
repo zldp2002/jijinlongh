@@ -83,25 +83,25 @@ static void usage(void)
 {
 	printf("xfel(v1.2.2) - https://github.com/xboot/xfel\r\n");
 	printf("usage:\r\n");
-	printf("    xfel version                                             - Show chip version\r\n");
-	printf("    xfel hexdump <address> <length>                          - Dumps memory region in hex\r\n");
-	printf("    xfel dump <address> <length>                             - Binary memory dump to stdout\r\n");
-	printf("    xfel exec <address>                                      - Call function address\r\n");
-	printf("    xfel read32 <address>                                    - Read 32-bits value from device memory\r\n");
-	printf("    xfel write32 <address> <value>                           - Write 32-bits value to device memory\r\n");
-	printf("    xfel read <address> <length> <file>                      - Read memory to file\r\n");
-	printf("    xfel write <address> <file>                              - Write file to memory\r\n");
-	printf("    xfel reset                                               - Reset device using watchdog\r\n");
-	printf("    xfel sid                                                 - Show sid information\r\n");
-	printf("    xfel jtag                                                - Enable jtag debug\r\n");
-	printf("    xfel ddr [type]                                          - Initial ddr controller with optional type\r\n");
-	printf("    xfel spinor                                              - Detect spi nor flash\r\n");
-	printf("    xfel spinor read <address> <length> <file>               - Read spi nor flash to file\r\n");
-	printf("    xfel spinor write <address> <file>                       - Write file to spi nor flash\r\n");
-	printf("    xfel spinand                                             - Detect spi nand flash\r\n");
-	printf("    xfel spinand read <address> <length> <file>              - Read spi nand flash to file\r\n");
-	printf("    xfel spinand write <address> <file>                      - Write file to spi nand flash\r\n");
-	printf("    xfel spinand splwrite <valid-page-size> <address> <file> - Write file to spi nand flash with spl mode\r\n");
+	printf("    xfel version                                        - Show chip version\r\n");
+	printf("    xfel hexdump <address> <length>                     - Dumps memory region in hex\r\n");
+	printf("    xfel dump <address> <length>                        - Binary memory dump to stdout\r\n");
+	printf("    xfel exec <address>                                 - Call function address\r\n");
+	printf("    xfel read32 <address>                               - Read 32-bits value from device memory\r\n");
+	printf("    xfel write32 <address> <value>                      - Write 32-bits value to device memory\r\n");
+	printf("    xfel read <address> <length> <file>                 - Read memory to file\r\n");
+	printf("    xfel write <address> <file>                         - Write file to memory\r\n");
+	printf("    xfel reset                                          - Reset device using watchdog\r\n");
+	printf("    xfel sid                                            - Show sid information\r\n");
+	printf("    xfel jtag                                           - Enable jtag debug\r\n");
+	printf("    xfel ddr [type]                                     - Initial ddr controller with optional type\r\n");
+	printf("    xfel spinor                                         - Detect spi nor flash\r\n");
+	printf("    xfel spinor read <address> <length> <file>          - Read spi nor flash to file\r\n");
+	printf("    xfel spinor write <address> <file>                  - Write file to spi nor flash\r\n");
+	printf("    xfel spinand                                        - Detect spi nand flash\r\n");
+	printf("    xfel spinand read <address> <length> <file>         - Read spi nand flash to file\r\n");
+	printf("    xfel spinand write <address> <file>                 - Write file to spi nand flash\r\n");
+	printf("    xfel spinand splwrite <split-size> <address> <file> - Write file to spi nand flash with split support\r\n");
 }
 
 int main(int argc, char * argv[])
@@ -388,14 +388,14 @@ int main(int argc, char * argv[])
 			{
 				argc -= 1;
 				argv += 1;
-				uint32_t pagesz = strtoul(argv[0], NULL, 0);
+				uint32_t splitsz = strtoul(argv[0], NULL, 0);
 				uint64_t addr = strtoull(argv[1], NULL, 0);
 				uint64_t len;
 				void * buf = file_load(argv[2], &len);
 				if(buf)
 				{
-					if(!spinand_splwrite(&ctx, pagesz, addr, buf, len))
-						printf("Can't write spi nand flash with spl mode\r\n");
+					if(!spinand_splwrite(&ctx, splitsz, addr, buf, len))
+						printf("Can't write spi nand flash with split support\r\n");
 					free(buf);
 				}
 			}

@@ -490,7 +490,7 @@ int spinand_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t l
 	return 0;
 }
 
-int spinand_splwrite(struct xfel_ctx_t * ctx, uint32_t pagesz, uint64_t addr, void * buf, uint64_t len)
+int spinand_splwrite(struct xfel_ctx_t * ctx, uint32_t splitsz, uint64_t addr, void * buf, uint64_t len)
 {
 	struct spinand_pdata_t pdat;
 	struct progress_t p;
@@ -504,9 +504,9 @@ int spinand_splwrite(struct xfel_ctx_t * ctx, uint32_t pagesz, uint64_t addr, vo
 	{
 		esize = pdat.info.page_size * pdat.info.pages_per_block;
 		emask = esize - 1;
-		if((pagesz <= 0) || (pagesz > pdat.info.page_size))
-			pagesz = pdat.info.page_size;
-		if(pagesz & 0x3ff)
+		if((splitsz <= 0) || (splitsz > pdat.info.page_size))
+			splitsz = pdat.info.page_size;
+		if(splitsz & 0x3ff)
 		{
 			printf("The valid page size is not 1k alignable and thus not supported\r\n");
 			return 0;
@@ -523,7 +523,7 @@ int spinand_splwrite(struct xfel_ctx_t * ctx, uint32_t pagesz, uint64_t addr, vo
 			printf("The spl size is too large, please check!\r\n");
 			return 0;
 		}
-		uint32_t tsplsz = (splsz * pdat.info.page_size / pagesz + esize) & ~emask;
+		uint32_t tsplsz = (splsz * pdat.info.page_size / splitsz + esize) & ~emask;
 		if(addr >= tsplsz)
 		{
 			int copies = 0;
@@ -540,10 +540,10 @@ int spinand_splwrite(struct xfel_ctx_t * ctx, uint32_t pagesz, uint64_t addr, vo
 				uint8_t * pb = buf;
 				uint8_t * pnb = nbuf;
 				memset(pnb, 0xff, nlen);
-				for(int i = 0; i < splsz; i += pagesz)
+				for(int i = 0; i < splsz; i += splitsz)
 				{
-					memcpy(pnb, pb, pagesz);
-					pb += pagesz;
+					memcpy(pnb, pb, splitsz);
+					pb += splitsz;
 					pnb += pdat.info.page_size;
 				}
 				for(int i = 1; i < copies; i++)
@@ -564,10 +564,10 @@ int spinand_splwrite(struct xfel_ctx_t * ctx, uint32_t pagesz, uint64_t addr, vo
 				uint8_t * pb = buf;
 				uint8_t * pnb = nbuf;
 				memset(pnb, 0xff, nlen);
-				for(int i = 0; i < splsz; i += pagesz)
+				for(int i = 0; i < splsz; i += splitsz)
 				{
-					memcpy(pnb, pb, pagesz);
-					pb += pagesz;
+					memcpy(pnb, pb, splitsz);
+					pb += splitsz;
 					pnb += pdat.info.page_size;
 				}
 			}
