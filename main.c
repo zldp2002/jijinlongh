@@ -128,7 +128,7 @@ static void usage(void)
 
 int main(int argc, char * argv[])
 {
-	struct xfel_ctx_t ctx;
+	struct xfel_ctx_t ctx = { 0 };
     libusb_context *context = NULL;
 
 
