@@ -4,6 +4,10 @@
 # XFEL
 Tiny FEL tools for allwinner SOC, support RISC-V D1 chip.
 
+[Examples](https://xboot.github.io/xfel) &mdash;
+[Documentation](https://xboot.github.io/xfel) &mdash;
+[Release](https://github.com/xboot/xfel/releases/)
+
 ## How to build
 
 ### Linux platform
