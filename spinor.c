@@ -913,7 +913,8 @@ int spinor_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t le
 			return 0;
 		emask = esize - 1;
 		base = addr & ~emask;
-		cnt = ((addr & emask) + len + esize) & ~emask;
+		cnt = (addr == base)?0:esize;
+		cnt += ((len + emask) & ~emask);
 		progress_start(&p, cnt);
 		while(cnt > 0)
 		{
