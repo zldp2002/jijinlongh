@@ -1,8 +1,13 @@
 #include <spinand.h>
 
+#define SPINAND_ID(...)	{ .val = { __VA_ARGS__ }, .len = sizeof((uint8_t[]){ __VA_ARGS__ }) }
+
 struct spinand_info_t {
 	char * name;
-	uint32_t id;
+	struct {
+		uint8_t val[4];
+		uint8_t len;
+	} id;
 	uint32_t page_size;
 	uint32_t spare_size;
 	uint32_t pages_per_block;
@@ -36,145 +41,146 @@ enum {
 
 static const struct spinand_info_t spinand_infos[] = {
 	/* Gigadevice */
-	{ "GD5F1GQ4UAWxx",   0xc810, 2048,  64,  64, 1024, 1, 1 },
-	{ "GD5F1GQ4UExIG",   0xc8d1, 2048, 128,  64, 1024, 1, 1 },
-	{ "GD5F1GQ4UExxH",   0xc8d9, 2048,  64,  64, 1024, 1, 1 },
-	{ "GD5F1GQ4xAYIG",   0xc8f1, 2048,  64,  64, 1024, 1, 1 },
-	{ "GD5F2GQ4UExIG",   0xc8d2, 2048, 128,  64, 2048, 1, 1 },
-	{ "GD5F2GQ5UExxH",   0xc832, 2048,  64,  64, 2048, 1, 1 },
-	{ "GD5F2GQ4xAYIG",   0xc8f2, 2048,  64,  64, 2048, 1, 1 },
-	{ "GD5F4GQ4UBxIG",   0xc8d4, 4096, 256,  64, 2048, 1, 1 },
-	{ "GD5F4GQ4xAYIG",   0xc8f4, 2048,  64,  64, 4096, 1, 1 },
-	{ "GD5F2GQ5UExxG",   0xc852, 2048, 128,  64, 2048, 1, 1 },
-	{ "GD5F4GQ4UCxIG",   0xc8b4, 4096, 256,  64, 2048, 1, 1 },
+	{ "GD5F1GQ4UAWxx",   SPINAND_ID(0xc8, 0x10), 2048,  64,  64, 1024, 1, 1 },
+	{ "GD5F1GQ4UExIG",   SPINAND_ID(0xc8, 0xd1), 2048, 128,  64, 1024, 1, 1 },
+	{ "GD5F1GQ4UExxH",   SPINAND_ID(0xc8, 0xd9), 2048,  64,  64, 1024, 1, 1 },
+	{ "GD5F1GQ4xAYIG",   SPINAND_ID(0xc8, 0xf1), 2048,  64,  64, 1024, 1, 1 },
+	{ "GD5F2GQ4UExIG",   SPINAND_ID(0xc8, 0xd2), 2048, 128,  64, 2048, 1, 1 },
+	{ "GD5F2GQ5UExxH",   SPINAND_ID(0xc8, 0x32), 2048,  64,  64, 2048, 1, 1 },
+	{ "GD5F2GQ4xAYIG",   SPINAND_ID(0xc8, 0xf2), 2048,  64,  64, 2048, 1, 1 },
+	{ "GD5F4GQ4UBxIG",   SPINAND_ID(0xc8, 0xd4), 4096, 256,  64, 2048, 1, 1 },
+	{ "GD5F4GQ4xAYIG",   SPINAND_ID(0xc8, 0xf4), 2048,  64,  64, 4096, 1, 1 },
+	{ "GD5F2GQ5UExxG",   SPINAND_ID(0xc8, 0x52), 2048, 128,  64, 2048, 1, 1 },
+	{ "GD5F4GQ4UCxIG",   SPINAND_ID(0xc8, 0xb4), 4096, 256,  64, 2048, 1, 1 },
 
 	/* Macronix */
-	{ "MX35LF1GE4AB",    0xc212, 2048,  64,  64, 1024, 1, 1 },
-	{ "MX35LF1G24AD",    0xc214, 2048, 128,  64, 1024, 1, 1 },
-	{ "MX31LF1GE4BC",    0xc21e, 2048,  64,  64, 1024, 1, 1 },
-	{ "MX35LF2GE4AB",    0xc222, 2048,  64,  64, 2048, 1, 1 },
-	{ "MX35LF2G24AD",    0xc224, 2048, 128,  64, 2048, 1, 1 },
-	{ "MX35LF2GE4AD",    0xc226, 2048, 128,  64, 2048, 1, 1 },
-	{ "MX35LF2G14AC",    0xc220, 2048,  64,  64, 2048, 1, 1 },
-	{ "MX35LF4G24AD",    0xc235, 4096, 256,  64, 2048, 1, 1 },
-	{ "MX35LF4GE4AD",    0xc237, 4096, 256,  64, 2048, 1, 1 },
+	{ "MX35LF1GE4AB",    SPINAND_ID(0xc2, 0x12), 2048,  64,  64, 1024, 1, 1 },
+	{ "MX35LF1G24AD",    SPINAND_ID(0xc2, 0x14), 2048, 128,  64, 1024, 1, 1 },
+	{ "MX31LF1GE4BC",    SPINAND_ID(0xc2, 0x1e), 2048,  64,  64, 1024, 1, 1 },
+	{ "MX35LF2GE4AB",    SPINAND_ID(0xc2, 0x22), 2048,  64,  64, 2048, 1, 1 },
+	{ "MX35LF2G24AD",    SPINAND_ID(0xc2, 0x24), 2048, 128,  64, 2048, 1, 1 },
+	{ "MX35LF2GE4AD",    SPINAND_ID(0xc2, 0x26), 2048, 128,  64, 2048, 1, 1 },
+	{ "MX35LF2G14AC",    SPINAND_ID(0xc2, 0x20), 2048,  64,  64, 2048, 1, 1 },
+	{ "MX35LF4G24AD",    SPINAND_ID(0xc2, 0x35), 4096, 256,  64, 2048, 1, 1 },
+	{ "MX35LF4GE4AD",    SPINAND_ID(0xc2, 0x37), 4096, 256,  64, 2048, 1, 1 },
 
 	/* Micron */
-	{ "MT29F1G01AAADD",  0x2c12, 2048,  64,  64, 1024, 1, 1 },
-	{ "MT29F1G01ABAFD",  0x2c14, 2048, 128,  64, 1024, 1, 1 },
-	{ "MT29F2G01AAAED",  0x2c9f, 2048,  64,  64, 2048, 2, 1 },
-	{ "MT29F2G01ABAGD",  0x2c24, 2048, 128,  64, 2048, 2, 1 },
-	{ "MT29F4G01AAADD",  0x2c32, 2048,  64,  64, 4096, 2, 1 },
-	{ "MT29F4G01ABAFD",  0x2c34, 4096, 256,  64, 2048, 1, 1 },
-	{ "MT29F4G01ADAGD",  0x2c36, 2048, 128,  64, 2048, 2, 2 },
-	{ "MT29F8G01ADAFD",  0x2c46, 4096, 256,  64, 2048, 1, 2 },
+	{ "MT29F1G01AAADD",  SPINAND_ID(0x2c, 0x12), 2048,  64,  64, 1024, 1, 1 },
+	{ "MT29F1G01ABAFD",  SPINAND_ID(0x2c, 0x14), 2048, 128,  64, 1024, 1, 1 },
+	{ "MT29F2G01AAAED",  SPINAND_ID(0x2c, 0x9f), 2048,  64,  64, 2048, 2, 1 },
+	{ "MT29F2G01ABAGD",  SPINAND_ID(0x2c, 0x24), 2048, 128,  64, 2048, 2, 1 },
+	{ "MT29F4G01AAADD",  SPINAND_ID(0x2c, 0x32), 2048,  64,  64, 4096, 2, 1 },
+	{ "MT29F4G01ABAFD",  SPINAND_ID(0x2c, 0x34), 4096, 256,  64, 2048, 1, 1 },
+	{ "MT29F4G01ADAGD",  SPINAND_ID(0x2c, 0x36), 2048, 128,  64, 2048, 2, 2 },
+	{ "MT29F8G01ADAFD",  SPINAND_ID(0x2c, 0x46), 4096, 256,  64, 2048, 1, 2 },
 
 	/* Toshiba */
-	{ "TC58CVG0S3HRAIG", 0x98c2, 2048, 128,  64, 1024, 1, 1 },
-	{ "TC58CVG1S3HRAIG", 0x98cb, 2048, 128,  64, 2048, 1, 1 },
-	{ "TC58CVG2S0HRAIG", 0x98cd, 4096, 256,  64, 2048, 1, 1 },
-	{ "TC58CVG0S3HRAIJ", 0x98e2, 2048, 128,  64, 1024, 1, 1 },
-	{ "TC58CVG1S3HRAIJ", 0x98eb, 2048, 128,  64, 2048, 1, 1 },
-	{ "TC58CVG2S0HRAIJ", 0x98ed, 4096, 256,  64, 2048, 1, 1 },
-	{ "TH58CVG3S0HRAIJ", 0x98e4, 4096, 256,  64, 4096, 1, 1 },
+	{ "TC58CVG0S3HRAIG", SPINAND_ID(0x98, 0xc2), 2048, 128,  64, 1024, 1, 1 },
+	{ "TC58CVG1S3HRAIG", SPINAND_ID(0x98, 0xcb), 2048, 128,  64, 2048, 1, 1 },
+	{ "TC58CVG2S0HRAIG", SPINAND_ID(0x98, 0xcd), 4096, 256,  64, 2048, 1, 1 },
+	{ "TC58CVG0S3HRAIJ", SPINAND_ID(0x98, 0xe2), 2048, 128,  64, 1024, 1, 1 },
+	{ "TC58CVG1S3HRAIJ", SPINAND_ID(0x98, 0xeb), 2048, 128,  64, 2048, 1, 1 },
+	{ "TC58CVG2S0HRAIJ", SPINAND_ID(0x98, 0xed), 4096, 256,  64, 2048, 1, 1 },
+	{ "TH58CVG3S0HRAIJ", SPINAND_ID(0x98, 0xe4), 4096, 256,  64, 4096, 1, 1 },
 
 	/* Esmt */
-	{ "F50L512M41A",     0xc820, 2048,  64,  64,  512, 1, 1 },
-	{ "F50L1G41A",       0xc821, 2048,  64,  64, 1024, 1, 1 },
-	{ "F50L1G41LB",      0xc801, 2048,  64,  64, 1024, 1, 1 },
-	{ "F50L2G41LB",      0xc80a, 2048,  64,  64, 1024, 1, 2 },
+	{ "F50L512M41A",     SPINAND_ID(0xc8, 0x20), 2048,  64,  64,  512, 1, 1 },
+	{ "F50L1G41A",       SPINAND_ID(0xc8, 0x21), 2048,  64,  64, 1024, 1, 1 },
+	{ "F50L1G41LB",      SPINAND_ID(0xc8, 0x01), 2048,  64,  64, 1024, 1, 1 },
+	{ "F50L2G41LB",      SPINAND_ID(0xc8, 0x0a), 2048,  64,  64, 1024, 1, 2 },
 
 	/* Fison */
-	{ "CS11G0T0A0AA",    0x6b00, 2048, 128,  64, 1024, 1, 1 },
-	{ "CS11G0G0A0AA",    0x6b10, 2048, 128,  64, 1024, 1, 1 },
-	{ "CS11G0S0A0AA",    0x6b20, 2048,  64,  64, 1024, 1, 1 },
-	{ "CS11G1T0A0AA",    0x6b01, 2048, 128,  64, 2048, 1, 1 },
-	{ "CS11G1S0A0AA",    0x6b21, 2048,  64,  64, 2048, 1, 1 },
-	{ "CS11G2T0A0AA",    0x6b02, 2048, 128,  64, 4096, 1, 1 },
-	{ "CS11G2S0A0AA",    0x6b22, 2048,  64,  64, 4096, 1, 1 },
+	{ "CS11G0T0A0AA",    SPINAND_ID(0x6b, 0x00), 2048, 128,  64, 1024, 1, 1 },
+	{ "CS11G0G0A0AA",    SPINAND_ID(0x6b, 0x10), 2048, 128,  64, 1024, 1, 1 },
+	{ "CS11G0S0A0AA",    SPINAND_ID(0x6b, 0x20), 2048,  64,  64, 1024, 1, 1 },
+	{ "CS11G1T0A0AA",    SPINAND_ID(0x6b, 0x01), 2048, 128,  64, 2048, 1, 1 },
+	{ "CS11G1S0A0AA",    SPINAND_ID(0x6b, 0x21), 2048,  64,  64, 2048, 1, 1 },
+	{ "CS11G2T0A0AA",    SPINAND_ID(0x6b, 0x02), 2048, 128,  64, 4096, 1, 1 },
+	{ "CS11G2S0A0AA",    SPINAND_ID(0x6b, 0x22), 2048,  64,  64, 4096, 1, 1 },
 
 	/* Etron */
-	{ "EM73B044VCA",     0xd501, 2048,  64,  64,  512, 1, 1 },
-	{ "EM73C044SNB",     0xd511, 2048, 120,  64, 1024, 1, 1 },
-	{ "EM73C044SNF",     0xd509, 2048, 128,  64, 1024, 1, 1 },
-	{ "EM73C044VCA",     0xd518, 2048,  64,  64, 1024, 1, 1 },
-	{ "EM73C044SNA",     0xd519, 2048,  64, 128,  512, 1, 1 },
-	{ "EM73C044VCD",     0xd51c, 2048,  64,  64, 1024, 1, 1 },
-	{ "EM73C044SND",     0xd51d, 2048,  64,  64, 1024, 1, 1 },
-	{ "EM73D044SND",     0xd51e, 2048,  64,  64, 2048, 1, 1 },
-	{ "EM73C044VCC",     0xd522, 2048,  64,  64, 1024, 1, 1 },
-	{ "EM73C044VCF",     0xd525, 2048,  64,  64, 1024, 1, 1 },
-	{ "EM73C044SNC",     0xd531, 2048, 128,  64, 1024, 1, 1 },
-	{ "EM73D044SNC",     0xd50a, 2048, 120,  64, 2048, 1, 1 },
-	{ "EM73D044SNA",     0xd512, 2048, 128,  64, 2048, 1, 1 },
-	{ "EM73D044SNF",     0xd510, 2048, 128,  64, 2048, 1, 1 },
-	{ "EM73D044VCA",     0xd513, 2048, 128,  64, 2048, 1, 1 },
-	{ "EM73D044VCB",     0xd514, 2048,  64,  64, 2048, 1, 1 },
-	{ "EM73D044VCD",     0xd517, 2048, 128,  64, 2048, 1, 1 },
-	{ "EM73D044VCH",     0xd51b, 2048,  64,  64, 2048, 1, 1 },
-	{ "EM73D044SND",     0xd51d, 2048,  64,  64, 2048, 1, 1 },
-	{ "EM73D044VCG",     0xd51f, 2048,  64,  64, 2048, 1, 1 },
-	{ "EM73D044VCE",     0xd520, 2048,  64,  64, 2048, 1, 1 },
-	{ "EM73D044VCL",     0xd52e, 2048, 128,  64, 2048, 1, 1 },
-	{ "EM73D044SNB",     0xd532, 2048, 128,  64, 2048, 1, 1 },
-	{ "EM73E044SNA",     0xd503, 4096, 256,  64, 2048, 1, 1 },
-	{ "EM73E044SND",     0xd50b, 4096, 240,  64, 2048, 1, 1 },
-	{ "EM73E044SNB",     0xd523, 4096, 256,  64, 2048, 1, 1 },
-	{ "EM73E044VCA",     0xd52c, 4096, 256,  64, 2048, 1, 1 },
-	{ "EM73E044VCB",     0xd52f, 2048, 128,  64, 4096, 1, 1 },
-	{ "EM73F044SNA",     0xd524, 4096, 256,  64, 4096, 1, 1 },
-	{ "EM73F044VCA",     0xd52d, 4096, 256,  64, 4096, 1, 1 },
-	{ "EM73E044SNE",     0xd50e, 4096, 256,  64, 4096, 1, 1 },
-	{ "EM73C044SNG",     0xd50c, 2048, 120,  64, 1024, 1, 1 },
-	{ "EM73D044VCN",     0xd50f, 2048,  64,  64, 2048, 1, 1 },
+	{ "EM73B044VCA",     SPINAND_ID(0xd5, 0x01), 2048,  64,  64,  512, 1, 1 },
+	{ "EM73C044SNB",     SPINAND_ID(0xd5, 0x11), 2048, 120,  64, 1024, 1, 1 },
+	{ "EM73C044SNF",     SPINAND_ID(0xd5, 0x09), 2048, 128,  64, 1024, 1, 1 },
+	{ "EM73C044VCA",     SPINAND_ID(0xd5, 0x18), 2048,  64,  64, 1024, 1, 1 },
+	{ "EM73C044SNA",     SPINAND_ID(0xd5, 0x19), 2048,  64, 128,  512, 1, 1 },
+	{ "EM73C044VCD",     SPINAND_ID(0xd5, 0x1c), 2048,  64,  64, 1024, 1, 1 },
+	{ "EM73C044SND",     SPINAND_ID(0xd5, 0x1d), 2048,  64,  64, 1024, 1, 1 },
+	{ "EM73D044SND",     SPINAND_ID(0xd5, 0x1e), 2048,  64,  64, 2048, 1, 1 },
+	{ "EM73C044VCC",     SPINAND_ID(0xd5, 0x22), 2048,  64,  64, 1024, 1, 1 },
+	{ "EM73C044VCF",     SPINAND_ID(0xd5, 0x25), 2048,  64,  64, 1024, 1, 1 },
+	{ "EM73C044SNC",     SPINAND_ID(0xd5, 0x31), 2048, 128,  64, 1024, 1, 1 },
+	{ "EM73D044SNC",     SPINAND_ID(0xd5, 0x0a), 2048, 120,  64, 2048, 1, 1 },
+	{ "EM73D044SNA",     SPINAND_ID(0xd5, 0x12), 2048, 128,  64, 2048, 1, 1 },
+	{ "EM73D044SNF",     SPINAND_ID(0xd5, 0x10), 2048, 128,  64, 2048, 1, 1 },
+	{ "EM73D044VCA",     SPINAND_ID(0xd5, 0x13), 2048, 128,  64, 2048, 1, 1 },
+	{ "EM73D044VCB",     SPINAND_ID(0xd5, 0x14), 2048,  64,  64, 2048, 1, 1 },
+	{ "EM73D044VCD",     SPINAND_ID(0xd5, 0x17), 2048, 128,  64, 2048, 1, 1 },
+	{ "EM73D044VCH",     SPINAND_ID(0xd5, 0x1b), 2048,  64,  64, 2048, 1, 1 },
+	{ "EM73D044SND",     SPINAND_ID(0xd5, 0x1d), 2048,  64,  64, 2048, 1, 1 },
+	{ "EM73D044VCG",     SPINAND_ID(0xd5, 0x1f), 2048,  64,  64, 2048, 1, 1 },
+	{ "EM73D044VCE",     SPINAND_ID(0xd5, 0x20), 2048,  64,  64, 2048, 1, 1 },
+	{ "EM73D044VCL",     SPINAND_ID(0xd5, 0x2e), 2048, 128,  64, 2048, 1, 1 },
+	{ "EM73D044SNB",     SPINAND_ID(0xd5, 0x32), 2048, 128,  64, 2048, 1, 1 },
+	{ "EM73E044SNA",     SPINAND_ID(0xd5, 0x03), 4096, 256,  64, 2048, 1, 1 },
+	{ "EM73E044SND",     SPINAND_ID(0xd5, 0x0b), 4096, 240,  64, 2048, 1, 1 },
+	{ "EM73E044SNB",     SPINAND_ID(0xd5, 0x23), 4096, 256,  64, 2048, 1, 1 },
+	{ "EM73E044VCA",     SPINAND_ID(0xd5, 0x2c), 4096, 256,  64, 2048, 1, 1 },
+	{ "EM73E044VCB",     SPINAND_ID(0xd5, 0x2f), 2048, 128,  64, 4096, 1, 1 },
+	{ "EM73F044SNA",     SPINAND_ID(0xd5, 0x24), 4096, 256,  64, 4096, 1, 1 },
+	{ "EM73F044VCA",     SPINAND_ID(0xd5, 0x2d), 4096, 256,  64, 4096, 1, 1 },
+	{ "EM73E044SNE",     SPINAND_ID(0xd5, 0x0e), 4096, 256,  64, 4096, 1, 1 },
+	{ "EM73C044SNG",     SPINAND_ID(0xd5, 0x0c), 2048, 120,  64, 1024, 1, 1 },
+	{ "EM73D044VCN",     SPINAND_ID(0xd5, 0x0f), 2048,  64,  64, 2048, 1, 1 },
 
 	/* Elnec */
-	{ "FM35Q1GA",        0xe571, 2048,  64,  64, 1024, 1, 1 },
+	{ "FM35Q1GA",        SPINAND_ID(0xe5, 0x71), 2048,  64,  64, 1024, 1, 1 },
 
 	/* Paragon */
-	{ "PN26G01A",        0xa1e1, 2048, 128,  64, 1024, 1, 1 },
-	{ "PN26G02A",        0xa1e2, 2048, 128,  64, 2048, 1, 1 },
+	{ "PN26G01A",        SPINAND_ID(0xa1, 0xe1), 2048, 128,  64, 1024, 1, 1 },
+	{ "PN26G02A",        SPINAND_ID(0xa1, 0xe2), 2048, 128,  64, 2048, 1, 1 },
 
 	/* Ato */
-	{ "ATO25D1GA",       0x9b12, 2048,  64,  64, 1024, 1, 1 },
+	{ "ATO25D1GA",       SPINAND_ID(0x9b, 0x12), 2048,  64,  64, 1024, 1, 1 },
 
 	/* Heyang */
-	{ "HYF1GQ4U",        0xc951, 2048, 128,  64, 1024, 1, 1 },
-	{ "HYF2GQ4U",        0xc952, 2048, 128,  64, 2048, 1, 1 },
+	{ "HYF1GQ4U",        SPINAND_ID(0xc9, 0x51), 2048, 128,  64, 1024, 1, 1 },
+	{ "HYF2GQ4U",        SPINAND_ID(0xc9, 0x52), 2048, 128,  64, 2048, 1, 1 },
 };
-
-static inline int spinand_read_id(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, uint32_t cmdlen, uint32_t * id)
-{
-	uint8_t tx[2];
-	uint8_t rx[2];
-
-	tx[0] = OPCODE_RDID;
-	tx[1] = 0x0;
-	if(!fel_spi_xfer(ctx, swapbuf, swaplen, cmdlen, tx, 2, rx, 2))
-		return 0;
-	*id = (rx[0] << 8) | (rx[1] << 0);
-	return 1;
-}
 
 static inline int spinand_info(struct xfel_ctx_t * ctx, struct spinand_pdata_t * pdat)
 {
 	const struct spinand_info_t * t;
-	uint32_t id;
+	uint8_t tx[2];
+	uint8_t rx[4];
 	int i;
 
-	if(spinand_read_id(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, &id) && (id != 0xffffff) && (id != 0))
+	tx[0] = OPCODE_RDID;
+	tx[1] = 0x0;
+	if(!fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 2, rx, 4))
+		return 0;
+	for(i = 0; i < ARRAY_SIZE(spinand_infos); i++)
 	{
-		for(i = 0; i < ARRAY_SIZE(spinand_infos); i++)
+		t = &spinand_infos[i];
+		if(memcmp(rx, t->id.val, t->id.len) == 0)
 		{
-			t = &spinand_infos[i];
-			if(id == t->id)
-			{
-				memcpy(&pdat->info, t, sizeof(struct spinand_info_t));
-				return 1;
-			}
+			memcpy(&pdat->info, t, sizeof(struct spinand_info_t));
+			return 1;
 		}
-		printf("The spi nand flash '0x%x' is not yet supported\r\n", id);
 	}
+	tx[0] = OPCODE_RDID;
+	if(!fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 1, rx, 4))
+		return 0;
+	for(i = 0; i < ARRAY_SIZE(spinand_infos); i++)
+	{
+		t = &spinand_infos[i];
+		if(memcmp(rx, t->id.val, t->id.len) == 0)
+		{
+			memcpy(&pdat->info, t, sizeof(struct spinand_info_t));
+			return 1;
+		}
+	}
+	printf("The spi nand flash '0x%02x%02x%02x%02x' is not yet supported\r\n", rx[0], rx[1], rx[2], rx[3]);
 	return 0;
 }
 
