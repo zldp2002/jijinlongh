@@ -49,6 +49,23 @@ FEL 是全志 SOC 中上 BootROM 中包含的低级程序。可以通过它使�
 | V536 | Dual-Core Cortex-A7 | 0x00181600 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | V831 | Single-core Cortex-A7 800Mhz | 0x00181700 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
+# 下载安装
+
+## Linux
+
+### ArchLinux
+
+xfel 现在可以在 [AUR](https://aur.archlinux.org/packages/xfel/) 下载到, 对于 ArchLinux 只需要使用 AUR 管理器就可以安装。例如`yay`。
+
+```shell
+yay -S xfel
+```
+
+## Windows
+
+在 [RELEASE](https://github.com/xboot/xfel/releases/latest) 找到预编译的Windows软件。
+
+
 # 使用方法
 
 ```
