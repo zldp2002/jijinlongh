@@ -54,6 +54,7 @@ usage:
 | R16 | Quad-Core ARM Cortex-A7 @ 1.2GHz | 0x00166700 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | A40i | Quad-Core ARM Cortex-A7 @ 1.2 GHz | 0x00170100 | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
 | R40 | Quad-Core ARM Cortex-A7 @ 1.2 GHz | 0x00170100 | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
+| A50 | Quad-Core ARM Cortex-A7 @ 1.8GHz | 0x00175500 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | A64 | Quad-Core ARM Cortex-A53 | 0x00168900 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | A80 | Octa-core big.LITTLE Cortex-A15/7 | 0x00163900 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | A83T | Octa-core Cortex-A7 @ 1.6GHz | 0x00167300 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
