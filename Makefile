@@ -2,6 +2,7 @@
 # Top makefile
 #
 
+PREFIX ?= /usr/local
 CROSS		?=
 
 AS			:= $(CROSS)gcc -x assembler-with-cpp
@@ -64,15 +65,15 @@ $(CPPOBJS) : %.o : %.cpp
 	@$(CXX) $(CXXFLAGS) -MD -MP -MF $@.d $(INCDIRS) -c $< -o $@
 
 install:
-	install -Dm0755 xfel /usr/local/bin/xfel
-	install -Dm0644 99-xfel.rules /etc/udev/rules.d/99-xfel.rules
-	install -Dm0644 LICENSE /usr/share/licenses/xfel/LICENSE
+	install -Dm0755 xfel $(DESTDIR)$(PREFIX)/bin/xfel
+	install -Dm0644 99-xfel.rules $(DESTDIR)/lib/udev/rules.d/99-xfel.rules
+	install -Dm0644 LICENSE $(DESTDIR)$(PREFIX)/share/licenses/xfel/LICENSE
 	udevadm control --reload
 
 uninstall:
-	rm -f /usr/local/bin/xfel
-	rm -f /etc/udev/rules.d/99-xfel.rules
-	rm -f /usr/share/licenses/xfel/LICENSE
+	rm -f $(DESTDIR)$(PREFIX)/bin/xfel
+	rm -f $(DESTDIR)/lib/udev/rules.d/99-xfel.rules
+	rm -f $(DESTDIR)$(PREFIX)/share/licenses/xfel/LICENSE
 	udevadm control --reload
 
 clean:
