@@ -1,4 +1,4 @@
-<p align="center"><img width="300" src="" alt="XFEL logo"></p>
+<p align="center"><img width="300" src="https://avatars.githubusercontent.com/u/423027?s=200&v=4" alt="XFEL logo"></p>
 <h1 align="center">XFEL</h1>
 <p align="center">Tiny FEL tools for Allwinner SOC.</p>
 
