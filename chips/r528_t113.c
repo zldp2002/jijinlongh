@@ -4238,8 +4238,9 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 			return 1;
 		}
 	}
-	printf("xfel ddr r528-s3 - Initial ddr controller for R528-S3\r\n");
-	printf("xfel ddr t113-s3 - Initial ddr controller for T113-S3\r\n");
+	printf("usage:\r\n");
+	printf("    xfel ddr r528-s3 - Initial ddr controller for R528-S3\r\n");
+	printf("    xfel ddr t113-s3 - Initial ddr controller for T113-S3\r\n");
 	return 0;
 }
 

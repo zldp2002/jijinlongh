@@ -959,8 +959,9 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 			return 1;
 		}
 	}
-	printf("xfel ddr v3s - Initial v3s ddr controller\r\n");
-	printf("xfel ddr s3  - Initial s3 ddr controller\r\n");
+	printf("usage:\r\n");
+	printf("    xfel ddr v3s - Initial v3s ddr controller\r\n");
+	printf("    xfel ddr s3  - Initial s3 ddr controller\r\n");
 	return 0;
 }
 

@@ -1475,8 +1475,9 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 		fel_exec(ctx, 0x00008000);
 		return 1;
 	}
-	printf("xfel ddr ddr3   - Initial ddr controller for DDR3\r\n");
-	printf("xfel ddr lpddr3 - Initial ddr controller for LPDDR3\r\n");
+	printf("usage:\r\n");
+	printf("    xfel ddr ddr3   - Initial ddr controller for DDR3\r\n");
+	printf("    xfel ddr lpddr3 - Initial ddr controller for LPDDR3\r\n");
 	return 0;
 }
 

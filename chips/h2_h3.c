@@ -1017,8 +1017,9 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 			return 1;
 		}
 	}
-	printf("xfel ddr h2 - Initial h2 ddr controller\r\n");
-	printf("xfel ddr h3 - Initial h3 ddr controller\r\n");
+	printf("usage:\r\n");
+	printf("    xfel ddr h2 - Initial h2 ddr controller\r\n");
+	printf("    xfel ddr h3 - Initial h3 ddr controller\r\n");
 	return 0;
 }
 

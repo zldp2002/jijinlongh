@@ -5850,9 +5850,10 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 			return 1;
 		}
 	}
-	printf("xfel ddr r128-s2 - Initial PSRAM controller for R128-S2\r\n");
-	printf("xfel ddr r128-s3 - Initial PSRAM controller for R128-S3\r\n");
-	printf("xfel ddr xr875   - Initial PSRAM controller for XR875\r\n");
+	printf("usage:\r\n");
+	printf("    xfel ddr r128-s2 - Initial PSRAM controller for R128-S2\r\n");
+	printf("    xfel ddr r128-s3 - Initial PSRAM controller for R128-S3\r\n");
+	printf("    xfel ddr xr875   - Initial PSRAM controller for XR875\r\n");
 	return 0;
 }
 
@@ -6134,7 +6135,6 @@ static int chip_extra(struct xfel_ctx_t * ctx, int argc, char * argv[])
 			}
 		}
 	}
-
 	printf("usage:\r\n");
 	printf("    xfel extra exec riscv <address> - Boot riscv and jump to address\r\n");
 	printf("    xfel extra exec dsp <address>   - Boot dsp and jump to address\r\n");
