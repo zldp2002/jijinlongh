@@ -400,6 +400,9 @@ static void spinand_helper_write(struct xfel_ctx_t * ctx, struct spinand_pdata_t
 				addr += n;
 				buf += n;
 				count -= n;
+
+				if(!count)
+					break;
 			}
 			cbuf[clen++] = SPI_CMD_END;
 			fel_write(ctx, pdat->swapbuf, txbuf, txlen);
