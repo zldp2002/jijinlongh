@@ -9,8 +9,6 @@ CC			:= $(CROSS)gcc
 CXX			:= $(CROSS)g++
 LD			:= $(CROSS)ld
 AR			:= $(CROSS)ar
-OC			:= $(CROSS)objcopy
-OD			:= $(CROSS)objdump
 RM			:= rm -fr
 
 ASFLAGS		:= -g -ggdb -Wall -O3
@@ -18,8 +16,6 @@ CFLAGS		:= -g -ggdb -Wall -O3
 CXXFLAGS	:= -g -ggdb -Wall -O3
 LDFLAGS		:=
 ARFLAGS		:= -rcs
-OCFLAGS		:= -v -O binary
-ODFLAGS		:=
 MCFLAGS		:=
 
 LIBDIRS		:=
