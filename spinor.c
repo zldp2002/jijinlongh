@@ -658,9 +658,8 @@ static void spinor_helper_erase(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 	else
 		return;
 	emask = esize - 1;
-
 	base = addr & ~emask;
-	cnt = ((addr & emask) + count + esize) & ~emask;
+	cnt = ((addr + count + esize - 1) & ~emask) - base;
 	while(cnt > 0)
 	{
 		if((pdat->info.opcode_erase_256k != 0) && ((base & 0x3ffff) == 0) && (cnt >= 262144))
@@ -851,7 +850,7 @@ int spinor_erase(struct xfel_ctx_t * ctx, uint64_t addr, uint64_t len)
 			return 0;
 		emask = esize - 1;
 		base = addr & ~emask;
-		cnt = ((addr & emask) + len + ((addr == base) && (len >= esize)) ? 0 : esize) & ~emask;
+		cnt = ((addr + len + esize - 1) & ~emask) - base;
 		progress_start(&p, cnt);
 		while(cnt > 0)
 		{
@@ -913,7 +912,7 @@ int spinor_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t le
 			return 0;
 		emask = esize - 1;
 		base = addr & ~emask;
-		cnt = ((addr & emask) + len + ((addr == base) && (len >= esize)) ? 0 : esize) & ~emask;
+		cnt = ((addr + len + esize - 1) & ~emask) - base;
 		progress_start(&p, cnt);
 		while(cnt > 0)
 		{
