@@ -2,6 +2,5 @@
 # If rules fail to reload automatically, you can refresh udev rules
 # with the command "sudo udevadm control --reload"
 
-ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1f3a", ATTRS{idProduct}=="efe8", MODE="666", GROUP="plugdev"
-ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1f3a", ATTRS{idProduct}=="efe8", TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1f3a", ATTRS{idProduct}=="efe8", MODE="666", GROUP="users" TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
 

@@ -71,6 +71,7 @@ install:
 	install -Dm0755 xfel /usr/local/bin/xfel
 	install -Dm0644 99-xfel.rules /etc/udev/rules.d/99-xfel.rules
 	install -Dm0644 LICENSE /usr/share/licenses/xfel/LICENSE
+	udevadm control --reload
 
 clean:
 	@$(RM) $(DEPS) $(OBJS) $(NAME).exe $(NAME) *~
