@@ -249,9 +249,9 @@ static int spinand_helper_init(struct xfel_ctx_t * ctx, struct spinand_pdata_t *
 	{
 		spinand_reset(ctx, pdat);
 		spinand_wait_for_busy(ctx, pdat);
-		if(spinand_get_feature(ctx, pdat, OPCODE_FEATURE_PROTECT, &val) && (val & 0x38))
+		if(spinand_get_feature(ctx, pdat, OPCODE_FEATURE_PROTECT, &val) && (val != 0x0))
 		{
-			spinand_set_feature(ctx, pdat, OPCODE_FEATURE_PROTECT, val & ~0x38);
+			spinand_set_feature(ctx, pdat, OPCODE_FEATURE_PROTECT, 0x0);
 			spinand_wait_for_busy(ctx, pdat);
 		}
 		return 1;
