@@ -26,28 +26,27 @@
  *
  */
 
-.thumb
 .syntax unified
 
 	.global _start
 _start:
-	dsb sy
-	isb sy
-	ldr r0, _iciallu
-	ldr r1, =#0x0
-	str r1, [r0]
-	dsb sy
-	isb sy
+	dsb.w sy
+	isb.w sy
+	ldr.w r0, _iciallu
+	mov.w r1, #0x0
+	str.w r1, [r0]
+	dsb.w sy
+	isb.w sy
 	b.w reset
 	.align 2
 _iciallu:
 	.word 0xe000ef50
 
 reset:
-	ldr	r0, _adr
-	adr	r1, _val
-	ldr	r2, [r0]
-	str	r2, [r1]
+	ldr.w r0, _adr
+	adr.w r1, _val
+	ldr.w r2, [r0]
+	str.w r2, [r1]
 	bx lr
 	.align 2
 _adr:
