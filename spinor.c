@@ -381,7 +381,7 @@ static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_pdata_t * 
 	uint8_t tx[5];
 
 	if(pdat->info.read_granularity == 1)
-		granularity = (count < 0x7fffffff) ? count : 0x7fffffff;
+		granularity = (count < 0x40000000) ? count : 0x40000000;
 	else
 		granularity = pdat->info.read_granularity;
 	switch(pdat->info.address_length)
@@ -699,7 +699,7 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 	uint32_t granularity, n;
 
 	if(pdat->info.write_granularity == 1)
-		granularity = (count < 0x7fffffff) ? count : 0x7fffffff;
+		granularity = (count < 0x40000000) ? count : 0x40000000;
 	else
 		granularity = pdat->info.write_granularity;
 	switch(pdat->info.address_length)
