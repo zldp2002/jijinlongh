@@ -8,9 +8,6 @@ NAME		:= write32
 #
 # System environment variable.
 #
-#
-# System environment variable.
-#
 ifeq ($(OS), Windows_NT)
 	HOSTOS		:= windows
 else
