@@ -35,6 +35,7 @@ usage:
     xfel spinand read <address> <length> <file>         - Read spi nand flash to file
     xfel spinand write <address> <file>                 - Write file to spi nand flash
     xfel spinand splwrite <split-size> <address> <file> - Write file to spi nand flash with split support
+    xfel extra [...]                                    - The extra commands
 ```
 
 ## Links
