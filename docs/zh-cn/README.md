@@ -43,6 +43,7 @@ FEL 是全志 SOC 中上 BootROM 中包含的低级程序。可以通过它使�
 | R328 | Dual-Core Cortex-A7 | 0x00182100 | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | R329 | Dual-Core Cortex-A53 | 0x00185100 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | R528 | Dual-Core Cortex-A7 | 0x00185900 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| T113 | Dual-Core Cortex-A7 | 0x00185900 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | T507 | Quad-Core ARM Cortex-A53 | 0x00182300 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | V3s | Single-core Cortex-A7 | 0x00168100 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | S3 | Single-core Cortex-A7 | 0x00168100 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -185,7 +186,7 @@ xfel spinand write 0x600000 rootfs.squashfs
 
 
 ```
-xfel ddr ddr2                          # 使用ddr2方式初始化DDR控制器
+xfel ddr f133                          # 初始化F133 DDR控制器
 xfel write 0x80200000 opensbi.bin      # 将opensbi写入0x80200000
 xfel exec 0x80200000                   # 调用函数地址运行
 ```

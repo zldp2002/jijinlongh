@@ -43,6 +43,7 @@ FEL is a low-level subroutine contained in the BootROM on Allwinner devices. It 
 | R328 | Dual-Core Cortex-A7 | 0x00182100 | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | R329 | Dual-Core Cortex-A53 | 0x00185100 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | R528 | Dual-Core Cortex-A7 | 0x00185900 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| T113 | Dual-Core Cortex-A7 | 0x00185900 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | T507 | Quad-Core ARM Cortex-A53 | 0x00182300 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | V3s | Single-core Cortex-A7 | 0x00168100 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | S3 | Single-core Cortex-A7 | 0x00168100 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -181,7 +182,7 @@ xfel spinand write 0x600000 rootfs.squashfs
 ## F133: Write OpenSBI to DDR and execute it
 
 ```
-xfel ddr ddr2                          # Initial ddr controller with ddr2 type
+xfel ddr f133                          # Initial ddr controller for f133
 xfel write 0x80200000 opensbi.bin      # write opensbi to 0x80200000
 xfel exec 0x80200000                   # Call the function and exectue
 ```
