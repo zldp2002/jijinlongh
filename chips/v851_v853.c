@@ -63,38 +63,56 @@ static int chip_detect(struct xfel_ctx_t * ctx, uint32_t id)
 	return 0;
 }
 
-static int chip_reset(struct xfel_ctx_t * ctx)
+static uint32_t payload_read32(struct xfel_ctx_t * ctx, uint32_t addr)
 {
-	W32(0x020500a0 + 0x08, (0x16aa << 16) | (0x1 << 0));
-	return 1;
-}
-
-static uint32_t payload_arm_read32(struct xfel_ctx_t * ctx, uint32_t addr)
-{
-	uint32_t payload[] = {
-		cpu_to_le32(0xe59f000c), /* ldr r0, [pc, #12] */
-		cpu_to_le32(0xe28f100c), /* add r1, pc, #12   */
-		cpu_to_le32(0xe4902000), /* ldr r2, [r0], #0  */
-		cpu_to_le32(0xe4812000), /* str r2, [r1], #0  */
-		cpu_to_le32(0xe12fff1e), /* bx lr             */
-		cpu_to_le32(addr),
+	static const uint8_t payload[] = {
+		0x00, 0x00, 0xa0, 0xe3, 0x17, 0x0f, 0x08, 0xee, 0x15, 0x0f, 0x07, 0xee,
+		0xd5, 0x0f, 0x07, 0xee, 0x9a, 0x0f, 0x07, 0xee, 0x95, 0x0f, 0x07, 0xee,
+		0xff, 0xff, 0xff, 0xea, 0x0c, 0x00, 0x9f, 0xe5, 0x0c, 0x10, 0x8f, 0xe2,
+		0x00, 0x20, 0x90, 0xe5, 0x00, 0x20, 0x81, 0xe5, 0x1e, 0xff, 0x2f, 0xe1,
 	};
+	uint32_t adr = cpu_to_le32(addr);
 	uint32_t val;
 
 	fel_write(ctx, ctx->version.scratchpad, (void *)payload, sizeof(payload));
+	fel_write(ctx, ctx->version.scratchpad + sizeof(payload), (void *)&adr, sizeof(adr));
 	fel_exec(ctx, ctx->version.scratchpad);
-	fel_read(ctx, ctx->version.scratchpad + sizeof(payload), (void *)&val, sizeof(val));
+	fel_read(ctx, ctx->version.scratchpad + sizeof(payload) + sizeof(adr), (void *)&val, sizeof(val));
 	return le32_to_cpu(val);
+}
+
+static void payload_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val)
+{
+	static const uint8_t payload[] = {
+		0x00, 0x00, 0xa0, 0xe3, 0x17, 0x0f, 0x08, 0xee, 0x15, 0x0f, 0x07, 0xee,
+		0xd5, 0x0f, 0x07, 0xee, 0x9a, 0x0f, 0x07, 0xee, 0x95, 0x0f, 0x07, 0xee,
+		0xff, 0xff, 0xff, 0xea, 0x08, 0x00, 0x9f, 0xe5, 0x08, 0x10, 0x9f, 0xe5,
+		0x00, 0x10, 0x80, 0xe5, 0x1e, 0xff, 0x2f, 0xe1,
+	};
+	uint32_t params[2] = {
+		cpu_to_le32(addr),
+		cpu_to_le32(val),
+	};
+
+	fel_write(ctx, ctx->version.scratchpad, (void *)payload, sizeof(payload));
+	fel_write(ctx, ctx->version.scratchpad + sizeof(payload), (void *)params, sizeof(params));
+	fel_exec(ctx, ctx->version.scratchpad);
+}
+
+static int chip_reset(struct xfel_ctx_t * ctx)
+{
+	payload_write32(ctx, 0x020500a0 + 0x08, (0x16aa << 16) | (0x1 << 0));
+	return 1;
 }
 
 static int chip_sid(struct xfel_ctx_t * ctx, char * sid)
 {
 	uint32_t id[4];
 
-	id[0] = payload_arm_read32(ctx, 0x03006200 + 0x0);
-	id[1] = payload_arm_read32(ctx, 0x03006200 + 0x4);
-	id[2] = payload_arm_read32(ctx, 0x03006200 + 0x8);
-	id[3] = payload_arm_read32(ctx, 0x03006200 + 0xc);
+	id[0] = payload_read32(ctx, 0x03006200 + 0x0);
+	id[1] = payload_read32(ctx, 0x03006200 + 0x4);
+	id[2] = payload_read32(ctx, 0x03006200 + 0x8);
+	id[3] = payload_read32(ctx, 0x03006200 + 0xc);
 	sprintf(sid, "%08x%08x%08x%08x", id[0], id[1], id[2], id[3]);
 	return 1;
 }
@@ -1596,8 +1614,49 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 1;
 }
 
+static const struct sid_section_t {
+	char * name;
+	uint32_t offset;
+	uint32_t size_bits;
+} sids[] = {
+	{ "chipid",  0x0000,  128 },
+	{ "unknown", 0x0010, 1920 },
+};
+
 static int chip_extra(struct xfel_ctx_t * ctx, int argc, char * argv[])
 {
+	if(argc > 0)
+	{
+		if(!strcmp(argv[0], "efuse"))
+		{
+			argc -= 1;
+			argv += 1;
+			if(argc > 0)
+			{
+				if(!strcmp(argv[0], "dump") && (argc == 1))
+				{
+					uint32_t buffer[2048 / 4];
+					for(int n = 0; n < ARRAY_SIZE(sids); n++)
+					{
+						uint32_t count = sids[n].size_bits / 32;
+						for(int i = 0; i < count; i++)
+							buffer[i] = payload_read32(ctx, 0x03006200 + sids[n].offset + i * 4);
+						printf("%s:", sids[n].name);
+						for(int i = 0; i < count; i++)
+						{
+							if(i >= 0 && ((i % 8) == 0))
+								printf("\r\n%-4s", "");
+							printf("%08x ", buffer[i]);
+						}
+						printf("\r\n");
+					}
+					return 1;
+				}
+			}
+		}
+	}
+	printf("usage:\r\n");
+	printf("    xfel extra efuse dump - Dump all of the efuse information\r\n");
 	return 0;
 }
 
