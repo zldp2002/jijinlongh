@@ -318,9 +318,7 @@ int main(int argc, char * argv[])
 	{
 		argc -= 2;
 		argv += 2;
-		if(fel_chip_ddr(&ctx, (argc == 1) ? argv[0] : ""))
-			printf("Initial ddr controller succeeded\r\n");
-		else
+		if(!fel_chip_ddr(&ctx, (argc == 1) ? argv[0] : ""))
 			printf("Failed to initial ddr controller\r\n");
 	}
 	else if(!strcmp(argv[1], "sign"))
