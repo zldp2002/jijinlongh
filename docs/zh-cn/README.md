@@ -74,11 +74,11 @@ usage:
     xfel version                                        - 显示芯片ID
     xfel hexdump <address> <length>                     - 以HEX文件转储内存区域
     xfel dump <address> <length>                        - 转储内存区域并输出
-    xfel exec <address>                                 - 调用函数地址
     xfel read32 <address>                               - 从设备内存中读取 32 位值
     xfel write32 <address> <value>                      - 向设备内存中写入 32 位值
     xfel read <address> <length> <file>                 - 向文件写入内存
     xfel write <address> <file>                         - 向内存写入文件
+    xfel exec <address>                                 - 调用函数地址
     xfel reset                                          - 使用看门狗重置设备
     xfel sid                                            - 显示sid信息
     xfel jtag                                           - 启用 jtag 调试

@@ -104,11 +104,11 @@ static void usage(void)
 	printf("    xfel version                                        - Show chip version\r\n");
 	printf("    xfel hexdump <address> <length>                     - Dumps memory region in hex\r\n");
 	printf("    xfel dump <address> <length>                        - Binary memory dump to stdout\r\n");
-	printf("    xfel exec <address>                                 - Call function address\r\n");
 	printf("    xfel read32 <address>                               - Read 32-bits value from device memory\r\n");
 	printf("    xfel write32 <address> <value>                      - Write 32-bits value to device memory\r\n");
 	printf("    xfel read <address> <length> <file>                 - Read memory to file\r\n");
 	printf("    xfel write <address> <file>                         - Write file to memory\r\n");
+	printf("    xfel exec <address>                                 - Call function address\r\n");
 	printf("    xfel reset                                          - Reset device using watchdog\r\n");
 	printf("    xfel sid                                            - Show sid information\r\n");
 	printf("    xfel jtag                                           - Enable jtag debug\r\n");
@@ -197,18 +197,6 @@ int main(int argc, char * argv[])
 		else
 			usage();
 	}
-	else if(!strcmp(argv[1], "exec"))
-	{
-		argc -= 2;
-		argv += 2;
-		if(argc == 1)
-		{
-			uint32_t addr = strtoul(argv[0], NULL, 0);
-			fel_exec(&ctx, addr);
-		}
-		else
-			usage();
-	}
 	else if(!strcmp(argv[1], "read32"))
 	{
 		argc -= 2;
@@ -267,6 +255,18 @@ int main(int argc, char * argv[])
 				fel_write_progress(&ctx, addr, buf, len);
 				free(buf);
 			}
+		}
+		else
+			usage();
+	}
+	else if(!strcmp(argv[1], "exec"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 1)
+		{
+			uint32_t addr = strtoul(argv[0], NULL, 0);
+			fel_exec(&ctx, addr);
 		}
 		else
 			usage();
