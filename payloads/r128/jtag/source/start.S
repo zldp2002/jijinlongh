@@ -26,10 +26,15 @@
  *
  */
 
+.thumb
+.syntax unified
+
 	.global _start
 _start:
-	b reset
+	b.w reset
 
 reset:
+	push.w { lr }
 	bl sys_jtag_init
-	bx lr
+	pop.w { lr }
+	mov pc, lr
