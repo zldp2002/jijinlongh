@@ -100,7 +100,7 @@ static void hexdump(uint32_t addr, void * buf, size_t len)
 
 static void usage(void)
 {
-	printf("xfel(v1.3.0) - https://github.com/xboot/xfel\r\n");
+	printf("xfel(v1.3.1) - https://github.com/xboot/xfel\r\n");
 	printf("usage:\r\n");
 	printf("    xfel version                                        - Show chip version\r\n");
 	printf("    xfel hexdump <address> <length>                     - Dumps memory region in hex\r\n");
