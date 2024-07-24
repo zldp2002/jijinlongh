@@ -1,0 +1,14 @@
+#
+# Normal rules
+#
+*.d
+*.o
+*.map
+*~
+
+#
+# Generated files
+#
+/.cproject
+/.project
+/xfel
