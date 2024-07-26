@@ -116,18 +116,18 @@ static inline void fel_version(struct xfel_ctx_t * ctx)
 	int i;
 
 	send_fel_request(ctx, 0x001, 0, 0);
-	usb_read(ctx, &ctx->ver, sizeof(struct fel_version_t));
+	usb_read(ctx, &ctx->version, sizeof(ctx->version));
 	read_fel_status(ctx);
-	ctx->ver.id = le32_to_cpu(ctx->ver.id);
-	ctx->ver.unknown_0a = le32_to_cpu(ctx->ver.unknown_0a);
-	ctx->ver.protocol = le32_to_cpu(ctx->ver.protocol);
-	ctx->ver.scratchpad = le16toh(ctx->ver.scratchpad);
-	ctx->ver.pad[0] = le32_to_cpu(ctx->ver.pad[0]);
-	ctx->ver.pad[1] = le32_to_cpu(ctx->ver.pad[1]);
+	ctx->version.id = le32_to_cpu(ctx->version.id);
+	ctx->version.unknown_0a = le32_to_cpu(ctx->version.unknown_0a);
+	ctx->version.protocol = le16_to_cpu(ctx->version.protocol);
+	ctx->version.scratchpad = le32_to_cpu(ctx->version.scratchpad);
+	ctx->version.pad[0] = le32_to_cpu(ctx->version.pad[0]);
+	ctx->version.pad[1] = le32_to_cpu(ctx->version.pad[1]);
 	ctx->chip = NULL;
 	for(i = 0; i < ARRAY_SIZE(chips); i++)
 	{
-		if(chips[i]->id == ctx->ver.id)
+		if(chips[i]->id == ctx->version.id)
 		{
 			ctx->chip = chips[i];
 			break;
@@ -173,25 +173,93 @@ int fel_init(struct xfel_ctx_t * ctx)
 	return 0;
 }
 
-void fel_read(struct xfel_ctx_t * ctx, uint32_t offset, void * buf, size_t len)
+void fel_exec(struct xfel_ctx_t * ctx, uint32_t addr)
 {
-	send_fel_request(ctx, 0x103, offset, len);
+	send_fel_request(ctx, 0x102, addr, 0);
+	read_fel_status(ctx);
+}
+
+static inline void fel_read_raw(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+{
+	send_fel_request(ctx, 0x103, addr, len);
 	usb_read(ctx, buf, len);
 	read_fel_status(ctx);
 }
 
-void fel_write(struct xfel_ctx_t * ctx, uint32_t offset, void * buf, size_t len)
+void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+{
+	size_t n;
+
+	while(len > 0)
+	{
+		n = len > 256 ? 256 : len;
+		fel_read_raw(ctx, addr, buf, n);
+		addr += n;
+		buf += n;
+		len -= n;
+	}
+}
+
+static inline void fel_write_raw(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
 	if(len > 0)
 	{
-		send_fel_request(ctx, 0x101, offset, len);
+		send_fel_request(ctx, 0x101, addr, len);
 		usb_write(ctx, buf, len);
 		read_fel_status(ctx);
 	}
 }
 
-void fel_exec(struct xfel_ctx_t * ctx, uint32_t offset)
+void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
-	send_fel_request(ctx, 0x102, offset, 0);
-	read_fel_status(ctx);
+	size_t n;
+
+	while(len > 0)
+	{
+		n = len > 256 ? 256 : len;
+		fel_write_raw(ctx, addr, buf, n);
+		addr += n;
+		buf += n;
+		len -= n;
+	}
+}
+
+uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr)
+{
+	uint32_t val;
+	fel_read(ctx, addr, &val, sizeof(val));
+	return val;
+}
+
+void fel_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val)
+{
+	fel_write(ctx, addr, &val, sizeof(val));
+}
+
+int fel_chip_sid(struct xfel_ctx_t * ctx)
+{
+	if(ctx && ctx->chip && ctx->chip->sid)
+		return ctx->chip->sid(ctx);
+	return 0;
+}
+
+int fel_chip_jtag(struct xfel_ctx_t * ctx)
+{
+	if(ctx && ctx->chip && ctx->chip->jtag)
+		return ctx->chip->jtag(ctx);
+	return 0;
+}
+
+int fel_chip_ddr(struct xfel_ctx_t * ctx)
+{
+	if(ctx && ctx->chip && ctx->chip->ddr)
+		return ctx->chip->ddr(ctx);
+	return 0;
+}
+
+int fel_chip_reset(struct xfel_ctx_t * ctx)
+{
+	if(ctx && ctx->chip && ctx->chip->reset)
+		return ctx->chip->reset(ctx);
+	return 0;
 }

@@ -1,11 +1,32 @@
-#ifndef __BYTEORDER_H__
-#define __BYTEORDER_H__
+#ifndef __X_H__
+#define __X_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#if (defined(_WIN16) || defined(_WIN32) || defined(_WIN64)) && !defined(__WINDOWS__)
+# define __WINDOWS__
+#endif
+#if defined(__linux__) || defined(__CYGWIN__)
+# include <endian.h>
+#elif defined(__OpenBSD__) || defined(__NetBSD__) || defined(__FreeBSD__) || defined(__DragonFly__)
+# include <sys/endian.h>
+#elif defined(__WINDOWS__)
+# include <winsock2.h>
+# include <sys/param.h>
+#else
+# error "platform not supported!"
+#endif
+
+#include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <ctype.h>
+#include <assert.h>
+#include <libusb.h>
 
 static inline uint16_t __swab16(uint16_t x)
 {
@@ -40,7 +61,7 @@ static inline uint32_t __swahb32(uint32_t x)
 	return ( ((x & (uint32_t)0x00ff00ffUL)<<8) | ((x & (uint32_t)0xff00ff00UL)>>8) );
 }
 
-#if (0)	/* BIG_ENDIAN */
+#if BYTE_ORDER == BIG_ENDIAN
 #define cpu_to_le64(x)	(__swab64((uint64_t)(x)))
 #define le64_to_cpu(x)	(__swab64((uint64_t)(x)))
 #define cpu_to_le32(x)	(__swab32((uint32_t)(x)))
@@ -68,8 +89,11 @@ static inline uint32_t __swahb32(uint32_t x)
 #define be16_to_cpu(x)	(__swab16((uint16_t)(x)))
 #endif
 
+#define ARRAY_SIZE(array)	(sizeof(array) / sizeof((array)[0]))
+#define X(...)				("" #__VA_ARGS__ "")
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __BYTEORDER_H__ */
+#endif /* __X_H__ */

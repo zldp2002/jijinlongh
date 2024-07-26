@@ -5,46 +5,50 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <ctype.h>
-#include <assert.h>
-#include <libusb.h>
-#include <byteorder.h>
+#include <x.h>
 
-#define ARRAY_SIZE(array)	(sizeof(array) / sizeof((array)[0]))
-
-struct fel_version_t {
-	char signature[8];
-	uint32_t id;
-	uint32_t unknown_0a;
-	uint16_t protocol;
-	uint8_t  unknown_12;
-	uint8_t  unknown_13;
-	uint32_t scratchpad;
-	uint32_t pad[2];
-};
-
-struct chip_t {
-	char * name;
-	uint32_t id;
-};
+struct xfel_ctx_t;
+struct chip_t;
 
 struct xfel_ctx_t {
 	libusb_device_handle * hdl;
 	int epout;
 	int epin;
-	struct fel_version_t ver;
+	struct {
+		char signature[8];
+		uint32_t id;
+		uint32_t unknown_0a;
+		uint16_t protocol;
+		uint8_t  unknown_12;
+		uint8_t  unknown_13;
+		uint32_t scratchpad;
+		uint32_t pad[2];
+	} version;
 	struct chip_t * chip;
 };
 
+struct chip_t {
+	char * name;
+	uint32_t id;
+
+	int (*reset)(struct xfel_ctx_t * ctx);
+	int (*sid)(struct xfel_ctx_t * ctx);
+	int (*jtag)(struct xfel_ctx_t * ctx);
+	int (*ddr)(struct xfel_ctx_t * ctx);
+};
+
 int fel_init(struct xfel_ctx_t * ctx);
-void fel_read(struct xfel_ctx_t * ctx, uint32_t offset, void * buf, size_t len);
-void fel_write(struct xfel_ctx_t * ctx, uint32_t offset, void * buf, size_t len);
-void fel_exec(struct xfel_ctx_t * ctx, uint32_t offset);
+
+void fel_exec(struct xfel_ctx_t * ctx, uint32_t addr);
+void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr);
+void fel_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val);
+
+int fel_chip_reset(struct xfel_ctx_t * ctx);
+int fel_chip_sid(struct xfel_ctx_t * ctx);
+int fel_chip_jtag(struct xfel_ctx_t * ctx);
+int fel_chip_ddr(struct xfel_ctx_t * ctx);
 
 #ifdef __cplusplus
 }
