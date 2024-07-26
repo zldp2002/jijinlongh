@@ -40,10 +40,10 @@ struct chip_t {
 int fel_init(struct xfel_ctx_t * ctx);
 
 void fel_exec(struct xfel_ctx_t * ctx, uint32_t addr);
-void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
-void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr);
 void fel_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val);
+void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int progress);
+void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int progress);
 
 int fel_chip_reset(struct xfel_ctx_t * ctx);
 int fel_chip_sid(struct xfel_ctx_t * ctx);

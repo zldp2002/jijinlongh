@@ -173,6 +173,69 @@ int fel_init(struct xfel_ctx_t * ctx)
 	return 0;
 }
 
+struct progressbar_t {
+	size_t total;
+	size_t done;
+	double start;
+};
+
+static inline double gettime(void)
+{
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return tv.tv_sec + (double)tv.tv_usec / 1000000.0;
+}
+
+static inline const char * format_eta(double remaining)
+{
+	static char result[6] = "";
+	int seconds = remaining + 0.5;
+	if(seconds >= 0 && seconds < 6000)
+	{
+		snprintf(result, sizeof(result), "%02d:%02d", seconds / 60, seconds % 60);
+		return result;
+	}
+	return "--:--";
+}
+
+static void progressbar_start(struct progressbar_t * bar, size_t total)
+{
+	if(bar && (total > 0))
+	{
+		bar->total = total;
+		bar->done = 0;
+		bar->start = gettime();
+	}
+}
+
+static void progressbar_update(struct progressbar_t * bar, size_t bytes)
+{
+	if(bar)
+	{
+		bar->done += bytes;
+		double ratio = bar->total > 0 ? (double)bar->done / (double)bar->total : 0.0;
+		double speed = (double)bar->done / (gettime() - bar->start);
+		double eta = speed > 0 ? (bar->total - bar->done) / speed : 0;
+		int i, pos = 48 * ratio;
+		printf("\r%3.0f%% [", ratio * 100);
+		for(i = 0; i < pos; i++)
+			putchar('=');
+		for(i = pos; i < 48; i++)
+			putchar(' ');
+		if(bar->done < bar->total)
+			printf("]%6.1f kB/s, ETA %s ", speed / 1000.0, format_eta(eta));
+		else
+			printf("] %5.0f kB, %6.1f kB/s", bar->done / 1000.0, speed / 1000.0);
+		fflush(stdout);
+	}
+}
+
+static void progressbar_stop(struct progressbar_t * bar)
+{
+	if(bar)
+		printf("\r\n");
+}
+
 void fel_exec(struct xfel_ctx_t * ctx, uint32_t addr)
 {
 	send_fel_request(ctx, 0x102, addr, 0);
@@ -186,20 +249,6 @@ static inline void fel_read_raw(struct xfel_ctx_t * ctx, uint32_t addr, void * b
 	read_fel_status(ctx);
 }
 
-void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
-{
-	size_t n;
-
-	while(len > 0)
-	{
-		n = len > 256 ? 256 : len;
-		fel_read_raw(ctx, addr, buf, n);
-		addr += n;
-		buf += n;
-		len -= n;
-	}
-}
-
 static inline void fel_write_raw(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
 	if(len > 0)
@@ -210,10 +259,46 @@ static inline void fel_write_raw(struct xfel_ctx_t * ctx, uint32_t addr, void * 
 	}
 }
 
-void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr)
 {
+	uint32_t val;
+	fel_read_raw(ctx, addr, &val, sizeof(val));
+	return val;
+}
+
+void fel_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val)
+{
+	fel_write_raw(ctx, addr, &val, sizeof(val));
+}
+
+void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int progress)
+{
+	struct progressbar_t bar;
 	size_t n;
 
+	if(progress)
+		progressbar_start(&bar, len);
+	while(len > 0)
+	{
+		n = len > 256 ? 256 : len;
+		fel_read_raw(ctx, addr, buf, n);
+		addr += n;
+		buf += n;
+		len -= n;
+		if(progress)
+			progressbar_update(&bar, n);
+	}
+	if(progress)
+		progressbar_stop(&bar);
+}
+
+void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int progress)
+{
+	struct progressbar_t bar;
+	size_t n;
+
+	if(progress)
+		progressbar_start(&bar, len);
 	while(len > 0)
 	{
 		n = len > 256 ? 256 : len;
@@ -221,19 +306,11 @@ void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 		addr += n;
 		buf += n;
 		len -= n;
+		if(progress)
+			progressbar_update(&bar, n);
 	}
-}
-
-uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr)
-{
-	uint32_t val;
-	fel_read(ctx, addr, &val, sizeof(val));
-	return val;
-}
-
-void fel_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val)
-{
-	fel_write(ctx, addr, &val, sizeof(val));
+	if(progress)
+		progressbar_stop(&bar);
 }
 
 int fel_chip_sid(struct xfel_ctx_t * ctx)
