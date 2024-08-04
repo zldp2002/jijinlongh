@@ -2,10 +2,12 @@
 
 extern struct chip_t f1c100s;
 extern struct chip_t d1;
+extern struct chip_t v831;
 
 static struct chip_t * chips[] = {
 	&f1c100s,
 	&d1,
+	&v831,
 };
 
 struct usb_request_t {
