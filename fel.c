@@ -315,10 +315,10 @@ void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, i
 		progressbar_stop(&bar);
 }
 
-int fel_chip_sid(struct xfel_ctx_t * ctx)
+int fel_chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
 {
 	if(ctx && ctx->chip && ctx->chip->sid)
-		return ctx->chip->sid(ctx);
+		return ctx->chip->sid(ctx, sid);
 	return 0;
 }
 

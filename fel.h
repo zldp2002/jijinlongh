@@ -32,7 +32,7 @@ struct chip_t {
 	uint32_t id;
 
 	int (*reset)(struct xfel_ctx_t * ctx);
-	int (*sid)(struct xfel_ctx_t * ctx);
+	int (*sid)(struct xfel_ctx_t * ctx, uint32_t * sid);
 	int (*jtag)(struct xfel_ctx_t * ctx);
 	int (*ddr)(struct xfel_ctx_t * ctx);
 };
@@ -48,7 +48,7 @@ void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, in
 void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int progress);
 
 int fel_chip_reset(struct xfel_ctx_t * ctx);
-int fel_chip_sid(struct xfel_ctx_t * ctx);
+int fel_chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid);
 int fel_chip_jtag(struct xfel_ctx_t * ctx);
 int fel_chip_ddr(struct xfel_ctx_t * ctx);
 

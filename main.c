@@ -85,12 +85,12 @@ static void usage(void)
 	printf("    xfel hexdump <address> <length>     - Dumps memory region in hex\r\n");
 	printf("    xfel dump <address> <length>        - Binary memory dump to stdout\r\n");
 	printf("    xfel exec <address>                 - Call function address\r\n");
-	printf("    xfel read32 <address>               - Read 32-bit value from device memory\r\n");
-	printf("    xfel write32 <address> <value>      - Write 32-bit value to device memory\r\n");
+	printf("    xfel read32 <address>               - Read 32-bits value from device memory\r\n");
+	printf("    xfel write32 <address> <value>      - Write 32-bits value to device memory\r\n");
 	printf("    xfel read <address> <length> <file> - Read memory to file\r\n");
 	printf("    xfel write <address> <file>         - Write memory from file\r\n");
 	printf("    xfel reset                          - Reset device using watchdog\r\n");
-	printf("    xfel sid                            - Output SID information\r\n");
+	printf("    xfel sid                            - Output 128-bits SID information\r\n");
 	printf("    xfel jtag                           - Enable JTAG debug\r\n");
 	printf("    xfel ddr                            - Initial DDR controller\r\n");
 }
@@ -256,7 +256,10 @@ int main(int argc, char * argv[])
 	}
 	else if(!strcmp(argv[1], "sid"))
 	{
-		if(!fel_chip_sid(&ctx))
+		uint32_t sid[4];
+		if(fel_chip_sid(&ctx, sid))
+			printf("%08x%08x%08x%08x\r\n",sid[0], sid[1], sid[2], sid[3]);
+		else
 			printf("The chip don't support '%s' command\r\n", argv[1]);
 	}
 	else if(!strcmp(argv[1], "jtag"))

@@ -5,7 +5,7 @@ static int chip_reset(struct xfel_ctx_t * ctx)
 	return 0;
 }
 
-static int chip_sid(struct xfel_ctx_t * ctx)
+static int chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
 {
 	return 0;
 }

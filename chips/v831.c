@@ -5,9 +5,13 @@ static int chip_reset(struct xfel_ctx_t * ctx)
 	return 0;
 }
 
-static int chip_sid(struct xfel_ctx_t * ctx)
+static int chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
 {
-	return 0;
+	sid[0] = R32(0x03006200 + 0x0);
+	sid[1] = R32(0x03006200 + 0x4);
+	sid[2] = R32(0x03006200 + 0x8);
+	sid[3] = R32(0x03006200 + 0xc);
+	return 1;
 }
 
 static int chip_jtag(struct xfel_ctx_t * ctx)
