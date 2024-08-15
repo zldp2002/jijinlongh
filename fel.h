@@ -38,7 +38,7 @@ struct chip_t {
 };
 
 #define R32(reg)		fel_read32(ctx, reg)
-#define W32(reg, val)	fel_write(ctx, addr, val)
+#define W32(reg, val)	fel_write32(ctx, reg, val)
 
 int fel_init(struct xfel_ctx_t * ctx);
 void fel_exec(struct xfel_ctx_t * ctx, uint32_t addr);
