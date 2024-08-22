@@ -23,7 +23,32 @@ static int chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
 
 static int chip_jtag(struct xfel_ctx_t * ctx)
 {
-	return 0;
+	uint32_t addr;
+	uint32_t val;
+
+	/* Config GPIOF0, GPIOF1, GPIOF3 and GPIOF5 to JTAG mode */
+	addr = 0x0300b0b4 + 0x00;
+	val = R32(addr);
+	val &= ~(0xf << ((0 & 0x7) << 2));
+	val |= ((0x3 & 0x7) << ((0 & 0x7) << 2));
+	W32(addr, val);
+
+	val = R32(addr);
+	val &= ~(0xf << ((1 & 0x7) << 2));
+	val |= ((0x3 & 0x7) << ((1 & 0x7) << 2));
+	W32(addr, val);
+
+	val = R32(addr);
+	val &= ~(0xf << ((3 & 0x7) << 2));
+	val |= ((0x3 & 0x7) << ((3 & 0x7) << 2));
+	W32(addr, val);
+
+	val = R32(addr);
+	val &= ~(0xf << ((5 & 0x7) << 2));
+	val |= ((0x3 & 0x7) << ((5 & 0x7) << 2));
+	W32(addr, val);
+
+	return 1;
 }
 
 static int chip_ddr(struct xfel_ctx_t * ctx)
