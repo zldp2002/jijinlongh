@@ -22,7 +22,7 @@ static int chip_jtag(struct xfel_ctx_t * ctx)
 	return 0;
 }
 
-static int chip_ddr(struct xfel_ctx_t * ctx)
+static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 {
 	return 0;
 }

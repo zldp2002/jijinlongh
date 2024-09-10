@@ -329,10 +329,10 @@ int fel_chip_jtag(struct xfel_ctx_t * ctx)
 	return 0;
 }
 
-int fel_chip_ddr(struct xfel_ctx_t * ctx)
+int fel_chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 {
 	if(ctx && ctx->chip && ctx->chip->ddr)
-		return ctx->chip->ddr(ctx);
+		return ctx->chip->ddr(ctx, type);
 	return 0;
 }
 

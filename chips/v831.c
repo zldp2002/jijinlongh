@@ -51,7 +51,7 @@ static int chip_jtag(struct xfel_ctx_t * ctx)
 	return 1;
 }
 
-static int chip_ddr(struct xfel_ctx_t * ctx)
+static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 {
 	static const uint8_t dram_bin[] = {
 		0x02, 0x00, 0x00, 0xea, 0x00, 0x72, 0x02, 0x00, 0x00, 0x20, 0x02, 0x00,

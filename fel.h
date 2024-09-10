@@ -34,7 +34,7 @@ struct chip_t {
 	int (*reset)(struct xfel_ctx_t * ctx);
 	int (*sid)(struct xfel_ctx_t * ctx, uint32_t * sid);
 	int (*jtag)(struct xfel_ctx_t * ctx);
-	int (*ddr)(struct xfel_ctx_t * ctx);
+	int (*ddr)(struct xfel_ctx_t * ctx, const char * type);
 };
 
 #define R32(reg)		fel_read32(ctx, reg)
@@ -50,7 +50,7 @@ void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, i
 int fel_chip_reset(struct xfel_ctx_t * ctx);
 int fel_chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid);
 int fel_chip_jtag(struct xfel_ctx_t * ctx);
-int fel_chip_ddr(struct xfel_ctx_t * ctx);
+int fel_chip_ddr(struct xfel_ctx_t * ctx, const char * type);
 
 #ifdef __cplusplus
 }

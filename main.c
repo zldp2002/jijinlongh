@@ -92,7 +92,7 @@ static void usage(void)
 	printf("    xfel reset                          - Reset device using watchdog\r\n");
 	printf("    xfel sid                            - Output 128-bits SID information\r\n");
 	printf("    xfel jtag                           - Enable JTAG debug\r\n");
-	printf("    xfel ddr                            - Initial DDR controller\r\n");
+	printf("    xfel ddr [type]                     - Initial DDR controller with optional type\r\n");
 }
 
 int main(int argc, char * argv[])
@@ -269,7 +269,9 @@ int main(int argc, char * argv[])
 	}
 	else if(!strcmp(argv[1], "ddr"))
 	{
-		if(!fel_chip_ddr(&ctx))
+		argc -= 2;
+		argv += 2;
+		if(!fel_chip_ddr(&ctx, (argc == 1) ? argv[0] : NULL))
 			printf("The chip don't support '%s' command\r\n", argv[1]);
 	}
 	else
