@@ -35,6 +35,12 @@ struct chip_t {
 	int (*sid)(struct xfel_ctx_t * ctx, uint32_t * sid);
 	int (*jtag)(struct xfel_ctx_t * ctx);
 	int (*ddr)(struct xfel_ctx_t * ctx, const char * type);
+	int (*spinor)(struct xfel_ctx_t * ctx);
+	int (*spinor_read)(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+	int (*spinor_write)(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+	int (*spinand)(struct xfel_ctx_t * ctx);
+	int (*spinand_read)(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+	int (*spinand_write)(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 };
 
 #define R32(reg)		fel_read32(ctx, reg)

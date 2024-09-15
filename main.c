@@ -80,19 +80,25 @@ static void hexdump(uint32_t addr, void * buf, size_t len)
 static void usage(void)
 {
 	printf("usage:\r\n");
-	printf("    xfel help                           - Print this usage summary\r\n");
-	printf("    xfel version                        - Show brom version\r\n");
-	printf("    xfel hexdump <address> <length>     - Dumps memory region in hex\r\n");
-	printf("    xfel dump <address> <length>        - Binary memory dump to stdout\r\n");
-	printf("    xfel exec <address>                 - Call function address\r\n");
-	printf("    xfel read32 <address>               - Read 32-bits value from device memory\r\n");
-	printf("    xfel write32 <address> <value>      - Write 32-bits value to device memory\r\n");
-	printf("    xfel read <address> <length> <file> - Read memory to file\r\n");
-	printf("    xfel write <address> <file>         - Write memory from file\r\n");
-	printf("    xfel reset                          - Reset device using watchdog\r\n");
-	printf("    xfel sid                            - Output 128-bits SID information\r\n");
-	printf("    xfel jtag                           - Enable JTAG debug\r\n");
-	printf("    xfel ddr [type]                     - Initial DDR controller with optional type\r\n");
+	printf("    xfel help                                   - Print this usage summary\r\n");
+	printf("    xfel version                                - Show brom version\r\n");
+	printf("    xfel hexdump <address> <length>             - Dumps memory region in hex\r\n");
+	printf("    xfel dump <address> <length>                - Binary memory dump to stdout\r\n");
+	printf("    xfel exec <address>                         - Call function address\r\n");
+	printf("    xfel read32 <address>                       - Read 32-bits value from device memory\r\n");
+	printf("    xfel write32 <address> <value>              - Write 32-bits value to device memory\r\n");
+	printf("    xfel read <address> <length> <file>         - Read memory to file\r\n");
+	printf("    xfel write <address> <file>                 - Write file to memory\r\n");
+	printf("    xfel reset                                  - Reset device using watchdog\r\n");
+	printf("    xfel sid                                    - Output 128-bits SID information\r\n");
+	printf("    xfel jtag                                   - Enable JTAG debug\r\n");
+	printf("    xfel ddr [type]                             - Initial DDR controller with optional type\r\n");
+	printf("    xfel spinor                                 - Detect spi nor flash\r\n");
+	printf("    xfel spinor read <address> <length> <file>  - Read spi nor flash to file\r\n");
+	printf("    xfel spinor write <address> <file>          - Write file to spi nor flash\r\n");
+	printf("    xfel spinand                                - Detect spi nand flash\r\n");
+	printf("    xfel spinand read <address> <length> <file> - Read spi nand flash to file\r\n");
+	printf("    xfel spinand write <address> <file>         - Write file to spi nand flash\r\n");
 }
 
 int main(int argc, char * argv[])
