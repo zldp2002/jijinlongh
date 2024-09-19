@@ -79,6 +79,7 @@ static void hexdump(uint32_t addr, void * buf, size_t len)
 
 static void usage(void)
 {
+	printf("xfel-v1.0.0 https://github.com/xboot/xfel\r\n");
 	printf("usage:\r\n");
 	printf("    xfel help                                   - Print this usage summary\r\n");
 	printf("    xfel version                                - Show brom version\r\n");
@@ -279,6 +280,94 @@ int main(int argc, char * argv[])
 		argv += 2;
 		if(!fel_chip_ddr(&ctx, (argc == 1) ? argv[0] : NULL))
 			printf("The chip don't support '%s' command\r\n", argv[1]);
+	}
+	else if(!strcmp(argv[1], "spinor"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 0)
+		{
+			if(fel_chip_spinor(&ctx))
+				printf("Found spi nor flash\r\n");
+			else
+				printf("Not found any spi nor flash\r\n");
+		}
+		else
+		{
+			if(!strcmp(argv[0], "read"))
+			{
+				argc -= 1;
+				argv += 1;
+				uint32_t addr = strtoul(argv[0], NULL, 0);
+				size_t len = strtoul(argv[1], NULL, 0);
+				char * buf = malloc(len);
+				if(buf)
+				{
+					fel_chip_spinor_read(&ctx, addr, buf, len);
+					file_save(argv[2], buf, len);
+					free(buf);
+				}
+			}
+			else if(!strcmp(argv[0], "write"))
+			{
+				argc -= 1;
+				argv += 1;
+				uint32_t addr = strtoul(argv[0], NULL, 0);
+				size_t len;
+				void * buf = file_load(argv[1], &len);
+				if(buf)
+				{
+					fel_chip_spinor_write(&ctx, addr, buf, len);
+					free(buf);
+				}
+			}
+			else
+				usage();
+		}
+	}
+	else if(!strcmp(argv[1], "spinand"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 0)
+		{
+			if(fel_chip_spinand(&ctx))
+				printf("Found spi nand flash\r\n");
+			else
+				printf("Not found any spi nand flash\r\n");
+		}
+		else
+		{
+			if(!strcmp(argv[0], "read"))
+			{
+				argc -= 1;
+				argv += 1;
+				uint32_t addr = strtoul(argv[0], NULL, 0);
+				size_t len = strtoul(argv[1], NULL, 0);
+				char * buf = malloc(len);
+				if(buf)
+				{
+					fel_chip_spinand_read(&ctx, addr, buf, len);
+					file_save(argv[2], buf, len);
+					free(buf);
+				}
+			}
+			else if(!strcmp(argv[0], "write"))
+			{
+				argc -= 1;
+				argv += 1;
+				uint32_t addr = strtoul(argv[0], NULL, 0);
+				size_t len;
+				void * buf = file_load(argv[1], &len);
+				if(buf)
+				{
+					fel_chip_spinand_write(&ctx, addr, buf, len);
+					free(buf);
+				}
+			}
+			else
+				usage();
+		}
 	}
 	else
 	{

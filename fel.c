@@ -315,6 +315,13 @@ void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, i
 		progressbar_stop(&bar);
 }
 
+int fel_chip_reset(struct xfel_ctx_t * ctx)
+{
+	if(ctx && ctx->chip && ctx->chip->reset)
+		return ctx->chip->reset(ctx);
+	return 0;
+}
+
 int fel_chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
 {
 	if(ctx && ctx->chip && ctx->chip->sid)
@@ -336,9 +343,112 @@ int fel_chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 	return 0;
 }
 
-int fel_chip_reset(struct xfel_ctx_t * ctx)
+int fel_chip_spinor(struct xfel_ctx_t * ctx)
 {
-	if(ctx && ctx->chip && ctx->chip->reset)
-		return ctx->chip->reset(ctx);
+	if(ctx && ctx->chip && ctx->chip->spinor)
+		return ctx->chip->spinor(ctx);
+	return 0;
+}
+
+int fel_chip_spinor_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+{
+	struct progressbar_t bar;
+	size_t n;
+
+	if(ctx && ctx->chip && ctx->chip->spinor_read)
+	{
+		progressbar_start(&bar, len);
+		while(len > 0)
+		{
+			n = len > 256 ? 256 : len;
+			if(!ctx->chip->spinor_read(ctx, addr, buf, n))
+				return 0;
+			addr += n;
+			buf += n;
+			len -= n;
+			progressbar_update(&bar, n);
+		}
+		progressbar_stop(&bar);
+		return 1;
+	}
+	return 0;
+}
+
+int fel_chip_spinor_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+{
+	struct progressbar_t bar;
+	size_t n;
+
+	if(ctx && ctx->chip && ctx->chip->spinor_write)
+	{
+		progressbar_start(&bar, len);
+		while(len > 0)
+		{
+			n = len > 256 ? 256 : len;
+			if(!ctx->chip->spinor_write(ctx, addr, buf, n))
+				return 0;
+			addr += n;
+			buf += n;
+			len -= n;
+			progressbar_update(&bar, n);
+		}
+		progressbar_stop(&bar);
+		return 1;
+	}
+	return 0;
+}
+
+int fel_chip_spinand(struct xfel_ctx_t * ctx)
+{
+	if(ctx && ctx->chip && ctx->chip->spinand)
+		return ctx->chip->spinand(ctx);
+	return 0;
+}
+
+int fel_chip_spinand_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+{
+	struct progressbar_t bar;
+	size_t n;
+
+	if(ctx && ctx->chip && ctx->chip->spinand_read)
+	{
+		progressbar_start(&bar, len);
+		while(len > 0)
+		{
+			n = len > 256 ? 256 : len;
+			if(!ctx->chip->spinand_read(ctx, addr, buf, n))
+				return 0;
+			addr += n;
+			buf += n;
+			len -= n;
+			progressbar_update(&bar, n);
+		}
+		progressbar_stop(&bar);
+		return 1;
+	}
+	return 0;
+}
+
+int fel_chip_spinand_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+{
+	struct progressbar_t bar;
+	size_t n;
+
+	if(ctx && ctx->chip && ctx->chip->spinand_write)
+	{
+		progressbar_start(&bar, len);
+		while(len > 0)
+		{
+			n = len > 256 ? 256 : len;
+			if(!ctx->chip->spinand_write(ctx, addr, buf, n))
+				return 0;
+			addr += n;
+			buf += n;
+			len -= n;
+			progressbar_update(&bar, n);
+		}
+		progressbar_stop(&bar);
+		return 1;
+	}
 	return 0;
 }

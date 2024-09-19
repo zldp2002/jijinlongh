@@ -57,6 +57,12 @@ int fel_chip_reset(struct xfel_ctx_t * ctx);
 int fel_chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid);
 int fel_chip_jtag(struct xfel_ctx_t * ctx);
 int fel_chip_ddr(struct xfel_ctx_t * ctx, const char * type);
+int fel_chip_spinor(struct xfel_ctx_t * ctx);
+int fel_chip_spinor_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+int fel_chip_spinor_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+int fel_chip_spinand(struct xfel_ctx_t * ctx);
+int fel_chip_spinand_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+int fel_chip_spinand_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 
 #ifdef __cplusplus
 }
