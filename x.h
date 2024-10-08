@@ -26,6 +26,7 @@ extern "C" {
 #include <errno.h>
 #include <ctype.h>
 #include <assert.h>
+#include <unistd.h>
 #include <libusb.h>
 
 static inline uint16_t __swab16(uint16_t x)
