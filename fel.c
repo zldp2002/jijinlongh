@@ -13,7 +13,7 @@ static struct chip_t * chips[] = {
 };
 
 struct usb_request_t {
-	char signature[8];
+	char magic[8];
 	uint32_t length;
 	uint32_t unknown1;
 	uint16_t request;
@@ -68,7 +68,7 @@ static inline void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf,
 static inline void send_usb_request(struct xfel_ctx_t * ctx, int type, size_t length)
 {
 	struct usb_request_t req = {
-		.signature = "AWUC",
+		.magic = "AWUC",
 		.request = cpu_to_le16(type),
 		.length = cpu_to_le32(length),
 		.unknown1 = cpu_to_le32(0x0c000000)
@@ -123,11 +123,9 @@ static inline void fel_version(struct xfel_ctx_t * ctx)
 	usb_read(ctx, &ctx->version, sizeof(ctx->version));
 	read_fel_status(ctx);
 	ctx->version.id = le32_to_cpu(ctx->version.id);
-	ctx->version.unknown_0a = le32_to_cpu(ctx->version.unknown_0a);
+	ctx->version.firmware = le32_to_cpu(ctx->version.firmware);
 	ctx->version.protocol = le16_to_cpu(ctx->version.protocol);
 	ctx->version.scratchpad = le32_to_cpu(ctx->version.scratchpad);
-	ctx->version.pad[0] = le32_to_cpu(ctx->version.pad[0]);
-	ctx->version.pad[1] = le32_to_cpu(ctx->version.pad[1]);
 	ctx->chip = NULL;
 	for(i = 0; i < ARRAY_SIZE(chips); i++)
 	{

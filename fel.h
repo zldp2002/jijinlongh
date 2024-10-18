@@ -15,14 +15,14 @@ struct xfel_ctx_t {
 	int epout;
 	int epin;
 	struct {
-		char signature[8];
+		char magic[8];
 		uint32_t id;
-		uint32_t unknown_0a;
+		uint32_t firmware;
 		uint16_t protocol;
-		uint8_t  unknown_12;
-		uint8_t  unknown_13;
+		uint8_t  dflag;
+		uint8_t  dlength;
 		uint32_t scratchpad;
-		uint32_t pad[2];
+		uint8_t pad[8];
 	} version;
 	struct chip_t * chip;
 };

@@ -124,10 +124,9 @@ int main(int argc, char * argv[])
 	if(!ctx.chip)
 	{
 		printf("WARNNING: Not yet support this device\r\n");
-		printf("%.8s soc=%08x %08x ver=%04x %02x %02x scratchpad=%08x %08x %08x\r\n",
-			ctx.version.signature, ctx.version.id, ctx.version.unknown_0a,
-			ctx.version.protocol, ctx.version.unknown_12, ctx.version.unknown_13,
-			ctx.version.scratchpad, ctx.version.pad[0], ctx.version.pad[1]);
+		printf("%.8s soc=%08x %08x ver=%04x %02x %02x scratchpad=%08x\r\n",
+			ctx.version.magic, ctx.version.id, ctx.version.firmware,
+			ctx.version.protocol, ctx.version.dflag, ctx.version.dlength, ctx.version.scratchpad);
 		if(ctx.hdl)
 			libusb_close(ctx.hdl);
 		libusb_exit(NULL);
@@ -139,10 +138,9 @@ int main(int argc, char * argv[])
 	}
 	else if(!strcmp(argv[1], "version"))
 	{
-		printf("%.8s soc=%08x(%s) %08x ver=%04x %02x %02x scratchpad=%08x %08x %08x\r\n",
-			ctx.version.signature, ctx.version.id, ctx.chip->name, ctx.version.unknown_0a,
-			ctx.version.protocol, ctx.version.unknown_12, ctx.version.unknown_13,
-			ctx.version.scratchpad, ctx.version.pad[0], ctx.version.pad[1]);
+		printf("%.8s soc=%08x(%s) %08x ver=%04x %02x %02x scratchpad=%08x\r\n",
+			ctx.version.magic, ctx.version.id, ctx.chip->name, ctx.version.firmware,
+			ctx.version.protocol, ctx.version.dflag, ctx.version.dlength, ctx.version.scratchpad);
 	}
 	else if(!strcmp(argv[1], "hexdump"))
 	{
