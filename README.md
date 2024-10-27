@@ -21,9 +21,9 @@ make
 ## Usage
 
 ```
-xfel-v1.0.0 https://github.com/xboot/xfel
+xfel(v1.0.0) - https://github.com/xboot/xfel
 usage:
-    xfel help                                   - Print this usage summary
+    xfel help                                   - Print this usage
     xfel version                                - Show brom version
     xfel hexdump <address> <length>             - Dumps memory region in hex
     xfel dump <address> <length>                - Binary memory dump to stdout
@@ -33,7 +33,7 @@ usage:
     xfel read <address> <length> <file>         - Read memory to file
     xfel write <address> <file>                 - Write file to memory
     xfel reset                                  - Reset device using watchdog
-    xfel sid                                    - Output 128-bits SID information
+    xfel sid                                    - Show 128-bits SID information
     xfel jtag                                   - Enable JTAG debug
     xfel ddr [type]                             - Initial DDR controller with optional type
     xfel spinor                                 - Detect spi nor flash

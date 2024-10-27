@@ -79,9 +79,9 @@ static void hexdump(uint32_t addr, void * buf, size_t len)
 
 static void usage(void)
 {
-	printf("xfel-v1.0.0 https://github.com/xboot/xfel\r\n");
+	printf("xfel(v1.0.0) - https://github.com/xboot/xfel\r\n");
 	printf("usage:\r\n");
-	printf("    xfel help                                   - Print this usage summary\r\n");
+	printf("    xfel help                                   - Print this usage\r\n");
 	printf("    xfel version                                - Show brom version\r\n");
 	printf("    xfel hexdump <address> <length>             - Dumps memory region in hex\r\n");
 	printf("    xfel dump <address> <length>                - Binary memory dump to stdout\r\n");
@@ -91,7 +91,7 @@ static void usage(void)
 	printf("    xfel read <address> <length> <file>         - Read memory to file\r\n");
 	printf("    xfel write <address> <file>                 - Write file to memory\r\n");
 	printf("    xfel reset                                  - Reset device using watchdog\r\n");
-	printf("    xfel sid                                    - Output 128-bits SID information\r\n");
+	printf("    xfel sid                                    - Show 128-bits SID information\r\n");
 	printf("    xfel jtag                                   - Enable JTAG debug\r\n");
 	printf("    xfel ddr [type]                             - Initial DDR controller with optional type\r\n");
 	printf("    xfel spinor                                 - Detect spi nor flash\r\n");
@@ -124,7 +124,7 @@ int main(int argc, char * argv[])
 	if(!ctx.chip)
 	{
 		printf("WARNNING: Not yet support this device\r\n");
-		printf("%.8s soc=%08x %08x ver=%04x %02x %02x scratchpad=%08x\r\n",
+		printf("%.8s soc=0x%08x 0x%08x ver=0x%04x 0x%02x 0x%02x scratchpad=0x%08x\r\n",
 			ctx.version.magic, ctx.version.id, ctx.version.firmware,
 			ctx.version.protocol, ctx.version.dflag, ctx.version.dlength, ctx.version.scratchpad);
 		if(ctx.hdl)
@@ -138,7 +138,7 @@ int main(int argc, char * argv[])
 	}
 	else if(!strcmp(argv[1], "version"))
 	{
-		printf("%.8s soc=%08x(%s) %08x ver=%04x %02x %02x scratchpad=%08x\r\n",
+		printf("%.8s soc=0x%08x(%s) 0x%08x ver=0x%04x 0x%02x 0x%02x scratchpad=0x%08x\r\n",
 			ctx.version.magic, ctx.version.id, ctx.chip->name, ctx.version.firmware,
 			ctx.version.protocol, ctx.version.dflag, ctx.version.dlength, ctx.version.scratchpad);
 	}
