@@ -4,6 +4,7 @@ extern struct chip_t d1;
 extern struct chip_t f1c100s;
 extern struct chip_t h3;
 extern struct chip_t r329;
+extern struct chip_t t507;
 extern struct chip_t v831;
 
 static struct chip_t * chips[] = {
@@ -11,6 +12,7 @@ static struct chip_t * chips[] = {
 	&f1c100s,
 	&h3,
 	&r329,
+	&t507,
 	&v831,
 };
 
