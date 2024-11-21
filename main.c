@@ -257,7 +257,7 @@ int main(int argc, char * argv[])
 	else if(!strcmp(argv[1], "reset"))
 	{
 		if(!fel_chip_reset(&ctx))
-			printf("The chip don't support '%s' command\r\n", argv[1]);
+			printf("The '%s' chip don't support '%s' command\r\n", ctx.chip->name, argv[1]);
 	}
 	else if(!strcmp(argv[1], "sid"))
 	{
@@ -265,19 +265,19 @@ int main(int argc, char * argv[])
 		if(fel_chip_sid(&ctx, sid))
 			printf("%08x%08x%08x%08x\r\n",sid[0], sid[1], sid[2], sid[3]);
 		else
-			printf("The chip don't support '%s' command\r\n", argv[1]);
+			printf("The '%s' chip don't support '%s' command\r\n", ctx.chip->name, argv[1]);
 	}
 	else if(!strcmp(argv[1], "jtag"))
 	{
 		if(!fel_chip_jtag(&ctx))
-			printf("The chip don't support '%s' command\r\n", argv[1]);
+			printf("The '%s' chip don't support '%s' command\r\n", ctx.chip->name, argv[1]);
 	}
 	else if(!strcmp(argv[1], "ddr"))
 	{
 		argc -= 2;
 		argv += 2;
 		if(!fel_chip_ddr(&ctx, (argc == 1) ? argv[0] : NULL))
-			printf("The chip don't support '%s' command\r\n", argv[1]);
+			printf("The '%s' chip don't support '%s' command\r\n", ctx.chip->name, argv[1]);
 	}
 	else if(!strcmp(argv[1], "spinor"))
 	{
