@@ -14,7 +14,7 @@ static int chip_reset(struct xfel_ctx_t * ctx)
 
 static int chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
 {
-	uint32_t payload[] = {
+	static const uint32_t payload[] = {
 		cpu_to_le32(0xe59f0040), /*    0:  ldr   r0, [pc, #64]           */
 		cpu_to_le32(0xe3a01000), /*    4:  mov   r1, #0                  */
 		cpu_to_le32(0xe28f303c), /*    8:  add   r3, pc, #60             */
