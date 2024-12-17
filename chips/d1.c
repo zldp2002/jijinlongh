@@ -2,7 +2,8 @@
 
 static int chip_reset(struct xfel_ctx_t * ctx)
 {
-	return 0;
+	W32(0x020500a0 + 0x08, (0x16aa << 16) | (0x1 << 0));
+	return 1;
 }
 
 static int chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
