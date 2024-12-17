@@ -91,9 +91,9 @@ static void usage(void)
 	printf("    xfel read <address> <length> <file>         - Read memory to file\r\n");
 	printf("    xfel write <address> <file>                 - Write file to memory\r\n");
 	printf("    xfel reset                                  - Reset device using watchdog\r\n");
-	printf("    xfel sid                                    - Show 128-bits SID information\r\n");
-	printf("    xfel jtag                                   - Enable JTAG debug\r\n");
-	printf("    xfel ddr [type]                             - Initial DDR controller with optional type\r\n");
+	printf("    xfel sid                                    - Show 128-bits sid information\r\n");
+	printf("    xfel jtag                                   - Enable jtag debug\r\n");
+	printf("    xfel ddr [type]                             - Initial ddr controller with optional type\r\n");
 	printf("    xfel spinor                                 - Detect spi nor flash\r\n");
 	printf("    xfel spinor read <address> <length> <file>  - Read spi nor flash to file\r\n");
 	printf("    xfel spinor write <address> <file>          - Write file to spi nor flash\r\n");
@@ -257,7 +257,7 @@ int main(int argc, char * argv[])
 	else if(!strcmp(argv[1], "reset"))
 	{
 		if(!fel_chip_reset(&ctx))
-			printf("The '%s' chip don't support '%s' command\r\n", ctx.chip->name, argv[1]);
+			printf("The '%s' chip don't support reset command\r\n", ctx.chip->name);
 	}
 	else if(!strcmp(argv[1], "sid"))
 	{
@@ -265,19 +265,21 @@ int main(int argc, char * argv[])
 		if(fel_chip_sid(&ctx, sid))
 			printf("%08x%08x%08x%08x\r\n",sid[0], sid[1], sid[2], sid[3]);
 		else
-			printf("The '%s' chip don't support '%s' command\r\n", ctx.chip->name, argv[1]);
+			printf("The '%s' chip don't support sid command\r\n", ctx.chip->name);
 	}
 	else if(!strcmp(argv[1], "jtag"))
 	{
 		if(!fel_chip_jtag(&ctx))
-			printf("The '%s' chip don't support '%s' command\r\n", ctx.chip->name, argv[1]);
+			printf("The '%s' chip don't support jtag command\r\n", ctx.chip->name);
 	}
 	else if(!strcmp(argv[1], "ddr"))
 	{
 		argc -= 2;
 		argv += 2;
-		if(!fel_chip_ddr(&ctx, (argc == 1) ? argv[0] : NULL))
-			printf("The '%s' chip don't support '%s' command\r\n", ctx.chip->name, argv[1]);
+		if(fel_chip_ddr(&ctx, (argc == 1) ? argv[0] : NULL))
+			printf("Initial ddr controller sucess\r\n");
+		else
+			printf("Fail to initial ddr controller\r\n");
 	}
 	else if(!strcmp(argv[1], "spinor"))
 	{
