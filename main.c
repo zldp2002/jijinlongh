@@ -277,9 +277,9 @@ int main(int argc, char * argv[])
 		argc -= 2;
 		argv += 2;
 		if(fel_chip_ddr(&ctx, (argc == 1) ? argv[0] : NULL))
-			printf("Initial ddr controller sucess\r\n");
+			printf("Initial ddr controller sucessed\r\n");
 		else
-			printf("Fail to initial ddr controller\r\n");
+			printf("Failed to initial ddr controller\r\n");
 	}
 	else if(!strcmp(argv[1], "spinor"))
 	{
