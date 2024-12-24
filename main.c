@@ -79,7 +79,7 @@ static void hexdump(uint32_t addr, void * buf, size_t len)
 
 static void usage(void)
 {
-	printf("xfel(v1.0.0) - https://github.com/xboot/xfel\r\n");
+	printf("xfel(v1.0.1) - https://github.com/xboot/xfel\r\n");
 	printf("usage:\r\n");
 	printf("    xfel help                                   - Print this usage\r\n");
 	printf("    xfel version                                - Show brom version\r\n");
