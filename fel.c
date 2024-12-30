@@ -147,35 +147,37 @@ int fel_init(struct xfel_ctx_t * ctx)
 {
 	if(ctx && ctx->hdl)
 	{
-		struct libusb_device * usb = libusb_get_device(ctx->hdl);
 		struct libusb_config_descriptor * config;
 		int if_idx, set_idx, ep_idx;
 		const struct libusb_interface * iface;
 		const struct libusb_interface_descriptor * setting;
 		const struct libusb_endpoint_descriptor * ep;
-		if(libusb_get_active_config_descriptor(usb, &config) == 0)
+		if(libusb_claim_interface(ctx->hdl, 0) == 0)
 		{
-			for(if_idx = 0; if_idx < config->bNumInterfaces; if_idx++)
+			if(libusb_get_active_config_descriptor(libusb_get_device(ctx->hdl), &config) == 0)
 			{
-				iface = config->interface + if_idx;
-				for(set_idx = 0; set_idx < iface->num_altsetting; set_idx++)
+				for(if_idx = 0; if_idx < config->bNumInterfaces; if_idx++)
 				{
-					setting = iface->altsetting + set_idx;
-					for(ep_idx = 0; ep_idx < setting->bNumEndpoints; ep_idx++)
+					iface = config->interface + if_idx;
+					for(set_idx = 0; set_idx < iface->num_altsetting; set_idx++)
 					{
-						ep = setting->endpoint + ep_idx;
-						if((ep->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) != LIBUSB_TRANSFER_TYPE_BULK)
-							continue;
-						if((ep->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN)
-							ctx->epin = ep->bEndpointAddress;
-						else
-							ctx->epout = ep->bEndpointAddress;
+						setting = iface->altsetting + set_idx;
+						for(ep_idx = 0; ep_idx < setting->bNumEndpoints; ep_idx++)
+						{
+							ep = setting->endpoint + ep_idx;
+							if((ep->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) != LIBUSB_TRANSFER_TYPE_BULK)
+								continue;
+							if((ep->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN)
+								ctx->epin = ep->bEndpointAddress;
+							else
+								ctx->epout = ep->bEndpointAddress;
+						}
 					}
 				}
+				libusb_free_config_descriptor(config);
+				fel_version(ctx);
+				return 1;
 			}
-			libusb_free_config_descriptor(config);
-			fel_version(ctx);
-			return 1;
 		}
 	}
 	return 0;
