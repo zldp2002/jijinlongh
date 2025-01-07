@@ -21,7 +21,7 @@ make
 ## Usage
 
 ```
-xfel(v1.0.0) - https://github.com/xboot/xfel
+xfel(v1.0.1) - https://github.com/xboot/xfel
 usage:
     xfel help                                   - Print this usage
     xfel version                                - Show brom version
@@ -33,9 +33,9 @@ usage:
     xfel read <address> <length> <file>         - Read memory to file
     xfel write <address> <file>                 - Write file to memory
     xfel reset                                  - Reset device using watchdog
-    xfel sid                                    - Show 128-bits SID information
-    xfel jtag                                   - Enable JTAG debug
-    xfel ddr [type]                             - Initial DDR controller with optional type
+    xfel sid                                    - Show 128-bits sid information
+    xfel jtag                                   - Enable jtag debug
+    xfel ddr [type]                             - Initial ddr controller with optional type
     xfel spinor                                 - Detect spi nor flash
     xfel spinor read <address> <length> <file>  - Read spi nor flash to file
     xfel spinor write <address> <file>          - Write file to spi nor flash
