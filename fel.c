@@ -34,7 +34,7 @@ struct fel_request_t {
 	uint32_t pad;
 } __attribute__((packed));
 
-static inline void usb_bulk_send(libusb_device_handle * hdl, int ep, const void * buf, size_t len)
+static inline void usb_bulk_send(libusb_device_handle * hdl, int ep, const char * buf, size_t len)
 {
 	size_t max_chunk = 128 * 1024;
 	size_t chunk;
@@ -54,13 +54,13 @@ static inline void usb_bulk_send(libusb_device_handle * hdl, int ep, const void 
 	}
 }
 
-static inline void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf, size_t len)
+static inline void usb_bulk_recv(libusb_device_handle * hdl, int ep, char * buf, size_t len)
 {
 	int r, bytes;
 
 	while(len > 0)
 	{
-		r = libusb_bulk_transfer(hdl, ep, buf, len, &bytes, 10000);
+		r = libusb_bulk_transfer(hdl, ep, (void *)buf, len, &bytes, 10000);
 		if(r != 0)
 		{
 			printf("usb bulk recv error\r\n");
@@ -80,28 +80,28 @@ static inline void send_usb_request(struct xfel_ctx_t * ctx, int type, size_t le
 		.unknown1 = cpu_to_le32(0x0c000000)
 	};
 	req.length2 = req.length;
-	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_send(ctx->hdl, ctx->epout, (const char *)&req, sizeof(struct usb_request_t));
 }
 
 static inline void read_usb_response(struct xfel_ctx_t * ctx)
 {
 	char buf[13];
 
-	usb_bulk_recv(ctx->hdl, ctx->epin, buf, sizeof(buf));
+	usb_bulk_recv(ctx->hdl, ctx->epin, (char *)buf, sizeof(buf));
 	assert(strcmp(buf, "AWUS") == 0);
 }
 
 static inline void usb_write(struct xfel_ctx_t * ctx, const void * buf, size_t len)
 {
 	send_usb_request(ctx, 0x12, len);
-	usb_bulk_send(ctx->hdl, ctx->epout, buf, len);
+	usb_bulk_send(ctx->hdl, ctx->epout, (const char *)buf, len);
 	read_usb_response(ctx);
 }
 
 static inline void usb_read(struct xfel_ctx_t * ctx, const void * data, size_t len)
 {
 	send_usb_request(ctx, 0x11, len);
-	usb_bulk_send(ctx->hdl, ctx->epin, data, len);
+	usb_bulk_send(ctx->hdl, ctx->epin, (const char *)data, len);
 	read_usb_response(ctx);
 }
 
