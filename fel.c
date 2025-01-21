@@ -272,16 +272,40 @@ static inline void fel_write_raw(struct xfel_ctx_t * ctx, uint32_t addr, void * 
 	}
 }
 
+uint8_t fel_read8(struct xfel_ctx_t * ctx, uint32_t addr)
+{
+	uint8_t val;
+	fel_read_raw(ctx, addr, &val, sizeof(uint8_t));
+	return val;
+}
+
+uint16_t fel_read16(struct xfel_ctx_t * ctx, uint32_t addr)
+{
+	uint16_t val;
+	fel_read_raw(ctx, addr, &val, sizeof(uint16_t));
+	return val;
+}
+
 uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr)
 {
 	uint32_t val;
-	fel_read_raw(ctx, addr, &val, sizeof(val));
+	fel_read_raw(ctx, addr, &val, sizeof(uint32_t));
 	return val;
+}
+
+void fel_write8(struct xfel_ctx_t * ctx, uint32_t addr, uint8_t val)
+{
+	fel_write_raw(ctx, addr, &val, sizeof(uint8_t));
+}
+
+void fel_write16(struct xfel_ctx_t * ctx, uint32_t addr, uint16_t val)
+{
+	fel_write_raw(ctx, addr, &val, sizeof(uint16_t));
 }
 
 void fel_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val)
 {
-	fel_write_raw(ctx, addr, &val, sizeof(val));
+	fel_write_raw(ctx, addr, &val, sizeof(uint32_t));
 }
 
 void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int progress)

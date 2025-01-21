@@ -43,12 +43,20 @@ struct chip_t {
 	int (*spinand_write)(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 };
 
+#define R8(reg)			fel_read8(ctx, reg)
+#define R16(reg)		fel_read16(ctx, reg)
 #define R32(reg)		fel_read32(ctx, reg)
+#define W8(reg, val)	fel_write8(ctx, reg, val)
+#define W16(reg, val)	fel_write16(ctx, reg, val)
 #define W32(reg, val)	fel_write32(ctx, reg, val)
 
 int fel_init(struct xfel_ctx_t * ctx);
 void fel_exec(struct xfel_ctx_t * ctx, uint32_t addr);
+uint8_t fel_read8(struct xfel_ctx_t * ctx, uint32_t addr);
+uint16_t fel_read16(struct xfel_ctx_t * ctx, uint32_t addr);
 uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr);
+void fel_write8(struct xfel_ctx_t * ctx, uint32_t addr, uint8_t val);
+void fel_write16(struct xfel_ctx_t * ctx, uint32_t addr, uint16_t val);
 void fel_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val);
 void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int progress);
 void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int progress);
