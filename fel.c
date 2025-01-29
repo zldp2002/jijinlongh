@@ -378,6 +378,41 @@ int fel_chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 	return 0;
 }
 
+int fel_chip_spi_init(struct xfel_ctx_t * ctx)
+{
+	if(ctx && ctx->chip && ctx->chip->spi_init)
+		return ctx->chip->spi_init(ctx);
+	return 0;
+}
+
+int fel_chip_spi_exit(struct xfel_ctx_t * ctx)
+{
+	if(ctx && ctx->chip && ctx->chip->spi_exit)
+		return ctx->chip->spi_exit(ctx);
+	return 0;
+}
+
+int fel_chip_spi_select(struct xfel_ctx_t * ctx)
+{
+	if(ctx && ctx->chip && ctx->chip->spi_select)
+		return ctx->chip->spi_select(ctx);
+	return 0;
+}
+
+int fel_chip_spi_deselect(struct xfel_ctx_t * ctx)
+{
+	if(ctx && ctx->chip && ctx->chip->spi_deselect)
+		return ctx->chip->spi_deselect(ctx);
+	return 0;
+}
+
+int fel_chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, int txlen, void * rxbuf, int rxlen)
+{
+	if(ctx && ctx->chip && ctx->chip->spi_xfer)
+		return ctx->chip->spi_xfer(ctx, txbuf, txlen, rxbuf, rxlen);
+	return 0;
+}
+
 int fel_chip_spinor(struct xfel_ctx_t * ctx)
 {
 	if(ctx && ctx->chip && ctx->chip->spinor)

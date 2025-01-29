@@ -35,6 +35,12 @@ struct chip_t {
 	int (*sid)(struct xfel_ctx_t * ctx, uint32_t * sid);
 	int (*jtag)(struct xfel_ctx_t * ctx);
 	int (*ddr)(struct xfel_ctx_t * ctx, const char * type);
+	int (*spi_init)(struct xfel_ctx_t * ctx);
+	int (*spi_exit)(struct xfel_ctx_t * ctx);
+	int (*spi_select)(struct xfel_ctx_t * ctx);
+	int (*spi_deselect)(struct xfel_ctx_t * ctx);
+	int (*spi_xfer)(struct xfel_ctx_t * ctx, void * txbuf, int txlen, void * rxbuf, int rxlen);
+
 	int (*spinor)(struct xfel_ctx_t * ctx);
 	int (*spinor_read)(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 	int (*spinor_write)(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
@@ -65,6 +71,12 @@ int fel_chip_reset(struct xfel_ctx_t * ctx);
 int fel_chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid);
 int fel_chip_jtag(struct xfel_ctx_t * ctx);
 int fel_chip_ddr(struct xfel_ctx_t * ctx, const char * type);
+int fel_chip_spi_init(struct xfel_ctx_t * ctx);
+int fel_chip_spi_exit(struct xfel_ctx_t * ctx);
+int fel_chip_spi_select(struct xfel_ctx_t * ctx);
+int fel_chip_spi_deselect(struct xfel_ctx_t * ctx);
+int fel_chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, int txlen, void * rxbuf, int rxlen);
+
 int fel_chip_spinor(struct xfel_ctx_t * ctx);
 int fel_chip_spinor_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 int fel_chip_spinor_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
