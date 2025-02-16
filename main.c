@@ -1,4 +1,6 @@
 #include <fel.h>
+#include <spinor.h>
+#include <spinand.h>
 
 static int file_save(const char * filename, void * buf, size_t len)
 {
@@ -287,7 +289,7 @@ int main(int argc, char * argv[])
 		argv += 2;
 		if(argc == 0)
 		{
-			if(fel_chip_spinor(&ctx))
+			if(spinor_detect(&ctx))
 				printf("Found spi nor flash\r\n");
 			else
 				printf("Not found any spi nor flash\r\n");
@@ -303,8 +305,10 @@ int main(int argc, char * argv[])
 				char * buf = malloc(len);
 				if(buf)
 				{
-					fel_chip_spinor_read(&ctx, addr, buf, len);
-					file_save(argv[2], buf, len);
+					if(spinor_read(&ctx, addr, buf, len) != len)
+						printf("Read spi nor flash error\r\n");
+					else
+						file_save(argv[2], buf, len);
 					free(buf);
 				}
 			}
@@ -317,7 +321,8 @@ int main(int argc, char * argv[])
 				void * buf = file_load(argv[1], &len);
 				if(buf)
 				{
-					fel_chip_spinor_write(&ctx, addr, buf, len);
+					if(spinor_write(&ctx, addr, buf, len) != len)
+						printf("Write spi nor flash error\r\n");
 					free(buf);
 				}
 			}
@@ -331,7 +336,7 @@ int main(int argc, char * argv[])
 		argv += 2;
 		if(argc == 0)
 		{
-			if(fel_chip_spinand(&ctx))
+			if(spinand_detect(&ctx))
 				printf("Found spi nand flash\r\n");
 			else
 				printf("Not found any spi nand flash\r\n");
@@ -347,8 +352,10 @@ int main(int argc, char * argv[])
 				char * buf = malloc(len);
 				if(buf)
 				{
-					fel_chip_spinand_read(&ctx, addr, buf, len);
-					file_save(argv[2], buf, len);
+					if(spinand_read(&ctx, addr, buf, len) != len)
+						printf("Read spi nand flash error\r\n");
+					else
+						file_save(argv[2], buf, len);
 					free(buf);
 				}
 			}
@@ -361,7 +368,8 @@ int main(int argc, char * argv[])
 				void * buf = file_load(argv[1], &len);
 				if(buf)
 				{
-					fel_chip_spinand_write(&ctx, addr, buf, len);
+					if(spinand_write(&ctx, addr, buf, len) != len)
+						printf("Write spi nand flash error\r\n");
 					free(buf);
 				}
 			}
