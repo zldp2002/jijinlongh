@@ -21,7 +21,7 @@ make
 ## Usage
 
 ```
-xfel(v1.0.1) - https://github.com/xboot/xfel
+xfel(v1.1.0) - https://github.com/xboot/xfel
 usage:
     xfel help                                   - Print this usage
     xfel version                                - Show brom version
