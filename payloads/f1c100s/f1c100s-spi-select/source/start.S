@@ -41,7 +41,7 @@ reset:
 	mrc p15, 0, lr, c1, c0, 0
 	str lr, [r0, #16]
 
-	bl sys_spi_init
+	bl sys_spi_select
 
 	mov r0, #0x4
 	mov r1, #'e'

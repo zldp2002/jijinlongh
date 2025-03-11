@@ -1,5 +1,5 @@
 /*
- * sys-spinor.c
+ * start.S
  *
  * Copyright(c) 2007-2021 Jianjun Jiang <8192542@qq.com>
  * Official site: http://xboot.org
@@ -26,32 +26,57 @@
  *
  */
 
-#include <xboot.h>
+	.global _start
+_start:
+	b reset
 
-enum {
-	SPI_GCR	= 0x04,
-	SPI_TCR	= 0x08,
-	SPI_IER	= 0x10,
-	SPI_ISR	= 0x14,
-	SPI_FCR	= 0x18,
-	SPI_FSR	= 0x1c,
-	SPI_WCR	= 0x20,
-	SPI_CCR	= 0x24,
-	SPI_MBC	= 0x30,
-	SPI_MTC	= 0x34,
-	SPI_BCC	= 0x38,
-	SPI_TXD	= 0x200,
-	SPI_RXD	= 0x300,
-};
+spi_xfer_txbuf:
+	.word 0
+spi_xfer_rxbuf:
+	.word 0
+spi_xfer_length:
+	.word 0
 
-void sys_spinor_exit(void)
-{
-	virtual_addr_t addr = 0x01c05000;
-	u32_t val;
+reset:
+	ldr r0, =0x00000040
+	str sp, [r0, #0]
+	str lr, [r0, #4]
+	mrs lr, cpsr
+	str lr, [r0, #8]
+	mrc p15, 0, lr, c1, c0, 0
+	str lr, [r0, #12]
+	mrc p15, 0, lr, c1, c0, 0
+	str lr, [r0, #16]
 
-	/* Disable the spi0 controller */
-	val = read32(addr + SPI_GCR);
-	val &= ~((1 << 1) | (1 << 0));
-	write32(addr + SPI_GCR, val);
-}
+	ldr r0, spi_xfer_txbuf
+	ldr r1, spi_xfer_rxbuf
+	ldr r2, spi_xfer_length
+	bl sys_spi_xfer
 
+	mov r0, #0x4
+	mov r1, #'e'
+	strb r1, [r0, #0]
+	mov r1, #'G'
+	strb r1, [r0, #1]
+	mov r1, #'O'
+	strb r1, [r0, #2]
+	mov r1, #'N'
+	strb r1, [r0, #3]
+	mov r1, #'.'
+	strb r1, [r0, #4]
+	mov r1, #'F'
+	strb r1, [r0, #5]
+	mov r1, #'E'
+	strb r1, [r0, #6]
+	mov r1, #'L'
+	strb r1, [r0, #7]
+	ldr r0, =0x00000040
+	ldr sp, [r0, #0]
+	ldr lr, [r0, #4]
+	ldr r1, [r0, #16]
+	mcr p15, 0, r1, c1, c0, 0
+	ldr r1, [r0, #12]
+	mcr p15, 0, r1, c1, c0, 0
+	ldr r1, [r0, #8]
+	msr cpsr, r1
+	bx lr

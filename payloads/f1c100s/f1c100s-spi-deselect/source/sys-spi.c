@@ -1,5 +1,5 @@
 /*
- * sys-spinor.c
+ * sys-spi.c
  *
  * Copyright(c) 2007-2021 Jianjun Jiang <8192542@qq.com>
  * Official site: http://xboot.org
@@ -44,62 +44,14 @@ enum {
 	SPI_RXD	= 0x300,
 };
 
-void sys_spinor_init(void)
+void sys_spi_deselect(void)
 {
-	virtual_addr_t addr;
+	virtual_addr_t addr = 0x01c05000;
 	u32_t val;
 
-	/* Config GPIOC0, GPIOC1, GPIOC2 and GPIOC3 */
-	addr = 0x01c20848 + 0x00;
-	val = read32(addr);
-	val &= ~(0xf << ((0 & 0x7) << 2));
-	val |= ((0x2 & 0x7) << ((0 & 0x7) << 2));
-	write32(addr, val);
-
-	val = read32(addr);
-	val &= ~(0xf << ((1 & 0x7) << 2));
-	val |= ((0x2 & 0x7) << ((1 & 0x7) << 2));
-	write32(addr, val);
-
-	val = read32(addr);
-	val &= ~(0xf << ((2 & 0x7) << 2));
-	val |= ((0x2 & 0x7) << ((2 & 0x7) << 2));
-	write32(addr, val);
-
-	val = read32(addr);
-	val &= ~(0xf << ((3 & 0x7) << 2));
-	val |= ((0x2 & 0x7) << ((3 & 0x7) << 2));
-	write32(addr, val);
-
-	/* Deassert spi0 reset */
-	addr = 0x01c202c0;
-	val = read32(addr);
-	val |= (1 << 20);
-	write32(addr, val);
-
-	/* Open the spi0 bus gate */
-	addr = 0x01c20000 + 0x60;
-	val = read32(addr);
-	val |= (1 << 20);
-	write32(addr, val);
-
-	/* Set spi clock rate control register, divided by 4 */
-	addr = 0x01c05000;
-	write32(addr + SPI_CCR, 0x00001001);
-
-	/* Enable spi0 and do a soft reset */
-	addr = 0x01c05000;
-	val = read32(addr + SPI_GCR);
-	val |= (1 << 31) | (1 << 7) | (1 << 1) | (1 << 0);
-	write32(addr + SPI_GCR, val);
-	while(read32(addr + SPI_GCR) & (1 << 31));
-
 	val = read32(addr + SPI_TCR);
-	val &= ~(0x3 << 0);
-	val |= (1 << 6) | (1 << 2);
+	val &= ~((0x3 << 4) | (0x1 << 7));
+	val |= ((0 & 0x3) << 4) | (0x1 << 7);
 	write32(addr + SPI_TCR, val);
-
-	val = read32(addr + SPI_FCR);
-	val |= (1 << 31) | (1 << 15);
-	write32(addr + SPI_FCR, val);
 }
+

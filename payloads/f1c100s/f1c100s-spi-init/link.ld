@@ -20,7 +20,7 @@ SECTIONS
 		PROVIDE(__image_start = .);
 		PROVIDE(__text_start = .);
 		.obj/source/start.o (.text)
-		.obj/source/sys-spinor.o (.text)
+		.obj/source/sys-spi.o (.text)
 		*(.text*)
 		*(.glue*)
 		*(.note.gnu.build-id)

@@ -1,5 +1,5 @@
 /*
- * start.S
+ * sys-spi.c
  *
  * Copyright(c) 2007-2021 Jianjun Jiang <8192542@qq.com>
  * Official site: http://xboot.org
@@ -26,47 +26,68 @@
  *
  */
 
-	.global _start
-_start:
-	b reset
+#include <xboot.h>
 
-reset:
-	ldr r0, =0x00000040
-	str sp, [r0, #0]
-	str lr, [r0, #4]
-	mrs lr, cpsr
-	str lr, [r0, #8]
-	mrc p15, 0, lr, c1, c0, 0
-	str lr, [r0, #12]
-	mrc p15, 0, lr, c1, c0, 0
-	str lr, [r0, #16]
+enum {
+	SPI_GCR	= 0x04,
+	SPI_TCR	= 0x08,
+	SPI_IER	= 0x10,
+	SPI_ISR	= 0x14,
+	SPI_FCR	= 0x18,
+	SPI_FSR	= 0x1c,
+	SPI_WCR	= 0x20,
+	SPI_CCR	= 0x24,
+	SPI_MBC	= 0x30,
+	SPI_MTC	= 0x34,
+	SPI_BCC	= 0x38,
+	SPI_TXD	= 0x200,
+	SPI_RXD	= 0x300,
+};
 
-	bl sys_spi_init
+static inline void sys_spi_write_txbuf(u8_t * buf, int len)
+{
+	virtual_addr_t addr = 0x01c05000;
+	int i;
 
-	mov r0, #0x4
-	mov r1, #'e'
-	strb r1, [r0, #0]
-	mov r1, #'G'
-	strb r1, [r0, #1]
-	mov r1, #'O'
-	strb r1, [r0, #2]
-	mov r1, #'N'
-	strb r1, [r0, #3]
-	mov r1, #'.'
-	strb r1, [r0, #4]
-	mov r1, #'F'
-	strb r1, [r0, #5]
-	mov r1, #'E'
-	strb r1, [r0, #6]
-	mov r1, #'L'
-	strb r1, [r0, #7]
-	ldr r0, =0x00000040
-	ldr sp, [r0, #0]
-	ldr lr, [r0, #4]
-	ldr r1, [r0, #16]
-	mcr p15, 0, r1, c1, c0, 0
-	ldr r1, [r0, #12]
-	mcr p15, 0, r1, c1, c0, 0
-	ldr r1, [r0, #8]
-	msr cpsr, r1
-	bx lr
+	write32(addr + SPI_MTC, len & 0xffffff);
+	write32(addr + SPI_BCC, len & 0xffffff);
+	if(buf)
+	{
+		for(i = 0; i < len; i++)
+			write8(addr + SPI_TXD, *buf++);
+	}
+	else
+	{
+		for(i = 0; i < len; i++)
+			write8(addr + SPI_TXD, 0xff);
+	}
+}
+
+int sys_spi_xfer(void * txbuf, void * rxbuf, int len)
+{
+	virtual_addr_t addr = 0x01c05000;
+	int count = len;
+	u8_t * tx = txbuf;
+	u8_t * rx = rxbuf;
+	u8_t val;
+	int n, i;
+
+	while(count > 0)
+	{
+		n = (count <= 64) ? count : 64;
+		write32(addr + SPI_MBC, n);
+		sys_spi_write_txbuf(tx, n);
+		write32(addr + SPI_TCR, read32(addr + SPI_TCR) | (1 << 31));
+		while((read32(addr + SPI_FSR) & 0xff) < n);
+		for(i = 0; i < n; i++)
+		{
+			val = read8(addr + SPI_RXD);
+			if(rx)
+				*rx++ = val;
+		}
+		if(tx)
+			tx += n;
+		count -= n;
+	}
+	return len;
+}
