@@ -76,7 +76,7 @@ static int chip_spi_init(struct xfel_ctx_t * ctx)
 		0x02, 0x39, 0x83, 0xe3, 0x18, 0x30, 0x82, 0xe5, 0x1e, 0xff, 0x2f, 0xe1,
 		0x00, 0x00, 0xc2, 0x01, 0x00, 0x50, 0xc0, 0x01, 0x01, 0x10, 0x00, 0x00
 	};
-	fel_write(ctx, 0x00008800, (void *)&payload[0], sizeof(payload), 0);
+	fel_write(ctx, 0x00008800, (void *)&payload[0], sizeof(payload));
 	fel_exec(ctx, 0x00008800);
 	return 1;
 }
@@ -100,7 +100,7 @@ static int chip_spi_exit(struct xfel_ctx_t * ctx)
 		0x04, 0x30, 0x92, 0xe5, 0x03, 0x30, 0xc3, 0xe3, 0x04, 0x30, 0x82, 0xe5,
 		0x1e, 0xff, 0x2f, 0xe1, 0x00, 0x50, 0xc0, 0x01
 	};
-	fel_write(ctx, 0x00008800, (void *)&payload[0], sizeof(payload), 0);
+	fel_write(ctx, 0x00008800, (void *)&payload[0], sizeof(payload));
 	fel_exec(ctx, 0x00008800);
 	return 1;
 }
@@ -124,7 +124,7 @@ static int chip_spi_select(struct xfel_ctx_t * ctx)
 		0x08, 0x30, 0x92, 0xe5, 0xb0, 0x30, 0xc3, 0xe3, 0x08, 0x30, 0x82, 0xe5,
 		0x1e, 0xff, 0x2f, 0xe1, 0x00, 0x50, 0xc0, 0x01
 	};
-	fel_write(ctx, 0x00008800, (void *)&payload[0], sizeof(payload), 0);
+	fel_write(ctx, 0x00008800, (void *)&payload[0], sizeof(payload));
 	fel_exec(ctx, 0x00008800);
 	return 1;
 }
@@ -148,12 +148,12 @@ static int chip_spi_deselect(struct xfel_ctx_t * ctx)
 		0x08, 0x30, 0x92, 0xe5, 0xb0, 0x30, 0xc3, 0xe3, 0x80, 0x30, 0x83, 0xe3,
 		0x08, 0x30, 0x82, 0xe5, 0x1e, 0xff, 0x2f, 0xe1, 0x00, 0x50, 0xc0, 0x01
 	};
-	fel_write(ctx, 0x00008800, (void *)&payload[0], sizeof(payload), 0);
+	fel_write(ctx, 0x00008800, (void *)&payload[0], sizeof(payload));
 	fel_exec(ctx, 0x00008800);
 	return 1;
 }
 
-static int chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, int txlen, void * rxbuf, int rxlen)
+static int chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen)
 {
 	static const uint8_t payload[] = {
 		0x02, 0x00, 0x00, 0xea, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -196,25 +196,32 @@ static int chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, int txlen, void 
 		0x00, 0x50, 0xc0, 0x01, 0x00, 0x52, 0xc0, 0x01, 0x00, 0x53, 0xc0, 0x01
 	};
 	uint32_t param[3];
+	uint32_t n;
 
-	fel_write(ctx, 0x00008800, (void *)&payload[0], sizeof(payload), 0);
-	if(txbuf && (txlen > 0))
+	fel_write(ctx, 0x00008800, (void *)&payload[0], sizeof(payload));
+	while(txlen > 0)
 	{
+		n = txlen > 256 ? 256 : txlen;
 		param[0] = cpu_to_le32(ctx->version.scratchpad);
 		param[1] = 0;
-		param[2] = txlen;
-		fel_write(ctx, 0x00008800 + 0x4, (void *)&param, sizeof(param), 0);
-		fel_write(ctx, ctx->version.scratchpad, txbuf, txlen, 0);
+		param[2] = n;
+		fel_write(ctx, 0x00008800 + 0x4, (void *)&param, sizeof(param));
+		fel_write(ctx, ctx->version.scratchpad, txbuf, n);
 		fel_exec(ctx, 0x00008800);
+		txbuf += n;
+		txlen -= n;
 	}
-	if(rxbuf && (rxlen > 0))
+	while(rxlen > 0)
 	{
+		n = rxlen > 256 ? 256 : rxlen;
 		param[0] = 0;
 		param[1] = cpu_to_le32(ctx->version.scratchpad);
-		param[2] = rxlen;
-		fel_write(ctx, 0x00008800 + 0x4, (void *)&param, sizeof(param), 0);
+		param[2] = n;
+		fel_write(ctx, 0x00008800 + 0x4, (void *)&param, sizeof(param));
 		fel_exec(ctx, 0x00008800);
-		fel_read(ctx, ctx->version.scratchpad, rxbuf, rxlen, 0);
+		fel_read(ctx, ctx->version.scratchpad, rxbuf, n);
+		rxbuf += n;
+		rxlen -= n;
 	}
 	return 1;
 }

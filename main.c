@@ -155,7 +155,7 @@ int main(int argc, char * argv[])
 			char * buf = malloc(len);
 			if(buf)
 			{
-				fel_read(&ctx, addr, buf, len, 0);
+				fel_read(&ctx, addr, buf, len);
 				hexdump(addr, buf, len);
 				free(buf);
 			}
@@ -174,7 +174,7 @@ int main(int argc, char * argv[])
 			char * buf = malloc(len);
 			if(buf)
 			{
-				fel_read(&ctx, addr, buf, len, 0);
+				fel_read(&ctx, addr, buf, len);
 				fwrite(buf, len, 1, stdout);
 				free(buf);
 			}
@@ -230,7 +230,7 @@ int main(int argc, char * argv[])
 			char * buf = malloc(len);
 			if(buf)
 			{
-				fel_read(&ctx, addr, buf, len, 1);
+				fel_read_progress(&ctx, addr, buf, len);
 				file_save(argv[2], buf, len);
 				free(buf);
 			}
@@ -249,7 +249,7 @@ int main(int argc, char * argv[])
 			void * buf = file_load(argv[1], &len);
 			if(buf)
 			{
-				fel_write(&ctx, addr, buf, len, 1);
+				fel_write_progress(&ctx, addr, buf, len);
 				free(buf);
 			}
 		}

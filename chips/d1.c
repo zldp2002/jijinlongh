@@ -1525,8 +1525,8 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 				.dram_tpr12 = 0x00000024,
 				.dram_tpr13 = 0x34050100,
 			};
-			fel_write(ctx, 0x00038000, (void *)&ddr_bin[0], sizeof(ddr_bin), 0);
-			fel_write(ctx, 0x00038004, (void *)&ddr3, sizeof(ddr3), 0);
+			fel_write(ctx, 0x00038000, (void *)&ddr_bin[0], sizeof(ddr_bin));
+			fel_write(ctx, 0x00038004, (void *)&ddr3, sizeof(ddr3));
 			fel_exec(ctx, 0x00038000);
 			return 1;
 		}
@@ -1566,8 +1566,8 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 				.dram_tpr13 = 0x61,
 				.dram_tpr14 = 0x211e1e22,
 			};
-			fel_write(ctx, 0x00038000, (void *)&ddr_bin[0], sizeof(ddr_bin), 0);
-			fel_write(ctx, 0x00038004, (void *)&lpddr3, sizeof(lpddr3), 0);
+			fel_write(ctx, 0x00038000, (void *)&ddr_bin[0], sizeof(ddr_bin));
+			fel_write(ctx, 0x00038004, (void *)&lpddr3, sizeof(lpddr3));
 			fel_exec(ctx, 0x00038000);
 			return 1;
 		}
@@ -1597,7 +1597,7 @@ static int chip_spi_deselect(struct xfel_ctx_t * ctx)
 	return 0;
 }
 
-static int chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, int txlen, void * rxbuf, int rxlen)
+static int chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen)
 {
 	return 0;
 }

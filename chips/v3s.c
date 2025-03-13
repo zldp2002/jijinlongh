@@ -51,7 +51,7 @@ static int chip_spi_deselect(struct xfel_ctx_t * ctx)
 	return 0;
 }
 
-static int chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, int txlen, void * rxbuf, int rxlen)
+static int chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen)
 {
 	return 0;
 }

@@ -39,9 +39,9 @@ static int chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
 		/* SID will put here */
 	};
 	uint32_t res[4];
-	fel_write(ctx, ctx->version.scratchpad, (void *)payload, sizeof(payload), 0);
+	fel_write(ctx, ctx->version.scratchpad, (void *)payload, sizeof(payload));
 	fel_exec(ctx, ctx->version.scratchpad);
-	fel_read(ctx, ctx->version.scratchpad + sizeof(payload), (void *)res, sizeof(res), 0);
+	fel_read(ctx, ctx->version.scratchpad + sizeof(payload), (void *)res, sizeof(res));
 	sid[0] = le32_to_cpu(res[0]);
 	sid[1] = le32_to_cpu(res[1]);
 	sid[2] = le32_to_cpu(res[2]);
@@ -79,7 +79,7 @@ static int chip_spi_deselect(struct xfel_ctx_t * ctx)
 	return 0;
 }
 
-static int chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, int txlen, void * rxbuf, int rxlen)
+static int chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen)
 {
 	return 0;
 }

@@ -216,11 +216,21 @@ uint8_t fel_read8(struct xfel_ctx_t * ctx, uint32_t addr)
 	return val;
 }
 
+void fel_write8(struct xfel_ctx_t * ctx, uint32_t addr, uint8_t val)
+{
+	fel_write_raw(ctx, addr, &val, sizeof(uint8_t));
+}
+
 uint16_t fel_read16(struct xfel_ctx_t * ctx, uint32_t addr)
 {
 	uint16_t val;
 	fel_read_raw(ctx, addr, &val, sizeof(uint16_t));
 	return val;
+}
+
+void fel_write16(struct xfel_ctx_t * ctx, uint32_t addr, uint16_t val)
+{
+	fel_write_raw(ctx, addr, &val, sizeof(uint16_t));
 }
 
 uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr)
@@ -230,28 +240,15 @@ uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr)
 	return val;
 }
 
-void fel_write8(struct xfel_ctx_t * ctx, uint32_t addr, uint8_t val)
-{
-	fel_write_raw(ctx, addr, &val, sizeof(uint8_t));
-}
-
-void fel_write16(struct xfel_ctx_t * ctx, uint32_t addr, uint16_t val)
-{
-	fel_write_raw(ctx, addr, &val, sizeof(uint16_t));
-}
-
 void fel_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val)
 {
 	fel_write_raw(ctx, addr, &val, sizeof(uint32_t));
 }
 
-void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int progress)
+void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
-	struct progress_t p;
 	size_t n;
 
-	if(progress)
-		progress_start(&p, len);
 	while(len > 0)
 	{
 		n = len > 256 ? 256 : len;
@@ -259,20 +256,13 @@ void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, in
 		addr += n;
 		buf += n;
 		len -= n;
-		if(progress)
-			progress_update(&p, n);
 	}
-	if(progress)
-		progress_stop(&p);
 }
 
-void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int progress)
+void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
-	struct progress_t p;
 	size_t n;
 
-	if(progress)
-		progress_start(&p, len);
 	while(len > 0)
 	{
 		n = len > 256 ? 256 : len;
@@ -280,11 +270,43 @@ void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len, i
 		addr += n;
 		buf += n;
 		len -= n;
-		if(progress)
-			progress_update(&p, n);
 	}
-	if(progress)
-		progress_stop(&p);
+}
+
+void fel_read_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+{
+	struct progress_t p;
+	size_t n;
+
+	progress_start(&p, len);
+	while(len > 0)
+	{
+		n = len > 256 ? 256 : len;
+		fel_read_raw(ctx, addr, buf, n);
+		addr += n;
+		buf += n;
+		len -= n;
+		progress_update(&p, n);
+	}
+	progress_stop(&p);
+}
+
+void fel_write_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+{
+	struct progress_t p;
+	size_t n;
+
+	progress_start(&p, len);
+	while(len > 0)
+	{
+		n = len > 256 ? 256 : len;
+		fel_write_raw(ctx, addr, buf, n);
+		addr += n;
+		buf += n;
+		len -= n;
+		progress_update(&p, n);
+	}
+	progress_stop(&p);
 }
 
 int fel_chip_reset(struct xfel_ctx_t * ctx)
@@ -343,7 +365,7 @@ int fel_chip_spi_deselect(struct xfel_ctx_t * ctx)
 	return 0;
 }
 
-int fel_chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, int txlen, void * rxbuf, int rxlen)
+int fel_chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen)
 {
 	if(ctx && ctx->chip && ctx->chip->spi_xfer)
 		return ctx->chip->spi_xfer(ctx, txbuf, txlen, rxbuf, rxlen);
