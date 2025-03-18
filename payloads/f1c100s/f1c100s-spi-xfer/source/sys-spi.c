@@ -63,18 +63,17 @@ static inline void sys_spi_write_txbuf(u8_t * buf, int len)
 	}
 }
 
-int sys_spi_xfer(void * txbuf, void * rxbuf, int len)
+void sys_spi_xfer(void * txbuf, void * rxbuf, u32_t len)
 {
 	virtual_addr_t addr = 0x01c05000;
-	int count = len;
 	u8_t * tx = txbuf;
 	u8_t * rx = rxbuf;
 	u8_t val;
 	int n, i;
 
-	while(count > 0)
+	while(len > 0)
 	{
-		n = (count <= 64) ? count : 64;
+		n = (len <= 64) ? len : 64;
 		write32(addr + SPI_MBC, n);
 		sys_spi_write_txbuf(tx, n);
 		write32(addr + SPI_TCR, read32(addr + SPI_TCR) | (1 << 31));
@@ -87,7 +86,6 @@ int sys_spi_xfer(void * txbuf, void * rxbuf, int len)
 		}
 		if(tx)
 			tx += n;
-		count -= n;
+		len -= n;
 	}
-	return len;
 }
