@@ -2,7 +2,7 @@
 #include <spinor.h>
 #include <spinand.h>
 
-static int file_save(const char * filename, void * buf, size_t len)
+static uint64_t file_save(const char * filename, void * buf, uint64_t len)
 {
 	FILE * out = fopen(filename, "wb");
 	int r;
@@ -16,9 +16,9 @@ static int file_save(const char * filename, void * buf, size_t len)
 	return r;
 }
 
-static void * file_load(const char * filename, size_t * len)
+static void * file_load(const char * filename, uint64_t * len)
 {
-	size_t offset = 0, bufsize = 8192;
+	uint64_t offset = 0, bufsize = 8192;
 	char * buf = malloc(bufsize);
 	FILE * in;
 	if(strcmp(filename, "-") == 0)
@@ -32,8 +32,8 @@ static void * file_load(const char * filename, size_t * len)
 	}
 	while(1)
 	{
-		size_t len = bufsize - offset;
-		size_t n = fread(buf + offset, 1, len, in);
+		uint64_t len = bufsize - offset;
+		uint64_t n = fread(buf + offset, 1, len, in);
 		offset += n;
 		if(n < len)
 			break;
@@ -289,8 +289,9 @@ int main(int argc, char * argv[])
 		argv += 2;
 		if(argc == 0)
 		{
-			if(spinor_detect(&ctx))
-				printf("Found spi nor flash\r\n");
+			uint64_t cap = spinor_detect(&ctx);
+			if(cap > 0)
+				printf("Found spi nor flash with %lld bytes\r\n", (long long)cap);
 			else
 				printf("Not found any spi nor flash\r\n");
 		}
@@ -300,15 +301,15 @@ int main(int argc, char * argv[])
 			{
 				argc -= 1;
 				argv += 1;
-				uint32_t addr = strtoul(argv[0], NULL, 0);
-				size_t len = strtoul(argv[1], NULL, 0);
+				uint64_t addr = strtoull(argv[0], NULL, 0);
+				uint64_t len = strtoull(argv[1], NULL, 0);
 				char * buf = malloc(len);
 				if(buf)
 				{
-					if(spinor_read(&ctx, addr, buf, len) != len)
-						printf("Read spi nor flash error\r\n");
-					else
+					if(spinor_read(&ctx, addr, buf, len))
 						file_save(argv[2], buf, len);
+					else
+						printf("Not found any spi nor flash\r\n");
 					free(buf);
 				}
 			}
@@ -316,13 +317,13 @@ int main(int argc, char * argv[])
 			{
 				argc -= 1;
 				argv += 1;
-				uint32_t addr = strtoul(argv[0], NULL, 0);
-				size_t len;
+				uint64_t addr = strtoull(argv[0], NULL, 0);
+				uint64_t len;
 				void * buf = file_load(argv[1], &len);
 				if(buf)
 				{
-					if(spinor_write(&ctx, addr, buf, len) != len)
-						printf("Write spi nor flash error\r\n");
+					if(!spinor_write(&ctx, addr, buf, len))
+						printf("Not found any spi nor flash\r\n");
 					free(buf);
 				}
 			}
@@ -336,8 +337,9 @@ int main(int argc, char * argv[])
 		argv += 2;
 		if(argc == 0)
 		{
-			if(spinand_detect(&ctx))
-				printf("Found spi nand flash\r\n");
+			uint64_t cap = spinand_detect(&ctx);
+			if(cap > 0)
+				printf("Found spi nand flash with %lld bytes\r\n", (long long)cap);
 			else
 				printf("Not found any spi nand flash\r\n");
 		}
@@ -347,15 +349,15 @@ int main(int argc, char * argv[])
 			{
 				argc -= 1;
 				argv += 1;
-				uint32_t addr = strtoul(argv[0], NULL, 0);
-				size_t len = strtoul(argv[1], NULL, 0);
+				uint64_t addr = strtoull(argv[0], NULL, 0);
+				uint64_t len = strtoull(argv[1], NULL, 0);
 				char * buf = malloc(len);
 				if(buf)
 				{
-					if(spinand_read(&ctx, addr, buf, len) != len)
-						printf("Read spi nand flash error\r\n");
-					else
+					if(spinand_read(&ctx, addr, buf, len))
 						file_save(argv[2], buf, len);
+					else
+						printf("Not found any spi nand flash\r\n");
 					free(buf);
 				}
 			}
@@ -363,13 +365,13 @@ int main(int argc, char * argv[])
 			{
 				argc -= 1;
 				argv += 1;
-				uint32_t addr = strtoul(argv[0], NULL, 0);
-				size_t len;
+				uint64_t addr = strtoull(argv[0], NULL, 0);
+				uint64_t len;
 				void * buf = file_load(argv[1], &len);
 				if(buf)
 				{
-					if(spinand_write(&ctx, addr, buf, len) != len)
-						printf("Write spi nand flash error\r\n");
+					if(!spinand_write(&ctx, addr, buf, len))
+						printf("Not found any spi nand flash\r\n");
 					free(buf);
 				}
 			}

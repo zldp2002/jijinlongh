@@ -7,9 +7,9 @@ extern "C" {
 
 #include <fel.h>
 
-int spinand_detect(struct xfel_ctx_t * ctx);
-size_t spinand_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
-size_t spinand_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+uint64_t spinand_detect(struct xfel_ctx_t * ctx);
+int spinand_read(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t len);
+int spinand_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t len);
 
 #ifdef __cplusplus
 }
