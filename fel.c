@@ -247,30 +247,12 @@ void fel_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val)
 
 void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
-	size_t n;
-
-	while(len > 0)
-	{
-		n = len > 256 ? 256 : len;
-		fel_read_raw(ctx, addr, buf, n);
-		addr += n;
-		buf += n;
-		len -= n;
-	}
+	fel_read_raw(ctx, addr, buf, len);
 }
 
 void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
-	size_t n;
-
-	while(len > 0)
-	{
-		n = len > 256 ? 256 : len;
-		fel_write_raw(ctx, addr, buf, n);
-		addr += n;
-		buf += n;
-		len -= n;
-	}
+	fel_write_raw(ctx, addr, buf, len);
 }
 
 void fel_read_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
@@ -281,7 +263,7 @@ void fel_read_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_
 	progress_start(&p, len);
 	while(len > 0)
 	{
-		n = len > 256 ? 256 : len;
+		n = len > 16384 ? 16384 : len;
 		fel_read_raw(ctx, addr, buf, n);
 		addr += n;
 		buf += n;
@@ -299,7 +281,7 @@ void fel_write_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size
 	progress_start(&p, len);
 	while(len > 0)
 	{
-		n = len > 256 ? 256 : len;
+		n = len > 16384 ? 16384 : len;
 		fel_write_raw(ctx, addr, buf, n);
 		addr += n;
 		buf += n;
