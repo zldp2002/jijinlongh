@@ -635,73 +635,6 @@ static uint64_t spinor_block_write(struct xfel_ctx_t * ctx, struct spinor_info_t
 	return blkcnt;
 }
 
-static uint64_t block_read(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint64_t offset, void * buf, uint64_t count)
-{
-	uint64_t blkno, blksz, blkcnt, capacity;
-	uint64_t len, tmp;
-	uint64_t ret = 0;
-	uint8_t * p;
-
-	blksz = info->blksz;
-	blkcnt = info->capacity / info->blksz;
-	if(!blksz || !blkcnt)
-		return 0;
-	capacity = info->capacity;
-	if(offset >= capacity)
-		return 0;
-	tmp = capacity - offset;
-	if(count > tmp)
-		count = tmp;
-	p = malloc(blksz);
-	if(!p)
-		return 0;
-	blkno = offset / blksz;
-	tmp = offset % blksz;
-	if(tmp > 0)
-	{
-		len = blksz - tmp;
-		if(count < len)
-			len = count;
-		if(spinor_block_read(ctx, info, p, blkno, 1) != 1)
-		{
-			free(p);
-			return ret;
-		}
-		memcpy((void *)buf, (const void *)(&p[tmp]), len);
-		buf += len;
-		count -= len;
-		ret += len;
-		blkno += 1;
-	}
-	tmp = count / blksz;
-	if(tmp > 0)
-	{
-		len = tmp * blksz;
-		if(spinor_block_read(ctx, info, buf, blkno, tmp) != tmp)
-		{
-			free(p);
-			return ret;
-		}
-		buf += len;
-		count -= len;
-		ret += len;
-		blkno += tmp;
-	}
-	if(count > 0)
-	{
-		len = count;
-		if(spinor_block_read(ctx, info, p, blkno, 1) != 1)
-		{
-			free(p);
-			return ret;
-		}
-		memcpy((void *)buf, (const void *)(&p[0]), len);
-		ret += len;
-	}
-	free(p);
-	return ret;
-}
-
 static uint64_t block_write(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint64_t offset, void * buf, uint64_t count)
 {
 	uint64_t blkno, blksz, blkcnt, capacity;
@@ -821,8 +754,7 @@ int spinor_read(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t len
 		while(len > 0)
 		{
 			n = len > 16384 ? 16384 : len;
-			block_read(ctx, &info, addr, buf, n);
-			//spinor_read_bytes(ctx, &info, addr, buf, n);
+			spinor_read_bytes(ctx, &info, addr, buf, n);
 			addr += n;
 			buf += n;
 			len -= n;
