@@ -753,7 +753,7 @@ int spinor_read(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t len
 		progress_start(&p, len);
 		while(len > 0)
 		{
-			n = len > 16384 ? 16384 : len;
+			n = len > 65536 ? 65536 : len;
 			spinor_read_bytes(ctx, &info, addr, buf, n);
 			addr += n;
 			buf += n;
@@ -777,7 +777,7 @@ int spinor_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t le
 		progress_start(&p, len);
 		while(len > 0)
 		{
-			n = len > 16384 ? 16384 : len;
+			n = len > 65536 ? 65536 : len;
 			block_write(ctx, &info, addr, buf, n);
 			addr += n;
 			buf += n;

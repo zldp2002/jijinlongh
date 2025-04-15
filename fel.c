@@ -263,7 +263,7 @@ void fel_read_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_
 	progress_start(&p, len);
 	while(len > 0)
 	{
-		n = len > 16384 ? 16384 : len;
+		n = len > 65536 ? 65536 : len;
 		fel_read_raw(ctx, addr, buf, n);
 		addr += n;
 		buf += n;
@@ -281,7 +281,7 @@ void fel_write_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size
 	progress_start(&p, len);
 	while(len > 0)
 	{
-		n = len > 16384 ? 16384 : len;
+		n = len > 65536 ? 65536 : len;
 		fel_write_raw(ctx, addr, buf, n);
 		addr += n;
 		buf += n;
