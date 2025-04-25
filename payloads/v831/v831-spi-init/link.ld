@@ -10,7 +10,7 @@ STACK_SRV_SIZE = 0x400;
 
 MEMORY
 {
-	ram : org = 0x00022000, len = 0x00002000	/* 8 KB */
+	ram : org = 0x00022000, len = 0x00001000	/* 4 KB */
 }
 
 SECTIONS
