@@ -1,5 +1,5 @@
-#ifndef __SPINAND_H__
-#define __SPINAND_H__
+#ifndef __SPINOR_H__
+#define __SPINOR_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,4 +15,4 @@ int spinor_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t le
 }
 #endif
 
-#endif /* __SPINAND_H__ */
+#endif /* __SPINOR_H__ */
