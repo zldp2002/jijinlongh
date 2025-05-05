@@ -1413,25 +1413,25 @@ static int chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, 
 	fel_write(ctx, 0x00022000, (void *)&payload[0], sizeof(payload));
 	while(txlen > 0)
 	{
-		n = txlen > 256 ? 256 : txlen;
-		param[0] = cpu_to_le32(ctx->version.scratchpad);
+		n = txlen > 32768 ? 32768 : txlen;
+		param[0] = cpu_to_le32(0x00023000);
 		param[1] = 0;
 		param[2] = n;
 		fel_write(ctx, 0x00022000 + 0x4, (void *)&param, sizeof(param));
-		fel_write(ctx, ctx->version.scratchpad, txbuf, n);
+		fel_write(ctx, 0x00023000, txbuf, n);
 		fel_exec(ctx, 0x00022000);
 		txbuf += n;
 		txlen -= n;
 	}
 	while(rxlen > 0)
 	{
-		n = rxlen > 256 ? 256 : rxlen;
+		n = rxlen > 32768 ? 32768 : rxlen;
 		param[0] = 0;
-		param[1] = cpu_to_le32(ctx->version.scratchpad);
+		param[1] = cpu_to_le32(0x00023000);
 		param[2] = n;
 		fel_write(ctx, 0x00022000 + 0x4, (void *)&param, sizeof(param));
 		fel_exec(ctx, 0x00022000);
-		fel_read(ctx, ctx->version.scratchpad, rxbuf, n);
+		fel_read(ctx, 0x00023000, rxbuf, n);
 		rxbuf += n;
 		rxlen -= n;
 	}
