@@ -297,7 +297,7 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			if(!strcmp(argv[0], "read"))
+			if(!strcmp(argv[0], "read") && (argc == 4))
 			{
 				argc -= 1;
 				argv += 1;
@@ -313,7 +313,7 @@ int main(int argc, char * argv[])
 					free(buf);
 				}
 			}
-			else if(!strcmp(argv[0], "write"))
+			else if(!strcmp(argv[0], "write") && (argc == 3))
 			{
 				argc -= 1;
 				argv += 1;
@@ -345,7 +345,7 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			if(!strcmp(argv[0], "read"))
+			if(!strcmp(argv[0], "read") && (argc == 4))
 			{
 				argc -= 1;
 				argv += 1;
@@ -361,7 +361,7 @@ int main(int argc, char * argv[])
 					free(buf);
 				}
 			}
-			else if(!strcmp(argv[0], "write"))
+			else if(!strcmp(argv[0], "write") && (argc == 3))
 			{
 				argc -= 1;
 				argv += 1;
