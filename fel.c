@@ -1,5 +1,6 @@
 #include <fel.h>
 
+extern struct chip_t a40i;
 extern struct chip_t d1;
 extern struct chip_t f1c100s;
 extern struct chip_t h3;
@@ -9,6 +10,7 @@ extern struct chip_t v3s;
 extern struct chip_t v831;
 
 static struct chip_t * chips[] = {
+	&a40i,
 	&d1,
 	&f1c100s,
 	&h3,
