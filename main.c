@@ -83,7 +83,6 @@ static void usage(void)
 {
 	printf("xfel(v1.1.0) - https://github.com/xboot/xfel\r\n");
 	printf("usage:\r\n");
-	printf("    xfel help                                   - Print this usage\r\n");
 	printf("    xfel version                                - Show brom version\r\n");
 	printf("    xfel hexdump <address> <length>             - Dumps memory region in hex\r\n");
 	printf("    xfel dump <address> <length>                - Binary memory dump to stdout\r\n");
@@ -134,11 +133,7 @@ int main(int argc, char * argv[])
 		libusb_exit(NULL);
 		return -1;
 	}
-	if(!strcmp(argv[1], "help"))
-	{
-		usage();
-	}
-	else if(!strcmp(argv[1], "version"))
+	if(!strcmp(argv[1], "version"))
 	{
 		printf("%.8s soc=0x%08x(%s) 0x%08x ver=0x%04x 0x%02x 0x%02x scratchpad=0x%08x\r\n",
 			ctx.version.magic, ctx.version.id, ctx.chip->name, ctx.version.firmware,

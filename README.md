@@ -23,7 +23,6 @@ make
 ```
 xfel(v1.1.0) - https://github.com/xboot/xfel
 usage:
-    xfel help                                   - Print this usage
     xfel version                                - Show brom version
     xfel hexdump <address> <length>             - Dumps memory region in hex
     xfel dump <address> <length>                - Binary memory dump to stdout
