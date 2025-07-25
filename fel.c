@@ -249,12 +249,30 @@ void fel_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val)
 
 void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
-	fel_read_raw(ctx, addr, buf, len);
+	size_t n;
+
+	while(len > 0)
+	{
+		n = len > 65536 ? 65536 : len;
+		fel_read_raw(ctx, addr, buf, n);
+		addr += n;
+		buf += n;
+		len -= n;
+	}
 }
 
 void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
-	fel_write_raw(ctx, addr, buf, len);
+	size_t n;
+
+	while(len > 0)
+	{
+		n = len > 65536 ? 65536 : len;
+		fel_write_raw(ctx, addr, buf, n);
+		addr += n;
+		buf += n;
+		len -= n;
+	}
 }
 
 void fel_read_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
