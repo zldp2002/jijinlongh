@@ -43,19 +43,11 @@ struct chip_t {
 	int (*spi_xfer)(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen);
 };
 
-#define R8(reg)			fel_read8(ctx, reg)
-#define W8(reg, val)	fel_write8(ctx, reg, val)
-#define R16(reg)		fel_read16(ctx, reg)
-#define W16(reg, val)	fel_write16(ctx, reg, val)
 #define R32(reg)		fel_read32(ctx, reg)
 #define W32(reg, val)	fel_write32(ctx, reg, val)
 
 int fel_init(struct xfel_ctx_t * ctx);
 void fel_exec(struct xfel_ctx_t * ctx, uint32_t addr);
-uint8_t fel_read8(struct xfel_ctx_t * ctx, uint32_t addr);
-void fel_write8(struct xfel_ctx_t * ctx, uint32_t addr, uint8_t val);
-uint16_t fel_read16(struct xfel_ctx_t * ctx, uint32_t addr);
-void fel_write16(struct xfel_ctx_t * ctx, uint32_t addr, uint16_t val);
 uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr);
 void fel_write32(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t val);
 void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
