@@ -15,7 +15,6 @@ SECTIONS
 	{
 		PROVIDE(__image_start = .);
 		PROVIDE(__text_start = .);
-		PROVIDE(__spl_start = .);
 		.obj/source/start.o (.text*)
 		.obj/source/memcpy.o (.text*)
 		.obj/source/memset.o (.text*)
@@ -23,46 +22,10 @@ SECTIONS
 		.obj/source/sys-uart.o (.text*)
 		.obj/source/sys-clock.o (.text*)
 		.obj/source/sys-dram.o (.text*)
-		PROVIDE(__spl_end = .);
 		*(.text*)
-		*(.init.text)
-		*(.exit.text)
 		*(.iplt)
 		*(.note.gnu.build-id)
 		PROVIDE(__text_end = .);
-	} > ram
-	PROVIDE(__spl_size = __spl_end - __spl_start);
-
-	.initcall ALIGN(8) :
-	{
-		PROVIDE(__initcall_start = .);
-		KEEP(*(.initcall_0.text))
-		KEEP(*(.initcall_1.text))
-		KEEP(*(.initcall_2.text))
-		KEEP(*(.initcall_3.text))
-		KEEP(*(.initcall_4.text))
-		KEEP(*(.initcall_5.text))
-		KEEP(*(.initcall_6.text))
-		KEEP(*(.initcall_7.text))
-		KEEP(*(.initcall_8.text))
-		KEEP(*(.initcall_9.text))
-		PROVIDE(__initcall_end = .);
-	} > ram
-
-	.exitcall ALIGN(8) :
-	{
-		PROVIDE(__exitcall_start = .);
-		KEEP(*(.exitcall_9.text))
-		KEEP(*(.exitcall_8.text))
-		KEEP(*(.exitcall_7.text))
-		KEEP(*(.exitcall_6.text))
-		KEEP(*(.exitcall_5.text))
-		KEEP(*(.exitcall_4.text))
-		KEEP(*(.exitcall_3.text))
-		KEEP(*(.exitcall_2.text))
-		KEEP(*(.exitcall_1.text))
-		KEEP(*(.exitcall_0.text))
-		PROVIDE(__exitcall_end = .);
 	} > ram
 
 	.ksymtab ALIGN(16) :
