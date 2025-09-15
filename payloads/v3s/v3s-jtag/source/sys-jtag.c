@@ -33,7 +33,6 @@ void sys_jtag_init(void)
 	virtual_addr_t addr;
 	u32_t val;
 
-
 	/* Config GPIOF0, GPIOF1, GPIOF3 and GPIOF5 to JTAG mode */
 	addr = 0x01c208b4 + 0x00;
 	val = read32(addr);
