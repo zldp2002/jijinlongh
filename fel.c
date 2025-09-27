@@ -193,22 +193,16 @@ void fel_exec(struct xfel_ctx_t * ctx, uint32_t addr)
 
 static inline void fel_read_raw(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
-	if(len > 0)
-	{
-		send_fel_request(ctx, 0x103, addr, len);
-		usb_read(ctx, buf, len);
-		read_fel_status(ctx);
-	}
+	send_fel_request(ctx, 0x103, addr, len);
+	usb_read(ctx, buf, len);
+	read_fel_status(ctx);
 }
 
 static inline void fel_write_raw(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
-	if(len > 0)
-	{
-		send_fel_request(ctx, 0x101, addr, len);
-		usb_write(ctx, buf, len);
-		read_fel_status(ctx);
-	}
+	send_fel_request(ctx, 0x101, addr, len);
+	usb_write(ctx, buf, len);
+	read_fel_status(ctx);
 }
 
 uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr)

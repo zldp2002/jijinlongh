@@ -43,6 +43,11 @@ struct chip_t {
 	int (*spi_xfer)(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen);
 };
 
+/*
+ * This R32 and W32 macro can only be used for byte access address, Don't used for address
+ * that can only support word access. Because the fel protocol can only support
+ * byte operation, VERY IMPORTANT !!!
+ */
 #define R32(reg)		fel_read32(ctx, reg)
 #define W32(reg, val)	fel_write32(ctx, reg, val)
 
