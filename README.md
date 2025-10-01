@@ -16,6 +16,7 @@ The just type `make` at the root directory, you will see a binary program.
 ```shell
 cd xfel
 make
+sudo make install
 ```
 
 ## Usage

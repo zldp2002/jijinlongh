@@ -49,7 +49,7 @@ OBJDIRS		:= $(patsubst %, %, $(SRCDIRS))
 NAME		:= xfel
 VPATH		:= $(OBJDIRS)
 
-.PHONY:		all clean
+.PHONY:		all install clean
 
 all : $(NAME)
 
@@ -68,6 +68,10 @@ $(COBJS) : %.o : %.c
 $(CPPOBJS) : %.o : %.cpp
 	@echo [CXX] $<
 	@$(CXX) $(CXXFLAGS) -MD -MP -MF $@.d $(INCDIRS) -c $< -o $@
+
+install:
+	install -d /usr/local/bin
+	install -m0755 xfel /usr/local/bin
 
 clean:
 	@$(RM) $(DEPS) $(OBJS) $(NAME).map $(NAME) *~
