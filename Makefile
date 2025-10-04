@@ -2,7 +2,7 @@
 # Makefile for module.
 #
 
-CROSS		?= 
+CROSS		?=
 
 
 AS		:= $(CROSS)gcc -x assembler-with-cpp
@@ -42,7 +42,7 @@ DEPS		:= $(SDEPS) $(CDEPS) $(CPPDEPS)
 
 SOBJS		:= $(patsubst %, %, $(SFILES:.S=.o))
 COBJS		:= $(patsubst %, %, $(CFILES:.c=.o))
-CPPOBJS		:= $(patsubst %, %, $(CPPFILES:.cpp=.o)) 
+CPPOBJS		:= $(patsubst %, %, $(CPPFILES:.cpp=.o))
 OBJS		:= $(SOBJS) $(COBJS) $(CPPOBJS)
 
 OBJDIRS		:= $(patsubst %, %, $(SRCDIRS))
@@ -70,8 +70,8 @@ $(CPPOBJS) : %.o : %.cpp
 	@$(CXX) $(CXXFLAGS) -MD -MP -MF $@.d $(INCDIRS) -c $< -o $@
 
 install:
-	install -d /usr/local/bin
-	install -m0755 xfel /usr/local/bin
+	install -Dm0755 xfel /usr/local/bin
+	install -Dm0644 99-xfel.rules /usr/lib/udev/rules.d
 
 clean:
 	@$(RM) $(DEPS) $(OBJS) $(NAME).map $(NAME) *~

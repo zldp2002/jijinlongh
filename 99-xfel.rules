@@ -1,0 +1,25 @@
+# Copy this file to /etc/udev/rules.d/ or /usr/lib/udev/rules.d/
+# If rules fail to reload automatically, you can refresh udev rules
+# with the command "sudo udevadm control --reload"
+
+ACTION!="add|change", GOTO="xfel_rules_end"
+
+SUBSYSTEM=="gpio", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+
+SUBSYSTEM!="usb|tty|hidraw", GOTO="xfel_rules_end"
+
+# [GNU MCU Eclipse] -----------------------------------------------------------
+# To simplify access, the access rights were changed from:
+#   MODE="660", GROUP="plugdev", TAG+="uaccess"
+# to:
+#   MODE="666"
+# -----------------------------------------------------------------------------
+
+# Please keep this list sorted by VID:PID
+
+# Allwinner devices
+# define USB_AW_VENDOR_ID	0x1f3a
+# define USB_AW_PRODUCT_ID	0xefe8
+ATTR{idVendor}=="1F3A", ATTR{idProduct}=="EFE8", MODE="666"
+
+LABEL="xfel_rules_end"
