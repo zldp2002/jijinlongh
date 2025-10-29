@@ -1,19 +1,17 @@
 #
-# Makefile for module.
+# Top makefile
 #
 
 CROSS		?=
 
-
-AS		:= $(CROSS)gcc -x assembler-with-cpp
-CC		:= $(CROSS)gcc
-CXX		:= $(CROSS)g++
-LD		:= $(CROSS)ld
-AR		:= $(CROSS)ar
-OC		:= $(CROSS)objcopy
-OD		:= $(CROSS)objdump
-RM		:= rm -fr
-
+AS			:= $(CROSS)gcc -x assembler-with-cpp
+CC			:= $(CROSS)gcc
+CXX			:= $(CROSS)g++
+LD			:= $(CROSS)ld
+AR			:= $(CROSS)ar
+OC			:= $(CROSS)objcopy
+OD			:= $(CROSS)objdump
+RM			:= rm -fr
 
 ASFLAGS		:= -g -ggdb -Wall -O3
 CFLAGS		:= -g -ggdb -Wall -O3
