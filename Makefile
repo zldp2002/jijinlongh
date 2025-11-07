@@ -68,9 +68,9 @@ $(CPPOBJS) : %.o : %.cpp
 	@$(CXX) $(CXXFLAGS) -MD -MP -MF $@.d $(INCDIRS) -c $< -o $@
 
 install:
-	install -Dm0755 xfel /usr/bin
-	install -Dm0644 99-xfel.rules /etc/udev/rules.d
-	install -Dm0644 LICENSE /usr/share/licenses/xfel
+	install -Dm0755 xfel /usr/bin/xfel
+	install -Dm0644 99-xfel.rules /etc/udev/rules.d/99-xfel.rules
+	install -Dm0644 LICENSE /usr/share/licenses/xfel/LICENSE
 
 clean:
 	@$(RM) $(DEPS) $(OBJS) $(NAME).map $(NAME) *~
