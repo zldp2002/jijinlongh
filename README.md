@@ -11,7 +11,7 @@ The xfel tools depends on the `libusb-1.0` library, you need to install `libusb-
 sudo apt install libusb-1.0-0-dev
 ```
 
-The just type `make` at the root directory, you will see a binary program.
+Then just type `make` at the root directory, you will see a binary program.
 
 ```shell
 cd xfel

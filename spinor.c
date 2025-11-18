@@ -289,7 +289,7 @@ static inline int spinor_info(struct xfel_ctx_t * ctx, struct spinor_info_t * in
 				return 1;
 			}
 		}
-		printf("The spi nor flash '0x%x' is not yet supported", id);
+		printf("The spi nor flash '0x%x' is not yet supported\r\n", id);
 	}
 	return 0;
 }
