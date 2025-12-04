@@ -294,23 +294,12 @@ static inline int spinor_info(struct xfel_ctx_t * ctx, struct spinor_info_t * in
 	return 0;
 }
 
-static inline uint8_t spinor_read_status_register(struct xfel_ctx_t * ctx, struct spinor_info_t * info)
-{
-	uint8_t tx = OPCODE_RDSR;
-	uint8_t rx = 0;
-
-	fel_chip_spi_select(ctx);
-	fel_chip_spi_xfer(ctx, &tx, 1, &rx, 1);
-	fel_chip_spi_deselect(ctx);
-	return rx;
-}
-
-static inline void spinor_write_status_register(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint8_t sr)
+static inline void spinor_chip_reset(struct xfel_ctx_t * ctx, struct spinor_info_t * info)
 {
 	uint8_t tx[2];
 
-	tx[0] = OPCODE_WRSR;
-	tx[1] = sr;
+	tx[0] = 0x66;
+	tx[1] = 0x99;
 	fel_chip_spi_select(ctx);
 	fel_chip_spi_xfer(ctx, tx, 2, 0, 0);
 	fel_chip_spi_deselect(ctx);
@@ -323,7 +312,18 @@ static inline void spinor_write_enable(struct xfel_ctx_t * ctx, struct spinor_in
 	fel_chip_spi_deselect(ctx);
 }
 
-static inline void spinor_address_mode_4byte(struct xfel_ctx_t * ctx, struct spinor_info_t * info, int enable)
+static inline void spinor_write_status(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint8_t s)
+{
+	uint8_t tx[2];
+
+	tx[0] = OPCODE_WRSR;
+	tx[1] = s;
+	fel_chip_spi_select(ctx);
+	fel_chip_spi_xfer(ctx, tx, 2, 0, 0);
+	fel_chip_spi_deselect(ctx);
+}
+
+static inline void spinor_address_4byte(struct xfel_ctx_t * ctx, struct spinor_info_t * info, int enable)
 {
 	uint8_t tx;
 
@@ -336,23 +336,40 @@ static inline void spinor_address_mode_4byte(struct xfel_ctx_t * ctx, struct spi
 	fel_chip_spi_deselect(ctx);
 }
 
-static inline void spinor_chip_reset(struct xfel_ctx_t * ctx, struct spinor_info_t * info)
+static inline void spinor_wait_for_busy(struct xfel_ctx_t * ctx, struct spinor_info_t * info)
 {
-	uint8_t tx[2];
+	uint8_t tx = OPCODE_RDSR;
+	uint8_t rx = 0;
 
-	tx[0] = 0x66;
-	tx[1] = 0x99;
 	fel_chip_spi_select(ctx);
-	fel_chip_spi_xfer(ctx, tx, 2, 0, 0);
+	do {
+		fel_chip_spi_xfer(ctx, &tx, 1, &rx, 1);
+	} while((rx & 0x1) == 0x1);
 	fel_chip_spi_deselect(ctx);
 }
 
-static inline void spinor_wait_for_busy(struct xfel_ctx_t * ctx, struct spinor_info_t * info)
+static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_info_t * info)
 {
-	while((spinor_read_status_register(ctx, info) & 0x1) == 0x1);
+	fel_chip_spi_init(ctx);
+	if(spinor_info(ctx, info))
+	{
+		spinor_chip_reset(ctx, info);
+		spinor_wait_for_busy(ctx, info);
+		spinor_write_enable(ctx, info);
+		spinor_write_status(ctx, info, 0);
+		spinor_wait_for_busy(ctx, info);
+		if(info->address_length == 4)
+		{
+			spinor_write_enable(ctx, info);
+			spinor_address_4byte(ctx, info, 1);
+			spinor_wait_for_busy(ctx, info);
+		}
+		return 1;
+	}
+	return 0;
 }
 
-static void spinor_read_bytes(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint32_t addr, uint8_t * buf, uint32_t count)
+static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint32_t addr, uint8_t * buf, uint32_t count)
 {
 	uint8_t tx[5];
 
@@ -367,7 +384,6 @@ static void spinor_read_bytes(struct xfel_ctx_t * ctx, struct spinor_info_t * in
 		fel_chip_spi_xfer(ctx, tx, 4, buf, count);
 		fel_chip_spi_deselect(ctx);
 		break;
-
 	case 4:
 		tx[0] = info->opcode_read;
 		tx[1] = (uint8_t)(addr >> 24);
@@ -378,43 +394,45 @@ static void spinor_read_bytes(struct xfel_ctx_t * ctx, struct spinor_info_t * in
 		fel_chip_spi_xfer(ctx, tx, 5, buf, count);
 		fel_chip_spi_deselect(ctx);
 		break;
-
 	default:
 		break;
 	}
 }
 
-static void spinor_write_bytes(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint32_t addr, uint8_t * buf, uint32_t count)
+static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint32_t addr, uint8_t * buf, uint32_t count)
 {
-	uint8_t tx[5];
+	uint8_t * txbuf;
 
-	switch(info->address_length)
+	txbuf = malloc(count + 5);
+	if(txbuf)
 	{
-	case 3:
-		tx[0] = info->opcode_write;
-		tx[1] = (uint8_t)(addr >> 16);
-		tx[2] = (uint8_t)(addr >> 8);
-		tx[3] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
-		fel_chip_spi_xfer(ctx, tx, 4, 0, 0);
-		fel_chip_spi_xfer(ctx, buf, count, 0, 0);
-		fel_chip_spi_deselect(ctx);
-		break;
-
-	case 4:
-		tx[0] = info->opcode_write;
-		tx[1] = (uint8_t)(addr >> 24);
-		tx[2] = (uint8_t)(addr >> 16);
-		tx[3] = (uint8_t)(addr >> 8);
-		tx[4] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
-		fel_chip_spi_xfer(ctx, tx, 5, 0, 0);
-		fel_chip_spi_xfer(ctx, buf, count, 0, 0);
-		fel_chip_spi_deselect(ctx);
-		break;
-
-	default:
-		break;
+		switch(info->address_length)
+		{
+		case 3:
+			txbuf[0] = info->opcode_write;
+			txbuf[1] = (uint8_t)(addr >> 16);
+			txbuf[2] = (uint8_t)(addr >> 8);
+			txbuf[3] = (uint8_t)(addr >> 0);
+			memcpy(&txbuf[4], buf, count);
+			fel_chip_spi_select(ctx);
+			fel_chip_spi_xfer(ctx, txbuf, count + 4, 0, 0);
+			fel_chip_spi_deselect(ctx);
+			break;
+		case 4:
+			txbuf[0] = info->opcode_write;
+			txbuf[1] = (uint8_t)(addr >> 24);
+			txbuf[2] = (uint8_t)(addr >> 16);
+			txbuf[3] = (uint8_t)(addr >> 8);
+			txbuf[4] = (uint8_t)(addr >> 0);
+			memcpy(&txbuf[5], buf, count);
+			fel_chip_spi_select(ctx);
+			fel_chip_spi_xfer(ctx, txbuf, count + 5, 0, 0);
+			fel_chip_spi_deselect(ctx);
+			break;
+		default:
+			break;
+		}
+		free(txbuf);
 	}
 }
 
@@ -560,7 +578,7 @@ static uint64_t spinor_block_read(struct xfel_ctx_t * ctx, struct spinor_info_t 
 	while(cnt > 0)
 	{
 		spinor_wait_for_busy(ctx, info);
-		spinor_read_bytes(ctx, info, addr, pbuf, len);
+		spinor_helper_read(ctx, info, addr, pbuf, len);
 		addr += len;
 		pbuf += len;
 		cnt -= len;
@@ -626,7 +644,7 @@ static uint64_t spinor_block_write(struct xfel_ctx_t * ctx, struct spinor_info_t
 	while(cnt > 0)
 	{
 		spinor_write_enable(ctx, info);
-		spinor_write_bytes(ctx, info, addr, pbuf, len);
+		spinor_helper_write(ctx, info, addr, pbuf, len);
 		spinor_wait_for_busy(ctx, info);
 		addr += len;
 		pbuf += len;
@@ -712,32 +730,11 @@ static uint64_t block_write(struct xfel_ctx_t * ctx, struct spinor_info_t * info
 	return ret;
 }
 
-static int spinor_init(struct xfel_ctx_t * ctx, struct spinor_info_t * info)
-{
-	fel_chip_spi_init(ctx);
-	if(spinor_info(ctx, info))
-	{
-		spinor_chip_reset(ctx, info);
-		spinor_wait_for_busy(ctx, info);
-		spinor_write_enable(ctx, info);
-		spinor_write_status_register(ctx, info, 0);
-		spinor_wait_for_busy(ctx, info);
-		if(info->address_length == 4)
-		{
-			spinor_write_enable(ctx, info);
-			spinor_address_mode_4byte(ctx, info, 1);
-			spinor_wait_for_busy(ctx, info);
-		}
-		return 1;
-	}
-	return 0;
-}
-
 uint64_t spinor_detect(struct xfel_ctx_t * ctx)
 {
 	struct spinor_info_t info;
 
-	if(spinor_init(ctx, &info))
+	if(spinor_helper_init(ctx, &info))
 		return info.capacity;
 	return 0;
 }
@@ -748,13 +745,13 @@ int spinor_read(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t len
 	struct progress_t p;
 	uint64_t n;
 
-	if(spinor_init(ctx, &info))
+	if(spinor_helper_init(ctx, &info))
 	{
 		progress_start(&p, len);
 		while(len > 0)
 		{
 			n = len > 65536 ? 65536 : len;
-			spinor_read_bytes(ctx, &info, addr, buf, n);
+			spinor_helper_read(ctx, &info, addr, buf, n);
 			addr += n;
 			buf += n;
 			len -= n;
@@ -772,7 +769,7 @@ int spinor_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t le
 	struct progress_t p;
 	uint64_t n;
 
-	if(spinor_init(ctx, &info))
+	if(spinor_helper_init(ctx, &info))
 	{
 		progress_start(&p, len);
 		while(len > 0)
