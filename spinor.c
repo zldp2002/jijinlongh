@@ -78,9 +78,7 @@ static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, struct sfdp_t * sfdp
 	tx[2] = 0x0;
 	tx[3] = 0x0;
 	tx[4] = 0x0;
-	fel_chip_spi_select(ctx);
 	r = fel_chip_spi_xfer(ctx, tx, 5, &sfdp->h, sizeof(struct sfdp_header_t));
-	fel_chip_spi_deselect(ctx);
 	if(r < 0)
 		return 0;
 	if((sfdp->h.sign[0] != 'S') || (sfdp->h.sign[1] != 'F') || (sfdp->h.sign[2] != 'D') || (sfdp->h.sign[3] != 'P'))
@@ -95,9 +93,7 @@ static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, struct sfdp_t * sfdp
 		tx[2] = (addr >>  8) & 0xff;
 		tx[3] = (addr >>  0) & 0xff;
 		tx[4] = 0x0;
-		fel_chip_spi_select(ctx);
 		r = fel_chip_spi_xfer(ctx, tx, 5, &sfdp->ph[i], sizeof(struct sfdp_parameter_header_t));
-		fel_chip_spi_deselect(ctx);
 		if(r < 0)
 			return 0;
 	}
@@ -112,9 +108,7 @@ static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, struct sfdp_t * sfdp
 			tx[2] = (addr >>  8) & 0xff;
 			tx[3] = (addr >>  0) & 0xff;
 			tx[4] = 0x0;
-			fel_chip_spi_select(ctx);
 			r = fel_chip_spi_xfer(ctx, tx, 5, &sfdp->bt.table[0], sfdp->ph[i].length * 4);
-			fel_chip_spi_deselect(ctx);
 			if(r >= 0)
 			{
 				sfdp->bt.major = sfdp->ph[i].major;
@@ -133,9 +127,7 @@ static inline int spinor_read_id(struct xfel_ctx_t * ctx, uint32_t * id)
 	int r;
 
 	tx[0] = OPCODE_RDID;
-	fel_chip_spi_select(ctx);
 	r = fel_chip_spi_xfer(ctx, tx, 1, rx, 3);
-	fel_chip_spi_deselect(ctx);
 	if(r < 0)
 		return 0;
 	*id = (rx[0] << 16) | (rx[1] << 8) | (rx[2] << 0);
@@ -300,16 +292,12 @@ static inline void spinor_chip_reset(struct xfel_ctx_t * ctx, struct spinor_info
 
 	tx[0] = 0x66;
 	tx[1] = 0x99;
-	fel_chip_spi_select(ctx);
 	fel_chip_spi_xfer(ctx, tx, 2, 0, 0);
-	fel_chip_spi_deselect(ctx);
 }
 
 static inline void spinor_write_enable(struct xfel_ctx_t * ctx, struct spinor_info_t * info)
 {
-	fel_chip_spi_select(ctx);
 	fel_chip_spi_xfer(ctx, &info->opcode_write_enable, 1, 0, 0);
-	fel_chip_spi_deselect(ctx);
 }
 
 static inline void spinor_write_status(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint8_t s)
@@ -318,9 +306,7 @@ static inline void spinor_write_status(struct xfel_ctx_t * ctx, struct spinor_in
 
 	tx[0] = OPCODE_WRSR;
 	tx[1] = s;
-	fel_chip_spi_select(ctx);
 	fel_chip_spi_xfer(ctx, tx, 2, 0, 0);
-	fel_chip_spi_deselect(ctx);
 }
 
 static inline void spinor_address_4byte(struct xfel_ctx_t * ctx, struct spinor_info_t * info, int enable)
@@ -331,9 +317,7 @@ static inline void spinor_address_4byte(struct xfel_ctx_t * ctx, struct spinor_i
 		tx = OPCODE_ENTER_4B;
 	else
 		tx = OPCODE_EXIT_4B;
-	fel_chip_spi_select(ctx);
 	fel_chip_spi_xfer(ctx, &tx, 1, 0, 0);
-	fel_chip_spi_deselect(ctx);
 }
 
 static inline void spinor_wait_for_busy(struct xfel_ctx_t * ctx, struct spinor_info_t * info)
@@ -341,11 +325,9 @@ static inline void spinor_wait_for_busy(struct xfel_ctx_t * ctx, struct spinor_i
 	uint8_t tx = OPCODE_RDSR;
 	uint8_t rx = 0;
 
-	fel_chip_spi_select(ctx);
 	do {
 		fel_chip_spi_xfer(ctx, &tx, 1, &rx, 1);
 	} while((rx & 0x1) == 0x1);
-	fel_chip_spi_deselect(ctx);
 }
 
 static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_info_t * info)
@@ -380,9 +362,7 @@ static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_info_t * i
 		tx[1] = (uint8_t)(addr >> 16);
 		tx[2] = (uint8_t)(addr >> 8);
 		tx[3] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
 		fel_chip_spi_xfer(ctx, tx, 4, buf, count);
-		fel_chip_spi_deselect(ctx);
 		break;
 	case 4:
 		tx[0] = info->opcode_read;
@@ -390,9 +370,7 @@ static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_info_t * i
 		tx[2] = (uint8_t)(addr >> 16);
 		tx[3] = (uint8_t)(addr >> 8);
 		tx[4] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
 		fel_chip_spi_xfer(ctx, tx, 5, buf, count);
-		fel_chip_spi_deselect(ctx);
 		break;
 	default:
 		break;
@@ -414,9 +392,7 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_info_t * 
 			txbuf[2] = (uint8_t)(addr >> 8);
 			txbuf[3] = (uint8_t)(addr >> 0);
 			memcpy(&txbuf[4], buf, count);
-			fel_chip_spi_select(ctx);
 			fel_chip_spi_xfer(ctx, txbuf, count + 4, 0, 0);
-			fel_chip_spi_deselect(ctx);
 			break;
 		case 4:
 			txbuf[0] = info->opcode_write;
@@ -425,9 +401,7 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_info_t * 
 			txbuf[3] = (uint8_t)(addr >> 8);
 			txbuf[4] = (uint8_t)(addr >> 0);
 			memcpy(&txbuf[5], buf, count);
-			fel_chip_spi_select(ctx);
 			fel_chip_spi_xfer(ctx, txbuf, count + 5, 0, 0);
-			fel_chip_spi_deselect(ctx);
 			break;
 		default:
 			break;
@@ -447,9 +421,7 @@ static void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor_info_t
 		tx[1] = (uint8_t)(addr >> 16);
 		tx[2] = (uint8_t)(addr >> 8);
 		tx[3] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
 		fel_chip_spi_xfer(ctx, tx, 4, 0, 0);
-		fel_chip_spi_deselect(ctx);
 		break;
 
 	case 4:
@@ -458,9 +430,7 @@ static void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor_info_t
 		tx[2] = (uint8_t)(addr >> 16);
 		tx[3] = (uint8_t)(addr >> 8);
 		tx[4] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
 		fel_chip_spi_xfer(ctx, tx, 5, 0, 0);
-		fel_chip_spi_deselect(ctx);
 		break;
 
 	default:
@@ -479,9 +449,7 @@ static void spinor_sector_erase_32k(struct xfel_ctx_t * ctx, struct spinor_info_
 		tx[1] = (uint8_t)(addr >> 16);
 		tx[2] = (uint8_t)(addr >> 8);
 		tx[3] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
 		fel_chip_spi_xfer(ctx, tx, 4, 0, 0);
-		fel_chip_spi_deselect(ctx);
 		break;
 
 	case 4:
@@ -490,9 +458,7 @@ static void spinor_sector_erase_32k(struct xfel_ctx_t * ctx, struct spinor_info_
 		tx[2] = (uint8_t)(addr >> 16);
 		tx[3] = (uint8_t)(addr >> 8);
 		tx[4] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
 		fel_chip_spi_xfer(ctx, tx, 5, 0, 0);
-		fel_chip_spi_deselect(ctx);
 		break;
 
 	default:
@@ -511,9 +477,7 @@ static void spinor_sector_erase_64k(struct xfel_ctx_t * ctx, struct spinor_info_
 		tx[1] = (uint8_t)(addr >> 16);
 		tx[2] = (uint8_t)(addr >> 8);
 		tx[3] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
 		fel_chip_spi_xfer(ctx, tx, 4, 0, 0);
-		fel_chip_spi_deselect(ctx);
 		break;
 
 	case 4:
@@ -522,9 +486,7 @@ static void spinor_sector_erase_64k(struct xfel_ctx_t * ctx, struct spinor_info_
 		tx[2] = (uint8_t)(addr >> 16);
 		tx[3] = (uint8_t)(addr >> 8);
 		tx[4] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
 		fel_chip_spi_xfer(ctx, tx, 5, 0, 0);
-		fel_chip_spi_deselect(ctx);
 		break;
 
 	default:
@@ -543,20 +505,15 @@ static void spinor_sector_erase_256k(struct xfel_ctx_t * ctx, struct spinor_info
 		tx[1] = (uint8_t)(addr >> 16);
 		tx[2] = (uint8_t)(addr >> 8);
 		tx[3] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
 		fel_chip_spi_xfer(ctx, tx, 4, 0, 0);
-		fel_chip_spi_deselect(ctx);
 		break;
-
 	case 4:
 		tx[0] = info->opcode_erase_256k;
 		tx[1] = (uint8_t)(addr >> 24);
 		tx[2] = (uint8_t)(addr >> 16);
 		tx[3] = (uint8_t)(addr >> 8);
 		tx[4] = (uint8_t)(addr >> 0);
-		fel_chip_spi_select(ctx);
 		fel_chip_spi_xfer(ctx, tx, 5, 0, 0);
-		fel_chip_spi_deselect(ctx);
 		break;
 
 	default:

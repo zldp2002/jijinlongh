@@ -37,10 +37,11 @@ struct chip_t {
 	int (*jtag)(struct xfel_ctx_t * ctx);
 	int (*ddr)(struct xfel_ctx_t * ctx, const char * type);
 	int (*spi_init)(struct xfel_ctx_t * ctx);
+	int (*spi_xfer)(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen);
+
 	int (*spi_exit)(struct xfel_ctx_t * ctx);
 	int (*spi_select)(struct xfel_ctx_t * ctx);
 	int (*spi_deselect)(struct xfel_ctx_t * ctx);
-	int (*spi_xfer)(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen);
 };
 
 /*
@@ -51,6 +52,36 @@ struct chip_t {
 #define R32(reg)		fel_read32(ctx, reg)
 #define W32(reg, val)	fel_write32(ctx, reg, val)
 
+static inline int fel_chip_reset(struct xfel_ctx_t * ctx)
+{
+	return ctx->chip->reset(ctx);
+}
+
+static inline int fel_chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
+{
+	return ctx->chip->sid(ctx, sid);
+}
+
+static inline int fel_chip_jtag(struct xfel_ctx_t * ctx)
+{
+	return ctx->chip->jtag(ctx);
+}
+
+static inline int fel_chip_ddr(struct xfel_ctx_t * ctx, const char * type)
+{
+	return ctx->chip->ddr(ctx, type);
+}
+
+static inline int fel_chip_spi_init(struct xfel_ctx_t * ctx)
+{
+	return ctx->chip->spi_init(ctx);
+}
+
+static inline int fel_chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen)
+{
+	return ctx->chip->spi_xfer(ctx, txbuf, txlen, rxbuf, rxlen);
+}
+
 int fel_init(struct xfel_ctx_t * ctx);
 void fel_exec(struct xfel_ctx_t * ctx, uint32_t addr);
 uint32_t fel_read32(struct xfel_ctx_t * ctx, uint32_t addr);
@@ -59,16 +90,6 @@ void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 void fel_read_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 void fel_write_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
-
-int fel_chip_reset(struct xfel_ctx_t * ctx);
-int fel_chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid);
-int fel_chip_jtag(struct xfel_ctx_t * ctx);
-int fel_chip_ddr(struct xfel_ctx_t * ctx, const char * type);
-int fel_chip_spi_init(struct xfel_ctx_t * ctx);
-int fel_chip_spi_exit(struct xfel_ctx_t * ctx);
-int fel_chip_spi_select(struct xfel_ctx_t * ctx);
-int fel_chip_spi_deselect(struct xfel_ctx_t * ctx);
-int fel_chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen);
 
 #ifdef __cplusplus
 }

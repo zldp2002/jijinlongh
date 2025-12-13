@@ -44,6 +44,88 @@ enum {
 	SPI_RXD	= 0x300,
 };
 
+void sys_spi_init(void)
+{
+	virtual_addr_t addr;
+	u32_t val;
+
+	/* Config GPIOC0, GPIOC1, GPIOC2 and GPIOC3 */
+	addr = 0x01c20848 + 0x00;
+	val = read32(addr);
+	val &= ~(0xf << ((0 & 0x7) << 2));
+	val |= ((0x2 & 0x7) << ((0 & 0x7) << 2));
+	write32(addr, val);
+
+	val = read32(addr);
+	val &= ~(0xf << ((1 & 0x7) << 2));
+	val |= ((0x2 & 0x7) << ((1 & 0x7) << 2));
+	write32(addr, val);
+
+	val = read32(addr);
+	val &= ~(0xf << ((2 & 0x7) << 2));
+	val |= ((0x2 & 0x7) << ((2 & 0x7) << 2));
+	write32(addr, val);
+
+	val = read32(addr);
+	val &= ~(0xf << ((3 & 0x7) << 2));
+	val |= ((0x2 & 0x7) << ((3 & 0x7) << 2));
+	write32(addr, val);
+
+	/* Deassert spi0 reset */
+	addr = 0x01c202c0;
+	val = read32(addr);
+	val |= (1 << 20);
+	write32(addr, val);
+
+	/* Open the spi0 bus gate */
+	addr = 0x01c20000 + 0x60;
+	val = read32(addr);
+	val |= (1 << 20);
+	write32(addr, val);
+
+	/* Set spi clock rate control register, divided by 4 */
+	addr = 0x01c05000;
+	write32(addr + SPI_CCR, 0x00001001);
+
+	/* Enable spi0 and do a soft reset */
+	addr = 0x01c05000;
+	val = read32(addr + SPI_GCR);
+	val |= (1 << 31) | (1 << 7) | (1 << 1) | (1 << 0);
+	write32(addr + SPI_GCR, val);
+	while(read32(addr + SPI_GCR) & (1 << 31));
+
+	val = read32(addr + SPI_TCR);
+	val &= ~(0x3 << 0);
+	val |= (1 << 6) | (1 << 2);
+	write32(addr + SPI_TCR, val);
+
+	val = read32(addr + SPI_FCR);
+	val |= (1 << 31) | (1 << 15);
+	write32(addr + SPI_FCR, val);
+}
+
+void sys_spi_select(void)
+{
+	virtual_addr_t addr = 0x01c05000;
+	u32_t val;
+
+	val = read32(addr + SPI_TCR);
+	val &= ~((0x3 << 4) | (0x1 << 7));
+	val |= ((0 & 0x3) << 4) | (0x0 << 7);
+	write32(addr + SPI_TCR, val);
+}
+
+void sys_spi_deselect(void)
+{
+	virtual_addr_t addr = 0x01c05000;
+	u32_t val;
+
+	val = read32(addr + SPI_TCR);
+	val &= ~((0x3 << 4) | (0x1 << 7));
+	val |= ((0 & 0x3) << 4) | (0x1 << 7);
+	write32(addr + SPI_TCR, val);
+}
+
 static inline void sys_spi_write_txbuf(u8_t * buf, int len)
 {
 	virtual_addr_t addr = 0x01c05000;
@@ -63,7 +145,7 @@ static inline void sys_spi_write_txbuf(u8_t * buf, int len)
 	}
 }
 
-void sys_spi_xfer(void * txbuf, void * rxbuf, u32_t len)
+void sys_spi_transfer(void * txbuf, void * rxbuf, u32_t len)
 {
 	virtual_addr_t addr = 0x01c05000;
 	u8_t * tx = txbuf;

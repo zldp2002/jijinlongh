@@ -3,7 +3,7 @@
 #
 
 CROSS		?= arm-none-eabi-
-NAME		:= f1c100s-spi-deselect
+NAME		:= f1c100s-spi
 
 #
 # System environment variable.
