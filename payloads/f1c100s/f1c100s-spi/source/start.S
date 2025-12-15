@@ -50,18 +50,18 @@ reset:
 	mrc p15, 0, lr, c1, c0, 0
 	str lr, [r0, #16]
 
-	ldr r4, spi_type
-	mov r3, #4
-	cmp r4, r3
+	ldr r1, spi_type
+	mov r0, #4
+	cmp r1, r0
 	beq _spi_transfer
-	mov r3, #3
-	cmp r4, r3
+	mov r0, #3
+	cmp r1, r0
 	beq _spi_deselect
-	mov r3, #2
-	cmp r4, r3
+	mov r0, #2
+	cmp r1, r0
 	beq _spi_select
-	mov r3, #1
-	cmp r4, r3
+	mov r0, #1
+	cmp r1, r0
 	beq _spi_init
 	b _exit
 _spi_init:
@@ -108,3 +108,4 @@ _exit:
 	ldr r1, [r0, #8]
 	msr cpsr, r1
 	bx lr
+
