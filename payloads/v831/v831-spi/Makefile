@@ -3,7 +3,7 @@
 #
 
 CROSS		?= arm-linux-gnueabihf-
-NAME		:= v831-spi-select
+NAME		:= v831-spi
 
 #
 # System environment variable.
