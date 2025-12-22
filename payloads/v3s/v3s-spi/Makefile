@@ -3,7 +3,7 @@
 #
 
 CROSS		?= arm-linux-gnueabihf-
-NAME		:= v3s-spi-select
+NAME		:= v3s-spi
 
 #
 # System environment variable.

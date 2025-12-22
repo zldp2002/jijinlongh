@@ -130,3 +130,71 @@ void sys_spi_init(void)
 	val |= (1 << 31) | (1 << 15);
 	write32(addr + SPI_FCR, val);
 }
+
+void sys_spi_select(void)
+{
+	virtual_addr_t addr = 0x01c68000;
+	u32_t val;
+
+	val = read32(addr + SPI_TCR);
+	val &= ~((0x3 << 4) | (0x1 << 7));
+	val |= ((0 & 0x3) << 4) | (0x0 << 7);
+	write32(addr + SPI_TCR, val);
+}
+
+void sys_spi_deselect(void)
+{
+	virtual_addr_t addr = 0x01c68000;
+	u32_t val;
+
+	val = read32(addr + SPI_TCR);
+	val &= ~((0x3 << 4) | (0x1 << 7));
+	val |= ((0 & 0x3) << 4) | (0x1 << 7);
+	write32(addr + SPI_TCR, val);
+}
+
+static inline void sys_spi_write_txbuf(u8_t * buf, int len)
+{
+	virtual_addr_t addr = 0x01c68000;
+	int i;
+
+	write32(addr + SPI_MTC, len & 0xffffff);
+	write32(addr + SPI_BCC, len & 0xffffff);
+	if(buf)
+	{
+		for(i = 0; i < len; i++)
+			write8(addr + SPI_TXD, *buf++);
+	}
+	else
+	{
+		for(i = 0; i < len; i++)
+			write8(addr + SPI_TXD, 0xff);
+	}
+}
+
+void sys_spi_transfer(void * txbuf, void * rxbuf, u32_t len)
+{
+	virtual_addr_t addr = 0x01c68000;
+	u8_t * tx = txbuf;
+	u8_t * rx = rxbuf;
+	u8_t val;
+	int n, i;
+
+	while(len > 0)
+	{
+		n = (len <= 64) ? len : 64;
+		write32(addr + SPI_MBC, n);
+		sys_spi_write_txbuf(tx, n);
+		write32(addr + SPI_TCR, read32(addr + SPI_TCR) | (1 << 31));
+		while((read32(addr + SPI_FSR) & 0xff) < n);
+		for(i = 0; i < n; i++)
+		{
+			val = read8(addr + SPI_RXD);
+			if(rx)
+				*rx++ = val;
+		}
+		if(tx)
+			tx += n;
+		len -= n;
+	}
+}
