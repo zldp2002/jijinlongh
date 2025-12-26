@@ -3,7 +3,7 @@
 #
 
 CROSS		?= arm-linux-gnueabihf-
-NAME		:= h3-spi-select
+NAME		:= h3-spi
 
 #
 # System environment variable.
