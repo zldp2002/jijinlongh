@@ -38,10 +38,6 @@ struct chip_t {
 	int (*ddr)(struct xfel_ctx_t * ctx, const char * type);
 	int (*spi_init)(struct xfel_ctx_t * ctx);
 	int (*spi_xfer)(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen);
-
-	int (*spi_exit)(struct xfel_ctx_t * ctx);
-	int (*spi_select)(struct xfel_ctx_t * ctx);
-	int (*spi_deselect)(struct xfel_ctx_t * ctx);
 };
 
 /*
