@@ -70,7 +70,7 @@ static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, struct sfdp_t * sfdp
 {
 	uint32_t addr;
 	uint8_t tx[5];
-	int i, r;
+	int i;
 
 	memset(sfdp, 0, sizeof(struct sfdp_t));
 	tx[0] = OPCODE_SFDP;
@@ -78,8 +78,7 @@ static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, struct sfdp_t * sfdp
 	tx[2] = 0x0;
 	tx[3] = 0x0;
 	tx[4] = 0x0;
-	r = fel_chip_spi_xfer(ctx, tx, 5, &sfdp->h, sizeof(struct sfdp_header_t));
-	if(r < 0)
+	if(!fel_chip_spi_xfer(ctx, tx, 5, &sfdp->h, sizeof(struct sfdp_header_t)))
 		return 0;
 	if((sfdp->h.sign[0] != 'S') || (sfdp->h.sign[1] != 'F') || (sfdp->h.sign[2] != 'D') || (sfdp->h.sign[3] != 'P'))
 		return 0;
@@ -93,8 +92,7 @@ static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, struct sfdp_t * sfdp
 		tx[2] = (addr >>  8) & 0xff;
 		tx[3] = (addr >>  0) & 0xff;
 		tx[4] = 0x0;
-		r = fel_chip_spi_xfer(ctx, tx, 5, &sfdp->ph[i], sizeof(struct sfdp_parameter_header_t));
-		if(r < 0)
+		if(!fel_chip_spi_xfer(ctx, tx, 5, &sfdp->ph[i], sizeof(struct sfdp_parameter_header_t)))
 			return 0;
 	}
 
@@ -108,8 +106,7 @@ static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, struct sfdp_t * sfdp
 			tx[2] = (addr >>  8) & 0xff;
 			tx[3] = (addr >>  0) & 0xff;
 			tx[4] = 0x0;
-			r = fel_chip_spi_xfer(ctx, tx, 5, &sfdp->bt.table[0], sfdp->ph[i].length * 4);
-			if(r >= 0)
+			if(fel_chip_spi_xfer(ctx, tx, 5, &sfdp->bt.table[0], sfdp->ph[i].length * 4))
 			{
 				sfdp->bt.major = sfdp->ph[i].major;
 				sfdp->bt.minor = sfdp->ph[i].minor;
@@ -124,11 +121,9 @@ static inline int spinor_read_id(struct xfel_ctx_t * ctx, uint32_t * id)
 {
 	uint8_t tx[1];
 	uint8_t rx[3];
-	int r;
 
 	tx[0] = OPCODE_RDID;
-	r = fel_chip_spi_xfer(ctx, tx, 1, rx, 3);
-	if(r < 0)
+	if(!fel_chip_spi_xfer(ctx, tx, 1, rx, 3))
 		return 0;
 	*id = (rx[0] << 16) | (rx[1] << 8) | (rx[2] << 0);
 	return 1;
@@ -332,8 +327,7 @@ static inline void spinor_wait_for_busy(struct xfel_ctx_t * ctx, struct spinor_i
 
 static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_info_t * info)
 {
-	fel_chip_spi_init(ctx);
-	if(spinor_info(ctx, info))
+	if(fel_chip_spi_init(ctx) && spinor_info(ctx, info))
 	{
 		spinor_chip_reset(ctx, info);
 		spinor_wait_for_busy(ctx, info);
@@ -423,7 +417,6 @@ static void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor_info_t
 		tx[3] = (uint8_t)(addr >> 0);
 		fel_chip_spi_xfer(ctx, tx, 4, 0, 0);
 		break;
-
 	case 4:
 		tx[0] = info->opcode_erase_4k;
 		tx[1] = (uint8_t)(addr >> 24);
@@ -432,7 +425,6 @@ static void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor_info_t
 		tx[4] = (uint8_t)(addr >> 0);
 		fel_chip_spi_xfer(ctx, tx, 5, 0, 0);
 		break;
-
 	default:
 		break;
 	}
@@ -451,7 +443,6 @@ static void spinor_sector_erase_32k(struct xfel_ctx_t * ctx, struct spinor_info_
 		tx[3] = (uint8_t)(addr >> 0);
 		fel_chip_spi_xfer(ctx, tx, 4, 0, 0);
 		break;
-
 	case 4:
 		tx[0] = info->opcode_erase_32k;
 		tx[1] = (uint8_t)(addr >> 24);
@@ -460,7 +451,6 @@ static void spinor_sector_erase_32k(struct xfel_ctx_t * ctx, struct spinor_info_
 		tx[4] = (uint8_t)(addr >> 0);
 		fel_chip_spi_xfer(ctx, tx, 5, 0, 0);
 		break;
-
 	default:
 		break;
 	}
@@ -479,7 +469,6 @@ static void spinor_sector_erase_64k(struct xfel_ctx_t * ctx, struct spinor_info_
 		tx[3] = (uint8_t)(addr >> 0);
 		fel_chip_spi_xfer(ctx, tx, 4, 0, 0);
 		break;
-
 	case 4:
 		tx[0] = info->opcode_erase_64k;
 		tx[1] = (uint8_t)(addr >> 24);
@@ -488,7 +477,6 @@ static void spinor_sector_erase_64k(struct xfel_ctx_t * ctx, struct spinor_info_
 		tx[4] = (uint8_t)(addr >> 0);
 		fel_chip_spi_xfer(ctx, tx, 5, 0, 0);
 		break;
-
 	default:
 		break;
 	}
@@ -515,7 +503,6 @@ static void spinor_sector_erase_256k(struct xfel_ctx_t * ctx, struct spinor_info
 		tx[4] = (uint8_t)(addr >> 0);
 		fel_chip_spi_xfer(ctx, tx, 5, 0, 0);
 		break;
-
 	default:
 		break;
 	}
