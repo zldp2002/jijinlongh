@@ -347,24 +347,43 @@ static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_info_t * in
 
 static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint32_t addr, uint8_t * buf, uint32_t count)
 {
+	uint32_t granularity, n;
 	uint8_t tx[5];
 
+	if(info->read_granularity == 1)
+		granularity = (count < 0x7fffffff) ? count : 0x7fffffff;
+	else
+		granularity = info->read_granularity;
 	switch(info->address_length)
 	{
 	case 3:
-		tx[0] = info->opcode_read;
-		tx[1] = (uint8_t)(addr >> 16);
-		tx[2] = (uint8_t)(addr >> 8);
-		tx[3] = (uint8_t)(addr >> 0);
-		fel_chip_spi_xfer(ctx, tx, 4, buf, count);
+		while(count > 0)
+		{
+			n = count > granularity ? granularity : count;
+			tx[0] = info->opcode_read;
+			tx[1] = (uint8_t)(addr >> 16);
+			tx[2] = (uint8_t)(addr >> 8);
+			tx[3] = (uint8_t)(addr >> 0);
+			fel_chip_spi_xfer(ctx, tx, 4, buf, n);
+			addr += n;
+			buf += n;
+			count -= n;
+		}
 		break;
 	case 4:
-		tx[0] = info->opcode_read;
-		tx[1] = (uint8_t)(addr >> 24);
-		tx[2] = (uint8_t)(addr >> 16);
-		tx[3] = (uint8_t)(addr >> 8);
-		tx[4] = (uint8_t)(addr >> 0);
-		fel_chip_spi_xfer(ctx, tx, 5, buf, count);
+		while(count > 0)
+		{
+			n = count > granularity ? granularity : count;
+			tx[0] = info->opcode_read;
+			tx[1] = (uint8_t)(addr >> 24);
+			tx[2] = (uint8_t)(addr >> 16);
+			tx[3] = (uint8_t)(addr >> 8);
+			tx[4] = (uint8_t)(addr >> 0);
+			fel_chip_spi_xfer(ctx, tx, 5, buf, n);
+			addr += n;
+			buf += n;
+			count -= n;
+		}
 		break;
 	default:
 		break;
@@ -373,34 +392,62 @@ static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_info_t * i
 
 static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint32_t addr, uint8_t * buf, uint32_t count)
 {
+	uint32_t granularity, n;
 	uint8_t * txbuf;
 
-	txbuf = malloc(count + 5);
-	if(txbuf)
+	if(info->write_granularity == 1)
+		granularity = (count < 0x7fffffff) ? count : 0x7fffffff;
+	else
+		granularity = info->write_granularity;
+	switch(info->address_length)
 	{
-		switch(info->address_length)
+	case 3:
+		txbuf = malloc(granularity + 4);
+		if(txbuf)
 		{
-		case 3:
-			txbuf[0] = info->opcode_write;
-			txbuf[1] = (uint8_t)(addr >> 16);
-			txbuf[2] = (uint8_t)(addr >> 8);
-			txbuf[3] = (uint8_t)(addr >> 0);
-			memcpy(&txbuf[4], buf, count);
-			fel_chip_spi_xfer(ctx, txbuf, count + 4, 0, 0);
-			break;
-		case 4:
-			txbuf[0] = info->opcode_write;
-			txbuf[1] = (uint8_t)(addr >> 24);
-			txbuf[2] = (uint8_t)(addr >> 16);
-			txbuf[3] = (uint8_t)(addr >> 8);
-			txbuf[4] = (uint8_t)(addr >> 0);
-			memcpy(&txbuf[5], buf, count);
-			fel_chip_spi_xfer(ctx, txbuf, count + 5, 0, 0);
-			break;
-		default:
-			break;
+			while(count > 0)
+			{
+				n = count > granularity ? granularity : count;
+				txbuf[0] = info->opcode_write;
+				txbuf[1] = (uint8_t)(addr >> 16);
+				txbuf[2] = (uint8_t)(addr >> 8);
+				txbuf[3] = (uint8_t)(addr >> 0);
+				memcpy(&txbuf[4], buf, n);
+				spinor_write_enable(ctx, info);
+				fel_chip_spi_xfer(ctx, txbuf, n + 4, 0, 0);
+				spinor_wait_for_busy(ctx, info);
+				addr += n;
+				buf += n;
+				count -= n;
+			}
+			free(txbuf);
 		}
-		free(txbuf);
+		break;
+	case 4:
+		txbuf = malloc(granularity + 5);
+		if(txbuf)
+		{
+			while(count > 0)
+			{
+				n = count > granularity ? granularity : count;
+				txbuf[0] = info->opcode_write;
+				txbuf[1] = (uint8_t)(addr >> 24);
+				txbuf[2] = (uint8_t)(addr >> 16);
+				txbuf[3] = (uint8_t)(addr >> 8);
+				txbuf[4] = (uint8_t)(addr >> 0);
+				memcpy(&txbuf[5], buf, n);
+				spinor_write_enable(ctx, info);
+				fel_chip_spi_xfer(ctx, txbuf, n + 5, 0, 0);
+				spinor_wait_for_busy(ctx, info);
+				addr += n;
+				buf += n;
+				count -= n;
+			}
+			free(txbuf);
+		}
+		break;
+	default:
+		break;
 	}
 }
 
@@ -510,36 +557,16 @@ static void spinor_sector_erase_256k(struct xfel_ctx_t * ctx, struct spinor_info
 
 static uint64_t spinor_block_read(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint8_t * buf, uint64_t blkno, uint64_t blkcnt)
 {
-	uint64_t addr = blkno * info->blksz;
-	int64_t cnt = blkcnt * info->blksz;
-	uint8_t * pbuf = buf;
-	uint32_t len;
-
-	if(info->read_granularity == 1)
-		len = (cnt < 0x7fffffff) ? cnt : 0x7fffffff;
-	else
-		len = info->read_granularity;
-	while(cnt > 0)
-	{
-		spinor_wait_for_busy(ctx, info);
-		spinor_helper_read(ctx, info, addr, pbuf, len);
-		addr += len;
-		pbuf += len;
-		cnt -= len;
-	}
+	spinor_helper_read(ctx, info, blkno * info->blksz, buf, blkcnt * info->blksz);
 	return blkcnt;
 }
 
 static uint64_t spinor_block_write(struct xfel_ctx_t * ctx, struct spinor_info_t * info, uint8_t * buf, uint64_t blkno, uint64_t blkcnt)
 {
-	uint64_t addr, baddr = blkno * info->blksz;
-	int64_t cnt, count = blkcnt * info->blksz;
+	uint64_t addr = blkno * info->blksz;
+	int64_t cnt = blkcnt * info->blksz;
 	uint32_t len;
-	uint8_t * pbuf;
 
-	addr = baddr;
-	cnt = count;
-	spinor_wait_for_busy(ctx, info);
 	while(cnt > 0)
 	{
 		if((info->opcode_erase_256k != 0) && ((addr & 0x3ffff) == 0) && (cnt >= 262144))
@@ -577,23 +604,7 @@ static uint64_t spinor_block_write(struct xfel_ctx_t * ctx, struct spinor_info_t
 		addr += len;
 		cnt -= len;
 	}
-	addr = baddr;
-	cnt = count;
-	pbuf = buf;
-	if(info->write_granularity == 1)
-		len = (cnt < 0x7fffffff) ? cnt : 0x7fffffff;
-	else
-		len = info->write_granularity;
-	spinor_wait_for_busy(ctx, info);
-	while(cnt > 0)
-	{
-		spinor_write_enable(ctx, info);
-		spinor_helper_write(ctx, info, addr, pbuf, len);
-		spinor_wait_for_busy(ctx, info);
-		addr += len;
-		pbuf += len;
-		cnt -= len;
-	}
+	spinor_helper_write(ctx, info, blkno * info->blksz, buf, blkcnt * info->blksz);
 	return blkcnt;
 }
 
