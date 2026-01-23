@@ -1569,12 +1569,12 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 	return 0;
 }
 
-static int chip_spi_init(struct xfel_ctx_t * ctx)
+static int chip_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen)
 {
 	return 0;
 }
 
-static int chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen)
+static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cmdbuf, uint32_t cmdlen)
 {
 	return 0;
 }
@@ -1587,5 +1587,5 @@ struct chip_t d1 = {
 	.jtag = chip_jtag,
 	.ddr = chip_ddr,
 	.spi_init = chip_spi_init,
-	.spi_xfer = chip_spi_xfer,
+	.spi_run = chip_spi_run,
 };

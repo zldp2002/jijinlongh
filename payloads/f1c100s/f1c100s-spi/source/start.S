@@ -30,15 +30,6 @@
 _start:
 	b reset
 
-spi_type:
-	.word 0
-spi_transfer_txbuf:
-	.word 0
-spi_transfer_rxbuf:
-	.word 0
-spi_transfer_length:
-	.word 0
-
 reset:
 	ldr r0, =0x00000040
 	str sp, [r0, #0]
@@ -50,37 +41,9 @@ reset:
 	mrc p15, 0, lr, c1, c0, 0
 	str lr, [r0, #16]
 
-	ldr r1, spi_type
-	mov r0, #4
-	cmp r1, r0
-	beq _spi_transfer
-	mov r0, #3
-	cmp r1, r0
-	beq _spi_deselect
-	mov r0, #2
-	cmp r1, r0
-	beq _spi_select
-	mov r0, #1
-	cmp r1, r0
-	beq _spi_init
-	b _exit
-_spi_init:
-	bl sys_spi_init
-	b _exit
-_spi_select:
-	bl sys_spi_select
-	b _exit
-_spi_deselect:
-	bl sys_spi_deselect
-	b _exit
-_spi_transfer:
-	ldr r0, spi_transfer_txbuf
-	ldr r1, spi_transfer_rxbuf
-	ldr r2, spi_transfer_length
-	bl sys_spi_transfer
-	b _exit
+	ldr r0, =0x00009800
+	bl sys_spi_run
 
-_exit:
 	mov r0, #0x4
 	mov r1, #'e'
 	strb r1, [r0, #0]
@@ -108,4 +71,3 @@ _exit:
 	ldr r1, [r0, #8]
 	msr cpsr, r1
 	bx lr
-

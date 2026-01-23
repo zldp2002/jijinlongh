@@ -36,8 +36,17 @@ struct chip_t {
 	int (*sid)(struct xfel_ctx_t * ctx, uint32_t * sid);
 	int (*jtag)(struct xfel_ctx_t * ctx);
 	int (*ddr)(struct xfel_ctx_t * ctx, const char * type);
-	int (*spi_init)(struct xfel_ctx_t * ctx);
-	int (*spi_xfer)(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen);
+	int (*spi_init)(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen);
+	int (*spi_run)(struct xfel_ctx_t * ctx, uint8_t * cmdbuf, uint32_t cmdlen);
+};
+
+enum {
+	SPI_CMD_END			= 0x00,
+	SPI_CMD_INIT		= 0x01,
+	SPI_CMD_SELECT		= 0x02,
+	SPI_CMD_DESELECT	= 0x03,
+	SPI_CMD_TXBUF		= 0x04,
+	SPI_CMD_RXBUF		= 0x05,
 };
 
 /*
@@ -68,14 +77,14 @@ static inline int fel_chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 	return ctx->chip->ddr(ctx, type);
 }
 
-static inline int fel_chip_spi_init(struct xfel_ctx_t * ctx)
+static inline int fel_chip_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen)
 {
-	return ctx->chip->spi_init(ctx);
+	return ctx->chip->spi_init(ctx, swapbuf, swaplen);
 }
 
-static inline int fel_chip_spi_xfer(struct xfel_ctx_t * ctx, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen)
+static inline int fel_chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cmdbuf, uint32_t cmdlen)
 {
-	return ctx->chip->spi_xfer(ctx, txbuf, txlen, rxbuf, rxlen);
+	return ctx->chip->spi_run(ctx, cmdbuf, cmdlen);
 }
 
 int fel_init(struct xfel_ctx_t * ctx);
@@ -86,6 +95,8 @@ void fel_read(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 void fel_write(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 void fel_read_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 void fel_write_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+int fel_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen);
+int fel_spi_xfer(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen);
 
 #ifdef __cplusplus
 }

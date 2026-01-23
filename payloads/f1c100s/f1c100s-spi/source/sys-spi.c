@@ -44,7 +44,7 @@ enum {
 	SPI_RXD	= 0x300,
 };
 
-void sys_spi_init(void)
+static void sys_spi_init(void)
 {
 	virtual_addr_t addr;
 	u32_t val;
@@ -104,7 +104,7 @@ void sys_spi_init(void)
 	write32(addr + SPI_FCR, val);
 }
 
-void sys_spi_select(void)
+static void sys_spi_select(void)
 {
 	virtual_addr_t addr = 0x01c05000;
 	u32_t val;
@@ -115,7 +115,7 @@ void sys_spi_select(void)
 	write32(addr + SPI_TCR, val);
 }
 
-void sys_spi_deselect(void)
+static void sys_spi_deselect(void)
 {
 	virtual_addr_t addr = 0x01c05000;
 	u32_t val;
@@ -145,7 +145,7 @@ static inline void sys_spi_write_txbuf(u8_t * buf, int len)
 	}
 }
 
-void sys_spi_transfer(void * txbuf, void * rxbuf, u32_t len)
+static void sys_spi_transfer(void * txbuf, void * rxbuf, u32_t len)
 {
 	virtual_addr_t addr = 0x01c05000;
 	u8_t * tx = txbuf;
@@ -169,5 +169,55 @@ void sys_spi_transfer(void * txbuf, void * rxbuf, u32_t len)
 		if(tx)
 			tx += n;
 		len -= n;
+	}
+}
+
+enum {
+	SPI_CMD_END			= 0x00,
+	SPI_CMD_INIT		= 0x01,
+	SPI_CMD_SELECT		= 0x02,
+	SPI_CMD_DESELECT	= 0x03,
+	SPI_CMD_TXBUF		= 0x04,
+	SPI_CMD_RXBUF		= 0x05,
+};
+
+void sys_spi_run(void * cmdbuf)
+{
+	u8_t c, * p = cmdbuf;
+	u32_t addr, len;
+
+	while(1)
+	{
+		c = *p++;
+		if(c == SPI_CMD_INIT)
+		{
+			sys_spi_init();
+		}
+		else if(c == SPI_CMD_SELECT)
+		{
+			sys_spi_select();
+		}
+		else if(c == SPI_CMD_DESELECT)
+		{
+			sys_spi_deselect();
+		}
+		else if(c == SPI_CMD_TXBUF)
+		{
+			addr = (p[0] << 0) | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+			len  = (p[4] << 0) | (p[5] << 8) | (p[6] << 16) | (p[7] << 24);
+			sys_spi_transfer((void *)addr, NULL, len);
+			p += 8;
+		}
+		else if(c == SPI_CMD_RXBUF)
+		{
+			addr = (p[0] << 0) | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+			len  = (p[4] << 0) | (p[5] << 8) | (p[6] << 16) | (p[7] << 24);
+			sys_spi_transfer(NULL, (void *)addr, len);
+			p += 8;
+		}
+		else
+		{
+			return;
+		}
 	}
 }
