@@ -300,55 +300,95 @@ int fel_spi_xfer(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, vo
 	uint32_t cmdlen;
 	uint32_t n;
 
-	cmdlen = 0;
-	cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-	cmdbuf[cmdlen++] = SPI_CMD_END;
-	if(!fel_chip_spi_run(ctx, cmdbuf, cmdlen))
-		return 0;
-	while(txlen > 0)
+	if((txlen <= swaplen) && (rxlen <= swaplen))
 	{
-		n = txlen > swaplen ? swaplen : txlen;
 		cmdlen = 0;
-		cmdbuf[cmdlen++] = SPI_CMD_TXBUF;
-		cmdbuf[cmdlen++] = (swapbuf >>  0) & 0xff;
-		cmdbuf[cmdlen++] = (swapbuf >>  8) & 0xff;
-		cmdbuf[cmdlen++] = (swapbuf >> 16) & 0xff;
-		cmdbuf[cmdlen++] = (swapbuf >> 24) & 0xff;
-		cmdbuf[cmdlen++] = (n >>  0) & 0xff;
-		cmdbuf[cmdlen++] = (n >>  8) & 0xff;
-		cmdbuf[cmdlen++] = (n >> 16) & 0xff;
-		cmdbuf[cmdlen++] = (n >> 24) & 0xff;
+		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+		if(txlen > 0)
+		{
+			cmdbuf[cmdlen++] = SPI_CMD_TXBUF;
+			cmdbuf[cmdlen++] = (swapbuf >>  0) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >>  8) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >> 16) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >> 24) & 0xff;
+			cmdbuf[cmdlen++] = (txlen >>  0) & 0xff;
+			cmdbuf[cmdlen++] = (txlen >>  8) & 0xff;
+			cmdbuf[cmdlen++] = (txlen >> 16) & 0xff;
+			cmdbuf[cmdlen++] = (txlen >> 24) & 0xff;
+		}
+		if(rxlen > 0)
+		{
+			cmdbuf[cmdlen++] = SPI_CMD_RXBUF;
+			cmdbuf[cmdlen++] = (swapbuf >>  0) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >>  8) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >> 16) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >> 24) & 0xff;
+			cmdbuf[cmdlen++] = (rxlen >>  0) & 0xff;
+			cmdbuf[cmdlen++] = (rxlen >>  8) & 0xff;
+			cmdbuf[cmdlen++] = (rxlen >> 16) & 0xff;
+			cmdbuf[cmdlen++] = (rxlen >> 24) & 0xff;
+		}
+		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
 		cmdbuf[cmdlen++] = SPI_CMD_END;
-		fel_write(ctx, swapbuf, txbuf, n);
+		if(txlen > 0)
+			fel_write(ctx, swapbuf, txbuf, txlen);
 		if(!fel_chip_spi_run(ctx, cmdbuf, cmdlen))
 			return 0;
-		txbuf += n;
-		txlen -= n;
+		if(rxlen > 0)
+			fel_read(ctx, swapbuf, rxbuf, rxlen);
 	}
-	while(rxlen > 0)
+	else
 	{
-		n = rxlen > swaplen ? swaplen : rxlen;
 		cmdlen = 0;
-		cmdbuf[cmdlen++] = SPI_CMD_RXBUF;
-		cmdbuf[cmdlen++] = (swapbuf >>  0) & 0xff;
-		cmdbuf[cmdlen++] = (swapbuf >>  8) & 0xff;
-		cmdbuf[cmdlen++] = (swapbuf >> 16) & 0xff;
-		cmdbuf[cmdlen++] = (swapbuf >> 24) & 0xff;
-		cmdbuf[cmdlen++] = (n >>  0) & 0xff;
-		cmdbuf[cmdlen++] = (n >>  8) & 0xff;
-		cmdbuf[cmdlen++] = (n >> 16) & 0xff;
-		cmdbuf[cmdlen++] = (n >> 24) & 0xff;
+		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
 		cmdbuf[cmdlen++] = SPI_CMD_END;
 		if(!fel_chip_spi_run(ctx, cmdbuf, cmdlen))
 			return 0;
-		fel_read(ctx, swapbuf, rxbuf, n);
-		rxbuf += n;
-		rxlen -= n;
+		while(txlen > 0)
+		{
+			n = txlen > swaplen ? swaplen : txlen;
+			cmdlen = 0;
+			cmdbuf[cmdlen++] = SPI_CMD_TXBUF;
+			cmdbuf[cmdlen++] = (swapbuf >>  0) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >>  8) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >> 16) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >> 24) & 0xff;
+			cmdbuf[cmdlen++] = (n >>  0) & 0xff;
+			cmdbuf[cmdlen++] = (n >>  8) & 0xff;
+			cmdbuf[cmdlen++] = (n >> 16) & 0xff;
+			cmdbuf[cmdlen++] = (n >> 24) & 0xff;
+			cmdbuf[cmdlen++] = SPI_CMD_END;
+			fel_write(ctx, swapbuf, txbuf, n);
+			if(!fel_chip_spi_run(ctx, cmdbuf, cmdlen))
+				return 0;
+			txbuf += n;
+			txlen -= n;
+		}
+		while(rxlen > 0)
+		{
+			n = rxlen > swaplen ? swaplen : rxlen;
+			cmdlen = 0;
+			cmdbuf[cmdlen++] = SPI_CMD_RXBUF;
+			cmdbuf[cmdlen++] = (swapbuf >>  0) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >>  8) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >> 16) & 0xff;
+			cmdbuf[cmdlen++] = (swapbuf >> 24) & 0xff;
+			cmdbuf[cmdlen++] = (n >>  0) & 0xff;
+			cmdbuf[cmdlen++] = (n >>  8) & 0xff;
+			cmdbuf[cmdlen++] = (n >> 16) & 0xff;
+			cmdbuf[cmdlen++] = (n >> 24) & 0xff;
+			cmdbuf[cmdlen++] = SPI_CMD_END;
+			if(!fel_chip_spi_run(ctx, cmdbuf, cmdlen))
+				return 0;
+			fel_read(ctx, swapbuf, rxbuf, n);
+			rxbuf += n;
+			rxlen -= n;
+		}
+		cmdlen = 0;
+		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+		cmdbuf[cmdlen++] = SPI_CMD_END;
+		if(!fel_chip_spi_run(ctx, cmdbuf, cmdlen))
+			return 0;
 	}
-	cmdlen = 0;
-	cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-	cmdbuf[cmdlen++] = SPI_CMD_END;
-	if(!fel_chip_spi_run(ctx, cmdbuf, cmdlen))
-		return 0;
 	return 1;
 }
