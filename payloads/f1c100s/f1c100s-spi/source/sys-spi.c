@@ -173,16 +173,19 @@ static void sys_spi_transfer(void * txbuf, void * rxbuf, u32_t len)
 }
 
 enum {
-	SPI_CMD_END			= 0x00,
-	SPI_CMD_INIT		= 0x01,
-	SPI_CMD_SELECT		= 0x02,
-	SPI_CMD_DESELECT	= 0x03,
-	SPI_CMD_TXBUF		= 0x04,
-	SPI_CMD_RXBUF		= 0x05,
+	SPI_CMD_END				= 0x00,
+	SPI_CMD_INIT			= 0x01,
+	SPI_CMD_SELECT			= 0x02,
+	SPI_CMD_DESELECT		= 0x03,
+	SPI_CMD_TXBUF			= 0x04,
+	SPI_CMD_RXBUF			= 0x05,
+	SPI_CMD_SPINOR_WAIT		= 0x06,
+	SPI_CMD_SPINAND_WAIT	= 0x07,
 };
 
 void sys_spi_run(void * cmdbuf)
 {
+	uint8_t tx[8], rx[8];
 	u8_t c, * p = cmdbuf;
 	u32_t addr, len;
 
@@ -214,6 +217,23 @@ void sys_spi_run(void * cmdbuf)
 			len  = (p[4] << 0) | (p[5] << 8) | (p[6] << 16) | (p[7] << 24);
 			sys_spi_transfer(NULL, (void *)addr, len);
 			p += 8;
+		}
+		else if(c == SPI_CMD_SPINOR_WAIT)
+		{
+			tx[0] = 0x05;
+			do {
+				sys_spi_transfer((void *)&tx[0], NULL, 1);
+				sys_spi_transfer(NULL, (void *)&rx[0], 1);
+			} while((rx[0] & 0x1) == 0x1);
+		}
+		else if(c == SPI_CMD_SPINAND_WAIT)
+		{
+			tx[0] = 0x0f;
+			tx[1] = 0xc0;
+			do {
+				sys_spi_transfer((void *)&tx[0], NULL, 2);
+				sys_spi_transfer(NULL, (void *)&rx[0], 1);
+			} while((rx[0] & 0x1) == 0x1);
 		}
 		else
 		{
