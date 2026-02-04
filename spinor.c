@@ -321,12 +321,13 @@ static inline void spinor_address_4byte(struct xfel_ctx_t * ctx, struct spinor_p
 
 static inline void spinor_wait_for_busy(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat)
 {
-	uint8_t tx = OPCODE_RDSR;
-	uint8_t rx = 0;
+	uint8_t cmdbuf[4];
 
-	do {
-		fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, &tx, 1, &rx, 1);
-	} while((rx & 0x1) == 0x1);
+	cmdbuf[0] = SPI_CMD_SELECT;
+	cmdbuf[1] = SPI_CMD_SPINOR_WAIT;
+	cmdbuf[2] = SPI_CMD_DESELECT;
+	cmdbuf[3] = SPI_CMD_END;
+	fel_chip_spi_run(ctx, cmdbuf, sizeof(cmdbuf));
 }
 
 static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat)
