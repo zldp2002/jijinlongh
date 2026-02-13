@@ -204,10 +204,11 @@ enum {
 	SPI_CMD_INIT			= 0x01,
 	SPI_CMD_SELECT			= 0x02,
 	SPI_CMD_DESELECT		= 0x03,
-	SPI_CMD_TXBUF			= 0x04,
-	SPI_CMD_RXBUF			= 0x05,
-	SPI_CMD_SPINOR_WAIT		= 0x06,
-	SPI_CMD_SPINAND_WAIT	= 0x07,
+	SPI_CMD_FAST			= 0x04,
+	SPI_CMD_TXBUF			= 0x05,
+	SPI_CMD_RXBUF			= 0x06,
+	SPI_CMD_SPINOR_WAIT		= 0x07,
+	SPI_CMD_SPINAND_WAIT	= 0x08,
 };
 
 void sys_spi_run(void * cmdbuf)
@@ -230,6 +231,12 @@ void sys_spi_run(void * cmdbuf)
 		else if(c == SPI_CMD_DESELECT)
 		{
 			sys_spi_deselect();
+		}
+		else if(c == SPI_CMD_FAST)
+		{
+			len  = p[0];
+			sys_spi_transfer((void *)&p[1], NULL, len);
+			p += (len + 1);
 		}
 		else if(c == SPI_CMD_TXBUF)
 		{

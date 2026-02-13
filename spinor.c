@@ -285,38 +285,9 @@ static inline int spinor_info(struct xfel_ctx_t * ctx, struct spinor_pdata_t * p
 	return 0;
 }
 
-static inline void spinor_chip_reset(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat)
-{
-	uint8_t tx[2];
-
-	tx[0] = 0x66;
-	tx[1] = 0x99;
-	fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, tx, 2, 0, 0);
-}
-
 static inline void spinor_write_enable(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat)
 {
 	fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, &pdat->info.opcode_write_enable, 1, 0, 0);
-}
-
-static inline void spinor_write_status(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint8_t s)
-{
-	uint8_t tx[2];
-
-	tx[0] = OPCODE_WRSR;
-	tx[1] = s;
-	fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, tx, 2, 0, 0);
-}
-
-static inline void spinor_address_4byte(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, int enable)
-{
-	uint8_t tx;
-
-	if(enable)
-		tx = OPCODE_ENTER_4B;
-	else
-		tx = OPCODE_EXIT_4B;
-	fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, &tx, 1, 0, 0);
 }
 
 static inline void spinor_wait_for_busy(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat)
@@ -332,19 +303,85 @@ static inline void spinor_wait_for_busy(struct xfel_ctx_t * ctx, struct spinor_p
 
 static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat)
 {
+	uint8_t cmdbuf[4096];
+	uint32_t cmdlen = 0;
+
 	if(fel_spi_init(ctx, &pdat->swapbuf, &pdat->swaplen) && spinor_info(ctx, pdat))
 	{
-		spinor_chip_reset(ctx, pdat);
-		spinor_wait_for_busy(ctx, pdat);
-		spinor_write_enable(ctx, pdat);
-		spinor_write_status(ctx, pdat, 0);
-		spinor_wait_for_busy(ctx, pdat);
+		/* spi select */
+		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+		/* chip reset */
+		cmdbuf[cmdlen++] = SPI_CMD_FAST;
+		cmdbuf[cmdlen++] = 2;
+		cmdbuf[cmdlen++] = 0x66;
+		cmdbuf[cmdlen++] = 0x99;
+		/* spi deselect */
+		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+		/* wait busy */
+		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
+		/* spi deselect */
+		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+		/* write enable */
+		cmdbuf[cmdlen++] = SPI_CMD_FAST;
+		cmdbuf[cmdlen++] = 1;
+		cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
+		/* spi deselect */
+		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+		/* write status */
+		cmdbuf[cmdlen++] = SPI_CMD_FAST;
+		cmdbuf[cmdlen++] = 2;
+		cmdbuf[cmdlen++] = OPCODE_WRSR;
+		cmdbuf[cmdlen++] = 0;
+		/* spi deselect */
+		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+
+		/* spi select */
+		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+		/* wait busy */
+		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
+		/* spi deselect */
+		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+
 		if(pdat->info.address_length == 4)
 		{
-			spinor_write_enable(ctx, pdat);
-			spinor_address_4byte(ctx, pdat, 1);
-			spinor_wait_for_busy(ctx, pdat);
+			/* spi select */
+			cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+			/* write enable */
+			cmdbuf[cmdlen++] = SPI_CMD_FAST;
+			cmdbuf[cmdlen++] = 1;
+			cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
+			/* spi deselect */
+			cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+
+			/* spi select */
+			cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+			/* entern 4byte address */
+			cmdbuf[cmdlen++] = SPI_CMD_FAST;
+			cmdbuf[cmdlen++] = 1;
+			cmdbuf[cmdlen++] = OPCODE_ENTER_4B;
+			/* spi deselect */
+			cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+
+			/* spi select */
+			cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+			/* wait busy */
+			cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
+			/* spi deselect */
+			cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
 		}
+
+		/* end */
+		cmdbuf[cmdlen++] = SPI_CMD_END;
+		fel_chip_spi_run(ctx, cmdbuf, cmdlen);
 		return 1;
 	}
 	return 0;
