@@ -287,7 +287,15 @@ static inline int spinor_info(struct xfel_ctx_t * ctx, struct spinor_pdata_t * p
 
 static inline void spinor_write_enable(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat)
 {
-	fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, &pdat->info.opcode_write_enable, 1, 0, 0);
+	uint8_t cmdbuf[6];
+
+	cmdbuf[0] = SPI_CMD_SELECT;
+	cmdbuf[1] = SPI_CMD_FAST;
+	cmdbuf[2] = 1;
+	cmdbuf[3] = pdat->info.opcode_write_enable;
+	cmdbuf[4] = SPI_CMD_DESELECT;
+	cmdbuf[5] = SPI_CMD_END;
+	fel_chip_spi_run(ctx, cmdbuf, sizeof(cmdbuf));
 }
 
 static inline void spinor_wait_for_busy(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat)
