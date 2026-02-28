@@ -1315,7 +1315,7 @@ static int chip_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t *
 	if(swapbuf)
 		*swapbuf = 0x00024000;
 	if(swaplen)
-		*swaplen = 32768;
+		*swaplen = 65536;
 	return 1;
 }
 
