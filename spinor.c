@@ -287,7 +287,7 @@ static inline int spinor_info(struct xfel_ctx_t * ctx, struct spinor_pdata_t * p
 
 static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat)
 {
-	uint8_t cmdbuf[4096];
+	uint8_t cmdbuf[256];
 	uint32_t cmdlen = 0;
 
 	if(fel_spi_init(ctx, &pdat->swapbuf, &pdat->swaplen) && spinor_info(ctx, pdat))
@@ -530,9 +530,9 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 	}
 }
 
-static void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
+static inline void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
 {
-	uint8_t cmdbuf[4096];
+	uint8_t cmdbuf[256];
 	uint32_t cmdlen = 0;
 
 	switch(pdat->info.address_length)
@@ -583,9 +583,9 @@ static void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor_pdata_
 	}
 }
 
-static void spinor_sector_erase_32k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
+static inline void spinor_sector_erase_32k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
 {
-	uint8_t cmdbuf[4096];
+	uint8_t cmdbuf[256];
 	uint32_t cmdlen = 0;
 
 	switch(pdat->info.address_length)
@@ -636,9 +636,9 @@ static void spinor_sector_erase_32k(struct xfel_ctx_t * ctx, struct spinor_pdata
 	}
 }
 
-static void spinor_sector_erase_64k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
+static inline void spinor_sector_erase_64k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
 {
-	uint8_t cmdbuf[4096];
+	uint8_t cmdbuf[256];
 	uint32_t cmdlen = 0;
 
 	switch(pdat->info.address_length)
@@ -689,9 +689,9 @@ static void spinor_sector_erase_64k(struct xfel_ctx_t * ctx, struct spinor_pdata
 	}
 }
 
-static void spinor_sector_erase_256k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
+static inline void spinor_sector_erase_256k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
 {
-	uint8_t cmdbuf[4096];
+	uint8_t cmdbuf[256];
 	uint32_t cmdlen = 0;
 
 	switch(pdat->info.address_length)
