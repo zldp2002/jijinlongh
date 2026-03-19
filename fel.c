@@ -296,7 +296,7 @@ int fel_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen
 
 int fel_spi_xfer(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen)
 {
-	uint8_t cmdbuf[4096];
+	uint8_t cmdbuf[256];
 	uint32_t cmdlen;
 	uint32_t n;
 
