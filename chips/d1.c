@@ -1574,7 +1574,7 @@ static int chip_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t *
 	return 0;
 }
 
-static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cmdbuf, uint32_t cmdlen)
+static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 {
 	return 0;
 }

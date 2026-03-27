@@ -184,10 +184,10 @@ enum {
 	SPI_CMD_SPINAND_WAIT	= 0x08,
 };
 
-void sys_spi_run(void * cmdbuf)
+void sys_spi_run(void * cbuf)
 {
 	uint8_t tx[8], rx[8];
-	u8_t c, * p = cmdbuf;
+	u8_t c, * p = cbuf;
 	u32_t addr, len;
 
 	while(1)

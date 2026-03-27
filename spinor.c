@@ -287,85 +287,85 @@ static inline int spinor_info(struct xfel_ctx_t * ctx, struct spinor_pdata_t * p
 
 static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat)
 {
-	uint8_t cmdbuf[256];
-	uint32_t cmdlen = 0;
+	uint8_t cbuf[256];
+	uint32_t clen = 0;
 
 	if(fel_spi_init(ctx, &pdat->swapbuf, &pdat->swaplen) && spinor_info(ctx, pdat))
 	{
 		/* spi select */
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
 		/* chip reset */
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 2;
-		cmdbuf[cmdlen++] = 0x66;
-		cmdbuf[cmdlen++] = 0x99;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 2;
+		cbuf[clen++] = 0x66;
+		cbuf[clen++] = 0x99;
 		/* spi deselect */
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
 
 		/* spi select */
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
 		/* wait busy */
-		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
 		/* spi deselect */
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
 
 		/* spi select */
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
 		/* write enable */
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 1;
-		cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
 		/* spi deselect */
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
 
 		/* spi select */
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
 		/* write status */
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 2;
-		cmdbuf[cmdlen++] = OPCODE_WRSR;
-		cmdbuf[cmdlen++] = 0;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 2;
+		cbuf[clen++] = OPCODE_WRSR;
+		cbuf[clen++] = 0;
 		/* spi deselect */
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
 
 		/* spi select */
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
 		/* wait busy */
-		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
 		/* spi deselect */
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
 
 		if(pdat->info.address_length == 4)
 		{
 			/* spi select */
-			cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+			cbuf[clen++] = SPI_CMD_SELECT;
 			/* write enable */
-			cmdbuf[cmdlen++] = SPI_CMD_FAST;
-			cmdbuf[cmdlen++] = 1;
-			cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
+			cbuf[clen++] = SPI_CMD_FAST;
+			cbuf[clen++] = 1;
+			cbuf[clen++] = pdat->info.opcode_write_enable;
 			/* spi deselect */
-			cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+			cbuf[clen++] = SPI_CMD_DESELECT;
 
 			/* spi select */
-			cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+			cbuf[clen++] = SPI_CMD_SELECT;
 			/* entern 4byte address */
-			cmdbuf[cmdlen++] = SPI_CMD_FAST;
-			cmdbuf[cmdlen++] = 1;
-			cmdbuf[cmdlen++] = OPCODE_ENTER_4B;
+			cbuf[clen++] = SPI_CMD_FAST;
+			cbuf[clen++] = 1;
+			cbuf[clen++] = OPCODE_ENTER_4B;
 			/* spi deselect */
-			cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+			cbuf[clen++] = SPI_CMD_DESELECT;
 
 			/* spi select */
-			cmdbuf[cmdlen++] = SPI_CMD_SELECT;
+			cbuf[clen++] = SPI_CMD_SELECT;
 			/* wait busy */
-			cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
+			cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
 			/* spi deselect */
-			cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+			cbuf[clen++] = SPI_CMD_DESELECT;
 		}
 
 		/* end */
-		cmdbuf[cmdlen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cmdbuf, cmdlen);
+		cbuf[clen++] = SPI_CMD_END;
+		fel_chip_spi_run(ctx, cbuf, clen);
 		return 1;
 	}
 	return 0;
@@ -418,8 +418,8 @@ static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_pdata_t * 
 
 static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr, uint8_t * buf, uint32_t count)
 {
-	uint8_t cmdbuf[4096];
-	uint32_t cmdlen;
+	uint8_t cbuf[4096];
+	uint32_t clen;
 	uint8_t * txbuf;
 	uint32_t txlen;
 	uint32_t granularity, n;
@@ -436,30 +436,30 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 		{
 			while(count > 0)
 			{
-				cmdlen = 0;
+				clen = 0;
 				txlen = 0;
-				while((cmdlen < (4096 - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 4)))
+				while((clen < (4096 - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 4)))
 				{
 					n = count > granularity ? granularity : count;
-					cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-					cmdbuf[cmdlen++] = SPI_CMD_FAST;
-					cmdbuf[cmdlen++] = 1;
-					cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
-					cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-					cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-					cmdbuf[cmdlen++] = SPI_CMD_TXBUF;
-					cmdbuf[cmdlen++] = ((pdat->swapbuf + txlen) >>  0) & 0xff;
-					cmdbuf[cmdlen++] = ((pdat->swapbuf + txlen) >>  8) & 0xff;
-					cmdbuf[cmdlen++] = ((pdat->swapbuf + txlen) >> 16) & 0xff;
-					cmdbuf[cmdlen++] = ((pdat->swapbuf + txlen) >> 24) & 0xff;
-					cmdbuf[cmdlen++] = ((n + 4) >>  0) & 0xff;
-					cmdbuf[cmdlen++] = ((n + 4) >>  8) & 0xff;
-					cmdbuf[cmdlen++] = ((n + 4) >> 16) & 0xff;
-					cmdbuf[cmdlen++] = ((n + 4) >> 24) & 0xff;
-					cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-					cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-					cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
-					cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_FAST;
+					cbuf[clen++] = 1;
+					cbuf[clen++] = pdat->info.opcode_write_enable;
+					cbuf[clen++] = SPI_CMD_DESELECT;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_TXBUF;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  0) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  8) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 16) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 24) & 0xff;
+					cbuf[clen++] = ((n + 4) >>  0) & 0xff;
+					cbuf[clen++] = ((n + 4) >>  8) & 0xff;
+					cbuf[clen++] = ((n + 4) >> 16) & 0xff;
+					cbuf[clen++] = ((n + 4) >> 24) & 0xff;
+					cbuf[clen++] = SPI_CMD_DESELECT;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+					cbuf[clen++] = SPI_CMD_DESELECT;
 					txbuf[txlen++] = pdat->info.opcode_write;
 					txbuf[txlen++] = (uint8_t)(addr >> 16);
 					txbuf[txlen++] = (uint8_t)(addr >> 8);
@@ -470,9 +470,9 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 					buf += n;
 					count -= n;
 				}
-				cmdbuf[cmdlen++] = SPI_CMD_END;
+				cbuf[clen++] = SPI_CMD_END;
 				fel_write(ctx, pdat->swapbuf, txbuf, txlen);
-				fel_chip_spi_run(ctx, cmdbuf, cmdlen);
+				fel_chip_spi_run(ctx, cbuf, clen);
 			}
 			free(txbuf);
 		}
@@ -483,30 +483,30 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 		{
 			while(count > 0)
 			{
-				cmdlen = 0;
+				clen = 0;
 				txlen = 0;
-				while((cmdlen < (4096 - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 5)))
+				while((clen < (4096 - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 5)))
 				{
 					n = count > granularity ? granularity : count;
-					cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-					cmdbuf[cmdlen++] = SPI_CMD_FAST;
-					cmdbuf[cmdlen++] = 1;
-					cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
-					cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-					cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-					cmdbuf[cmdlen++] = SPI_CMD_TXBUF;
-					cmdbuf[cmdlen++] = ((pdat->swapbuf + txlen) >>  0) & 0xff;
-					cmdbuf[cmdlen++] = ((pdat->swapbuf + txlen) >>  8) & 0xff;
-					cmdbuf[cmdlen++] = ((pdat->swapbuf + txlen) >> 16) & 0xff;
-					cmdbuf[cmdlen++] = ((pdat->swapbuf + txlen) >> 24) & 0xff;
-					cmdbuf[cmdlen++] = ((n + 5) >>  0) & 0xff;
-					cmdbuf[cmdlen++] = ((n + 5) >>  8) & 0xff;
-					cmdbuf[cmdlen++] = ((n + 5) >> 16) & 0xff;
-					cmdbuf[cmdlen++] = ((n + 5) >> 24) & 0xff;
-					cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-					cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-					cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
-					cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_FAST;
+					cbuf[clen++] = 1;
+					cbuf[clen++] = pdat->info.opcode_write_enable;
+					cbuf[clen++] = SPI_CMD_DESELECT;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_TXBUF;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  0) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >>  8) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 16) & 0xff;
+					cbuf[clen++] = ((pdat->swapbuf + txlen) >> 24) & 0xff;
+					cbuf[clen++] = ((n + 5) >>  0) & 0xff;
+					cbuf[clen++] = ((n + 5) >>  8) & 0xff;
+					cbuf[clen++] = ((n + 5) >> 16) & 0xff;
+					cbuf[clen++] = ((n + 5) >> 24) & 0xff;
+					cbuf[clen++] = SPI_CMD_DESELECT;
+					cbuf[clen++] = SPI_CMD_SELECT;
+					cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+					cbuf[clen++] = SPI_CMD_DESELECT;
 					txbuf[txlen++] = pdat->info.opcode_write;
 					txbuf[txlen++] = (uint8_t)(addr >> 24);
 					txbuf[txlen++] = (uint8_t)(addr >> 16);
@@ -518,9 +518,9 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 					buf += n;
 					count -= n;
 				}
-				cmdbuf[cmdlen++] = SPI_CMD_END;
+				cbuf[clen++] = SPI_CMD_END;
 				fel_write(ctx, pdat->swapbuf, txbuf, txlen);
-				fel_chip_spi_run(ctx, cmdbuf, cmdlen);
+				fel_chip_spi_run(ctx, cbuf, clen);
 			}
 			free(txbuf);
 		}
@@ -532,51 +532,51 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 
 static inline void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
 {
-	uint8_t cmdbuf[256];
-	uint32_t cmdlen = 0;
+	uint8_t cbuf[256];
+	uint32_t clen = 0;
 
 	switch(pdat->info.address_length)
 	{
 	case 3:
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 1;
-		cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 4;
-		cmdbuf[cmdlen++] = pdat->info.opcode_erase_4k;
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 16);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 8);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 0);
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cmdbuf, cmdlen);
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 4;
+		cbuf[clen++] = pdat->info.opcode_erase_4k;
+		cbuf[clen++] = (uint8_t)(addr >> 16);
+		cbuf[clen++] = (uint8_t)(addr >> 8);
+		cbuf[clen++] = (uint8_t)(addr >> 0);
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_END;
+		fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	case 4:
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 1;
-		cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 5;
-		cmdbuf[cmdlen++] = pdat->info.opcode_erase_4k;
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 24);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 16);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 8);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 0);
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cmdbuf, cmdlen);
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 5;
+		cbuf[clen++] = pdat->info.opcode_erase_4k;
+		cbuf[clen++] = (uint8_t)(addr >> 24);
+		cbuf[clen++] = (uint8_t)(addr >> 16);
+		cbuf[clen++] = (uint8_t)(addr >> 8);
+		cbuf[clen++] = (uint8_t)(addr >> 0);
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_END;
+		fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	default:
 		break;
@@ -585,51 +585,51 @@ static inline void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor
 
 static inline void spinor_sector_erase_32k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
 {
-	uint8_t cmdbuf[256];
-	uint32_t cmdlen = 0;
+	uint8_t cbuf[256];
+	uint32_t clen = 0;
 
 	switch(pdat->info.address_length)
 	{
 	case 3:
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 1;
-		cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 4;
-		cmdbuf[cmdlen++] = pdat->info.opcode_erase_32k;
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 16);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 8);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 0);
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cmdbuf, cmdlen);
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 4;
+		cbuf[clen++] = pdat->info.opcode_erase_32k;
+		cbuf[clen++] = (uint8_t)(addr >> 16);
+		cbuf[clen++] = (uint8_t)(addr >> 8);
+		cbuf[clen++] = (uint8_t)(addr >> 0);
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_END;
+		fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	case 4:
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 1;
-		cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 5;
-		cmdbuf[cmdlen++] = pdat->info.opcode_erase_32k;
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 24);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 16);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 8);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 0);
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cmdbuf, cmdlen);
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 5;
+		cbuf[clen++] = pdat->info.opcode_erase_32k;
+		cbuf[clen++] = (uint8_t)(addr >> 24);
+		cbuf[clen++] = (uint8_t)(addr >> 16);
+		cbuf[clen++] = (uint8_t)(addr >> 8);
+		cbuf[clen++] = (uint8_t)(addr >> 0);
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_END;
+		fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	default:
 		break;
@@ -638,51 +638,51 @@ static inline void spinor_sector_erase_32k(struct xfel_ctx_t * ctx, struct spino
 
 static inline void spinor_sector_erase_64k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
 {
-	uint8_t cmdbuf[256];
-	uint32_t cmdlen = 0;
+	uint8_t cbuf[256];
+	uint32_t clen = 0;
 
 	switch(pdat->info.address_length)
 	{
 	case 3:
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 1;
-		cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 4;
-		cmdbuf[cmdlen++] = pdat->info.opcode_erase_64k;
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 16);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 8);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 0);
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cmdbuf, cmdlen);
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 4;
+		cbuf[clen++] = pdat->info.opcode_erase_64k;
+		cbuf[clen++] = (uint8_t)(addr >> 16);
+		cbuf[clen++] = (uint8_t)(addr >> 8);
+		cbuf[clen++] = (uint8_t)(addr >> 0);
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_END;
+		fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	case 4:
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 1;
-		cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 5;
-		cmdbuf[cmdlen++] = pdat->info.opcode_erase_64k;
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 24);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 16);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 8);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 0);
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cmdbuf, cmdlen);
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 5;
+		cbuf[clen++] = pdat->info.opcode_erase_64k;
+		cbuf[clen++] = (uint8_t)(addr >> 24);
+		cbuf[clen++] = (uint8_t)(addr >> 16);
+		cbuf[clen++] = (uint8_t)(addr >> 8);
+		cbuf[clen++] = (uint8_t)(addr >> 0);
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_END;
+		fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	default:
 		break;
@@ -691,51 +691,51 @@ static inline void spinor_sector_erase_64k(struct xfel_ctx_t * ctx, struct spino
 
 static inline void spinor_sector_erase_256k(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr)
 {
-	uint8_t cmdbuf[256];
-	uint32_t cmdlen = 0;
+	uint8_t cbuf[256];
+	uint32_t clen = 0;
 
 	switch(pdat->info.address_length)
 	{
 	case 3:
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 1;
-		cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 4;
-		cmdbuf[cmdlen++] = pdat->info.opcode_erase_256k;
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 16);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 8);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 0);
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cmdbuf, cmdlen);
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 4;
+		cbuf[clen++] = pdat->info.opcode_erase_256k;
+		cbuf[clen++] = (uint8_t)(addr >> 16);
+		cbuf[clen++] = (uint8_t)(addr >> 8);
+		cbuf[clen++] = (uint8_t)(addr >> 0);
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_END;
+		fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	case 4:
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 1;
-		cmdbuf[cmdlen++] = pdat->info.opcode_write_enable;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_FAST;
-		cmdbuf[cmdlen++] = 5;
-		cmdbuf[cmdlen++] = pdat->info.opcode_erase_256k;
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 24);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 16);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 8);
-		cmdbuf[cmdlen++] = (uint8_t)(addr >> 0);
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_SPINOR_WAIT;
-		cmdbuf[cmdlen++] = SPI_CMD_DESELECT;
-		cmdbuf[cmdlen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cmdbuf, cmdlen);
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = pdat->info.opcode_write_enable;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 5;
+		cbuf[clen++] = pdat->info.opcode_erase_256k;
+		cbuf[clen++] = (uint8_t)(addr >> 24);
+		cbuf[clen++] = (uint8_t)(addr >> 16);
+		cbuf[clen++] = (uint8_t)(addr >> 8);
+		cbuf[clen++] = (uint8_t)(addr >> 0);
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_END;
+		fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	default:
 		break;

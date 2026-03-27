@@ -1319,11 +1319,11 @@ static int chip_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t *
 	return 1;
 }
 
-static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cmdbuf, uint32_t cmdlen)
+static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 {
-	if(cmdlen > 4096)
+	if(clen > 4096)
 		return 0;
-	fel_write(ctx, 0x00023000, (void *)cmdbuf, cmdlen);
+	fel_write(ctx, 0x00023000, (void *)cbuf, clen);
 	fel_exec(ctx, 0x00022000);
 	return 1;
 }

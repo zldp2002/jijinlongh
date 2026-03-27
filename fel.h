@@ -37,7 +37,7 @@ struct chip_t {
 	int (*jtag)(struct xfel_ctx_t * ctx);
 	int (*ddr)(struct xfel_ctx_t * ctx, const char * type);
 	int (*spi_init)(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen);
-	int (*spi_run)(struct xfel_ctx_t * ctx, uint8_t * cmdbuf, uint32_t cmdlen);
+	int (*spi_run)(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen);
 };
 
 enum {
@@ -85,9 +85,9 @@ static inline int fel_chip_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf,
 	return ctx->chip->spi_init(ctx, swapbuf, swaplen);
 }
 
-static inline int fel_chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cmdbuf, uint32_t cmdlen)
+static inline int fel_chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 {
-	return ctx->chip->spi_run(ctx, cmdbuf, cmdlen);
+	return ctx->chip->spi_run(ctx, cbuf, clen);
 }
 
 int fel_init(struct xfel_ctx_t * ctx);
