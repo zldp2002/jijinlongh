@@ -1186,7 +1186,7 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 	return 1;
 }
 
-static int chip_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen)
+static int chip_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen, uint32_t * cmdlen)
 {
 	static const uint8_t payload[] = {
 		0xff, 0xff, 0xff, 0xea, 0x5c, 0x00, 0x9f, 0xe5, 0x00, 0xd0, 0x80, 0xe5,
@@ -1316,13 +1316,13 @@ static int chip_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t *
 		*swapbuf = 0x00024000;
 	if(swaplen)
 		*swaplen = 65536;
+	if(cmdlen)
+		*cmdlen = 4096;
 	return 1;
 }
 
 static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 {
-	if(clen > 4096)
-		return 0;
 	fel_write(ctx, 0x00023000, (void *)cbuf, clen);
 	fel_exec(ctx, 0x00022000);
 	return 1;

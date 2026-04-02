@@ -281,11 +281,11 @@ void fel_write_progress(struct xfel_ctx_t * ctx, uint32_t addr, void * buf, size
 	progress_stop(&p);
 }
 
-int fel_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen)
+int fel_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen, uint32_t * cmdlen)
 {
 	uint8_t cbuf[2];
 
-	if(!fel_chip_spi_init(ctx, swapbuf, swaplen))
+	if(!fel_chip_spi_init(ctx, swapbuf, swaplen, cmdlen))
 		return 0;
 	cbuf[0] = SPI_CMD_INIT;
 	cbuf[1] = SPI_CMD_END;
@@ -294,7 +294,7 @@ int fel_spi_init(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen
 	return 1;
 }
 
-int fel_spi_xfer(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen)
+int fel_spi_xfer(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, uint32_t cmdlen, void * txbuf, uint32_t txlen, void * rxbuf, uint32_t rxlen)
 {
 	uint8_t cbuf[256];
 	uint32_t clen;
@@ -332,7 +332,7 @@ int fel_spi_xfer(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, vo
 		cbuf[clen++] = SPI_CMD_END;
 		if(txlen > 0)
 			fel_write(ctx, swapbuf, txbuf, txlen);
-		if(!fel_chip_spi_run(ctx, cbuf, clen))
+		if((clen > cmdlen) || !fel_chip_spi_run(ctx, cbuf, clen))
 			return 0;
 		if(rxlen > 0)
 			fel_read(ctx, swapbuf, rxbuf, rxlen);
@@ -387,7 +387,7 @@ int fel_spi_xfer(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, vo
 		clen = 0;
 		cbuf[clen++] = SPI_CMD_DESELECT;
 		cbuf[clen++] = SPI_CMD_END;
-		if(!fel_chip_spi_run(ctx, cbuf, clen))
+		if((clen > cmdlen) || !fel_chip_spi_run(ctx, cbuf, clen))
 			return 0;
 	}
 	return 1;

@@ -21,6 +21,7 @@ struct spinor_pdata_t {
 	struct spinor_info_t info;
 	uint32_t swapbuf;
 	uint32_t swaplen;
+	uint32_t cmdlen;
 };
 
 enum {
@@ -72,7 +73,7 @@ static const struct spinor_info_t spinor_infos[] = {
 	{ "w25x40", 0xef3013, 512 * 1024, 4096, 1, 256, 3, OPCODE_READ, OPCODE_PROG, OPCODE_WREN, OPCODE_E4K, 0, OPCODE_E64K, 0 },
 };
 
-static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, struct sfdp_t * sfdp)
+static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, uint32_t cmdlen, struct sfdp_t * sfdp)
 {
 	uint32_t addr;
 	uint8_t tx[5];
@@ -84,7 +85,7 @@ static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, uint32_t swapbuf, ui
 	tx[2] = 0x0;
 	tx[3] = 0x0;
 	tx[4] = 0x0;
-	if(!fel_spi_xfer(ctx, swapbuf, swaplen, tx, 5, &sfdp->h, sizeof(struct sfdp_header_t)))
+	if(!fel_spi_xfer(ctx, swapbuf, swaplen, cmdlen, tx, 5, &sfdp->h, sizeof(struct sfdp_header_t)))
 		return 0;
 	if((sfdp->h.sign[0] != 'S') || (sfdp->h.sign[1] != 'F') || (sfdp->h.sign[2] != 'D') || (sfdp->h.sign[3] != 'P'))
 		return 0;
@@ -97,7 +98,7 @@ static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, uint32_t swapbuf, ui
 		tx[2] = (addr >>  8) & 0xff;
 		tx[3] = (addr >>  0) & 0xff;
 		tx[4] = 0x0;
-		if(!fel_spi_xfer(ctx, swapbuf, swaplen, tx, 5, &sfdp->ph[i], sizeof(struct sfdp_parameter_header_t)))
+		if(!fel_spi_xfer(ctx, swapbuf, swaplen, cmdlen, tx, 5, &sfdp->ph[i], sizeof(struct sfdp_parameter_header_t)))
 			return 0;
 	}
 	for(i = 0; i < sfdp->h.nph; i++)
@@ -110,7 +111,7 @@ static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, uint32_t swapbuf, ui
 			tx[2] = (addr >>  8) & 0xff;
 			tx[3] = (addr >>  0) & 0xff;
 			tx[4] = 0x0;
-			if(fel_spi_xfer(ctx, swapbuf, swaplen, tx, 5, &sfdp->bt.table[0], sfdp->ph[i].length * 4))
+			if(fel_spi_xfer(ctx, swapbuf, swaplen, cmdlen, tx, 5, &sfdp->bt.table[0], sfdp->ph[i].length * 4))
 			{
 				sfdp->bt.major = sfdp->ph[i].major;
 				sfdp->bt.minor = sfdp->ph[i].minor;
@@ -121,13 +122,13 @@ static inline int spinor_read_sfdp(struct xfel_ctx_t * ctx, uint32_t swapbuf, ui
 	return 0;
 }
 
-static inline int spinor_read_id(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, uint32_t * id)
+static inline int spinor_read_id(struct xfel_ctx_t * ctx, uint32_t swapbuf, uint32_t swaplen, uint32_t cmdlen, uint32_t * id)
 {
 	uint8_t tx[1];
 	uint8_t rx[3];
 
 	tx[0] = OPCODE_RDID;
-	if(!fel_spi_xfer(ctx, swapbuf, swaplen, tx, 1, rx, 3))
+	if(!fel_spi_xfer(ctx, swapbuf, swaplen, cmdlen, tx, 1, rx, 3))
 		return 0;
 	*id = (rx[0] << 16) | (rx[1] << 8) | (rx[2] << 0);
 	return 1;
@@ -140,7 +141,7 @@ static inline int spinor_info(struct xfel_ctx_t * ctx, struct spinor_pdata_t * p
 	uint32_t v, id;
 	int i;
 
-	if(spinor_read_sfdp(ctx, pdat->swapbuf, pdat->swaplen, &sfdp))
+	if(spinor_read_sfdp(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, &sfdp))
 	{
 		pdat->info.name = "";
 		pdat->info.id = 0;
@@ -269,7 +270,7 @@ static inline int spinor_info(struct xfel_ctx_t * ctx, struct spinor_pdata_t * p
 		pdat->info.opcode_write = OPCODE_PROG;
 		return 1;
 	}
-	else if(spinor_read_id(ctx, pdat->swapbuf, pdat->swaplen, &id) && (id != 0xffffff) && (id != 0))
+	else if(spinor_read_id(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, &id) && (id != 0xffffff) && (id != 0))
 	{
 		for(i = 0; i < ARRAY_SIZE(spinor_infos); i++)
 		{
@@ -290,7 +291,7 @@ static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_pdata_t * p
 	uint8_t cbuf[256];
 	uint32_t clen = 0;
 
-	if(fel_spi_init(ctx, &pdat->swapbuf, &pdat->swaplen) && spinor_info(ctx, pdat))
+	if(fel_spi_init(ctx, &pdat->swapbuf, &pdat->swaplen, &pdat->cmdlen) && spinor_info(ctx, pdat))
 	{
 		/* spi select */
 		cbuf[clen++] = SPI_CMD_SELECT;
@@ -365,8 +366,11 @@ static int spinor_helper_init(struct xfel_ctx_t * ctx, struct spinor_pdata_t * p
 
 		/* end */
 		cbuf[clen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cbuf, clen);
-		return 1;
+		if(clen <= pdat->cmdlen)
+		{
+			fel_chip_spi_run(ctx, cbuf, clen);
+			return 1;
+		}
 	}
 	return 0;
 }
@@ -390,7 +394,7 @@ static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_pdata_t * 
 			tx[1] = (uint8_t)(addr >> 16);
 			tx[2] = (uint8_t)(addr >> 8);
 			tx[3] = (uint8_t)(addr >> 0);
-			fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, tx, 4, buf, n);
+			fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 4, buf, n);
 			addr += n;
 			buf += n;
 			count -= n;
@@ -405,7 +409,7 @@ static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_pdata_t * 
 			tx[2] = (uint8_t)(addr >> 16);
 			tx[3] = (uint8_t)(addr >> 8);
 			tx[4] = (uint8_t)(addr >> 0);
-			fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, tx, 5, buf, n);
+			fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 5, buf, n);
 			addr += n;
 			buf += n;
 			count -= n;
@@ -418,7 +422,7 @@ static void spinor_helper_read(struct xfel_ctx_t * ctx, struct spinor_pdata_t * 
 
 static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t * pdat, uint32_t addr, uint8_t * buf, uint32_t count)
 {
-	uint8_t cbuf[4096];
+	uint8_t * cbuf;
 	uint32_t clen;
 	uint8_t * txbuf;
 	uint32_t txlen;
@@ -431,14 +435,15 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 	switch(pdat->info.address_length)
 	{
 	case 3:
+		cbuf = malloc(pdat->cmdlen);
 		txbuf = malloc(pdat->swaplen);
-		if(txbuf)
+		if(cbuf && txbuf)
 		{
 			while(count > 0)
 			{
 				clen = 0;
 				txlen = 0;
-				while((clen < (4096 - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 4)))
+				while((clen < (pdat->cmdlen - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 4)))
 				{
 					n = count > granularity ? granularity : count;
 					cbuf[clen++] = SPI_CMD_SELECT;
@@ -474,18 +479,22 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 				fel_write(ctx, pdat->swapbuf, txbuf, txlen);
 				fel_chip_spi_run(ctx, cbuf, clen);
 			}
-			free(txbuf);
 		}
+		if(cbuf)
+			free(cbuf);
+		if(txbuf)
+			free(txbuf);
 		break;
 	case 4:
+		cbuf = malloc(pdat->cmdlen);
 		txbuf = malloc(pdat->swaplen);
-		if(txbuf)
+		if(cbuf && txbuf)
 		{
 			while(count > 0)
 			{
 				clen = 0;
 				txlen = 0;
-				while((clen < (4096 - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 5)))
+				while((clen < (pdat->cmdlen - 19 - 1)) && (txlen < (pdat->swaplen - granularity - 5)))
 				{
 					n = count > granularity ? granularity : count;
 					cbuf[clen++] = SPI_CMD_SELECT;
@@ -522,8 +531,11 @@ static void spinor_helper_write(struct xfel_ctx_t * ctx, struct spinor_pdata_t *
 				fel_write(ctx, pdat->swapbuf, txbuf, txlen);
 				fel_chip_spi_run(ctx, cbuf, clen);
 			}
-			free(txbuf);
 		}
+		if(cbuf)
+			free(cbuf);
+		if(txbuf)
+			free(txbuf);
 		break;
 	default:
 		break;
@@ -555,7 +567,8 @@ static inline void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor
 		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
 		cbuf[clen++] = SPI_CMD_DESELECT;
 		cbuf[clen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cbuf, clen);
+		if(clen <= pdat->cmdlen)
+			fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	case 4:
 		cbuf[clen++] = SPI_CMD_SELECT;
@@ -576,7 +589,8 @@ static inline void spinor_sector_erase_4k(struct xfel_ctx_t * ctx, struct spinor
 		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
 		cbuf[clen++] = SPI_CMD_DESELECT;
 		cbuf[clen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cbuf, clen);
+		if(clen <= pdat->cmdlen)
+			fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	default:
 		break;
@@ -608,7 +622,8 @@ static inline void spinor_sector_erase_32k(struct xfel_ctx_t * ctx, struct spino
 		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
 		cbuf[clen++] = SPI_CMD_DESELECT;
 		cbuf[clen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cbuf, clen);
+		if(clen <= pdat->cmdlen)
+			fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	case 4:
 		cbuf[clen++] = SPI_CMD_SELECT;
@@ -629,7 +644,8 @@ static inline void spinor_sector_erase_32k(struct xfel_ctx_t * ctx, struct spino
 		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
 		cbuf[clen++] = SPI_CMD_DESELECT;
 		cbuf[clen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cbuf, clen);
+		if(clen <= pdat->cmdlen)
+			fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	default:
 		break;
@@ -661,7 +677,8 @@ static inline void spinor_sector_erase_64k(struct xfel_ctx_t * ctx, struct spino
 		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
 		cbuf[clen++] = SPI_CMD_DESELECT;
 		cbuf[clen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cbuf, clen);
+		if(clen <= pdat->cmdlen)
+			fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	case 4:
 		cbuf[clen++] = SPI_CMD_SELECT;
@@ -682,7 +699,8 @@ static inline void spinor_sector_erase_64k(struct xfel_ctx_t * ctx, struct spino
 		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
 		cbuf[clen++] = SPI_CMD_DESELECT;
 		cbuf[clen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cbuf, clen);
+		if(clen <= pdat->cmdlen)
+			fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	default:
 		break;
@@ -714,7 +732,8 @@ static inline void spinor_sector_erase_256k(struct xfel_ctx_t * ctx, struct spin
 		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
 		cbuf[clen++] = SPI_CMD_DESELECT;
 		cbuf[clen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cbuf, clen);
+		if(clen <= pdat->cmdlen)
+			fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	case 4:
 		cbuf[clen++] = SPI_CMD_SELECT;
@@ -735,7 +754,8 @@ static inline void spinor_sector_erase_256k(struct xfel_ctx_t * ctx, struct spin
 		cbuf[clen++] = SPI_CMD_SPINOR_WAIT;
 		cbuf[clen++] = SPI_CMD_DESELECT;
 		cbuf[clen++] = SPI_CMD_END;
-		fel_chip_spi_run(ctx, cbuf, clen);
+		if(clen <= pdat->cmdlen)
+			fel_chip_spi_run(ctx, cbuf, clen);
 		break;
 	default:
 		break;
