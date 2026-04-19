@@ -29,7 +29,7 @@ LDFLAGS		:= -T link.ld -nostdlib
 ARFLAGS		:= -rcs
 OCFLAGS		:= -v -O binary
 ODFLAGS		:=
-MCFLAGS		:= -march=rv64gvxthead -mabi=lp64d -mcmodel=medany
+MCFLAGS		:= -march=rv64gvxthead -mabi=lp64d -mcmodel=medany -fno-stack-protector
 
 LIBDIRS		:=
 LIBS 		:=

@@ -32,11 +32,5 @@ extern int init_DRAM(int type, void * param);
 
 void sys_dram_init(void * param)
 {
-	uint32_t s;
-
-	s = init_DRAM(0, param);
-	if(s)
-		write32(0x07090000 + 0x0100 + 7 * 0x04, s << 20);
-	else
-		write32(0x07090000 + 0x0100 + 7 * 0x04, 0);
+	init_DRAM(0, param);
 }

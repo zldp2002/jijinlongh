@@ -2,7 +2,7 @@
 # Top makefile
 #
 
-CROSS		?= ~/test/tina-d1-open/prebuilt/gcc/linux-x86/riscv/toolchain-thead-glibc/riscv64-glibc-gcc-thead_20200702/bin/riscv64-unknown-linux-gnu-
+CROSS		?= riscv64-linux-gnu-
 NAME		:= d1-jtag
 
 #
@@ -29,7 +29,7 @@ LDFLAGS		:= -T link.ld -nostdlib
 ARFLAGS		:= -rcs
 OCFLAGS		:= -v -O binary
 ODFLAGS		:=
-MCFLAGS		:= -march=rv64gvxthead -mabi=lp64d -mcmodel=medany
+MCFLAGS		:= -march=rv64g -mabi=lp64d -mcmodel=medany -fno-stack-protector
 
 LIBDIRS		:=
 LIBS 		:=
