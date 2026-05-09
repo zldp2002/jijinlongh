@@ -61,17 +61,19 @@ ddr_param:
 	.word 0, 0, 0, 0, 0, 0, 0, 0
 
 reset:
-	addi sp, sp, -16
-	sd ra, 8(sp)
-	sd s0, 0(sp)
-	addi s0, sp, 16
+	addi sp, sp, -32
+	sd s0, 8(sp)
+	sd s1, 16(sp)
+	sd ra, 24(sp)
+	mv s0, a0
 
-	call sys_uart_init
-	call sys_clock_init
+	jal sys_uart_init
+	jal sys_clock_init
 	la a0, ddr_param
-	call sys_dram_init
+	jal sys_dram_init
 
-	ld ra, 8(sp)
-	ld s0, 0(sp)
-	addi sp, sp, 16
-	jr ra
+	ld ra, 24(sp)
+	ld s0, 8(sp)
+	ld s1, 16(sp)
+	addi sp, sp, 32
+	ret
