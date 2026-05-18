@@ -31,6 +31,10 @@
 
 	.global _start
 _start:
+	li t1, 0x1 << 22
+	csrs mxstatus, t1
+	li t1, 0x30013
+	csrs mcor, t1
 	j reset
 
 ddr_param:
