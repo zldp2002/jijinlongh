@@ -24,7 +24,7 @@ sudo make install
 ```
 xfel(v1.1.0) - https://github.com/xboot/xfel
 usage:
-    xfel version                                - Show brom version
+    xfel version                                - Show chip version
     xfel hexdump <address> <length>             - Dumps memory region in hex
     xfel dump <address> <length>                - Binary memory dump to stdout
     xfel exec <address>                         - Call function address
@@ -33,7 +33,7 @@ usage:
     xfel read <address> <length> <file>         - Read memory to file
     xfel write <address> <file>                 - Write file to memory
     xfel reset                                  - Reset device using watchdog
-    xfel sid                                    - Show 128-bits sid information
+    xfel sid                                    - Show sid information
     xfel jtag                                   - Enable jtag debug
     xfel ddr [type]                             - Initial ddr controller with optional type
     xfel spinor                                 - Detect spi nor flash

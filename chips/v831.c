@@ -12,12 +12,15 @@ static int chip_reset(struct xfel_ctx_t * ctx)
 	return 1;
 }
 
-static int chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
+static int chip_sid(struct xfel_ctx_t * ctx, char * sid)
 {
-	sid[0] = R32(0x03006200 + 0x0);
-	sid[1] = R32(0x03006200 + 0x4);
-	sid[2] = R32(0x03006200 + 0x8);
-	sid[3] = R32(0x03006200 + 0xc);
+	uint32_t id[4];
+
+	id[0] = R32(0x03006200 + 0x0);
+	id[1] = R32(0x03006200 + 0x4);
+	id[2] = R32(0x03006200 + 0x8);
+	id[3] = R32(0x03006200 + 0xc);
+	sprintf(sid, "%08x%08x%08x%08x", id[0], id[1], id[2], id[3]);
 	return 1;
 }
 

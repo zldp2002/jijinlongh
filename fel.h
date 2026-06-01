@@ -33,7 +33,7 @@ struct chip_t {
 	uint32_t id;
 
 	int (*reset)(struct xfel_ctx_t * ctx);
-	int (*sid)(struct xfel_ctx_t * ctx, uint32_t * sid);
+	int (*sid)(struct xfel_ctx_t * ctx, char * sid);
 	int (*jtag)(struct xfel_ctx_t * ctx);
 	int (*ddr)(struct xfel_ctx_t * ctx, const char * type);
 	int (*spi_init)(struct xfel_ctx_t * ctx, uint32_t * swapbuf, uint32_t * swaplen, uint32_t * cmdlen);
@@ -65,7 +65,7 @@ static inline int fel_chip_reset(struct xfel_ctx_t * ctx)
 	return ctx->chip->reset(ctx);
 }
 
-static inline int fel_chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
+static inline int fel_chip_sid(struct xfel_ctx_t * ctx, char * sid)
 {
 	return ctx->chip->sid(ctx, sid);
 }

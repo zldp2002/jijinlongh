@@ -12,7 +12,7 @@ static int chip_reset(struct xfel_ctx_t * ctx)
 	return 1;
 }
 
-static int chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
+static int chip_sid(struct xfel_ctx_t * ctx, char * sid)
 {
 	static const uint32_t payload[] = {
 		cpu_to_le32(0xe59f0040), /*    0:  ldr   r0, [pc, #64]           */
@@ -38,14 +38,11 @@ static int chip_sid(struct xfel_ctx_t * ctx, uint32_t * sid)
 		cpu_to_le32(0x01c14000), /* SID base addr */
 		/* SID will put here */
 	};
-	uint32_t res[4];
+	uint32_t id[4];
 	fel_write(ctx, ctx->version.scratchpad, (void *)payload, sizeof(payload));
 	fel_exec(ctx, ctx->version.scratchpad);
-	fel_read(ctx, ctx->version.scratchpad + sizeof(payload), (void *)res, sizeof(res));
-	sid[0] = le32_to_cpu(res[0]);
-	sid[1] = le32_to_cpu(res[1]);
-	sid[2] = le32_to_cpu(res[2]);
-	sid[3] = le32_to_cpu(res[3]);
+	fel_read(ctx, ctx->version.scratchpad + sizeof(payload), (void *)id, sizeof(id));
+	sprintf(sid, "%08x%08x%08x%08x", le32_to_cpu(id[0]), le32_to_cpu(id[1]), le32_to_cpu(id[2]), le32_to_cpu(id[3]));
 	return 1;
 }
 

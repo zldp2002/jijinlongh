@@ -83,7 +83,7 @@ static void usage(void)
 {
 	printf("xfel(v1.1.0) - https://github.com/xboot/xfel\r\n");
 	printf("usage:\r\n");
-	printf("    xfel version                                - Show brom version\r\n");
+	printf("    xfel version                                - Show chip version\r\n");
 	printf("    xfel hexdump <address> <length>             - Dumps memory region in hex\r\n");
 	printf("    xfel dump <address> <length>                - Binary memory dump to stdout\r\n");
 	printf("    xfel exec <address>                         - Call function address\r\n");
@@ -92,7 +92,7 @@ static void usage(void)
 	printf("    xfel read <address> <length> <file>         - Read memory to file\r\n");
 	printf("    xfel write <address> <file>                 - Write file to memory\r\n");
 	printf("    xfel reset                                  - Reset device using watchdog\r\n");
-	printf("    xfel sid                                    - Show 128-bits sid information\r\n");
+	printf("    xfel sid                                    - Show sid information\r\n");
 	printf("    xfel jtag                                   - Enable jtag debug\r\n");
 	printf("    xfel ddr [type]                             - Initial ddr controller with optional type\r\n");
 	printf("    xfel spinor                                 - Detect spi nor flash\r\n");
@@ -258,9 +258,9 @@ int main(int argc, char * argv[])
 	}
 	else if(!strcmp(argv[1], "sid"))
 	{
-		uint32_t sid[4];
+		char sid[256];
 		if(fel_chip_sid(&ctx, sid))
-			printf("%08x%08x%08x%08x\r\n",sid[0], sid[1], sid[2], sid[3]);
+			printf("%s\r\n", sid);
 		else
 			printf("The '%s' chip don't support sid command\r\n", ctx.chip->name);
 	}
