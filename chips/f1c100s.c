@@ -14,6 +14,25 @@ static int chip_reset(struct xfel_ctx_t * ctx)
 
 static int chip_sid(struct xfel_ctx_t * ctx, char * sid)
 {
+	uint32_t swapbuf, swaplen, cmdlen;
+	uint8_t tx[5], rx[8];
+
+	/*
+	 * The f1c100s have no sid, using spi nor flash's id.
+	 */
+	if(fel_spi_init(ctx, &swapbuf, &swaplen, &cmdlen))
+	{
+		tx[0] = 0x4b;
+		tx[1] = 0x0;
+		tx[2] = 0x0;
+		tx[3] = 0x0;
+		tx[4] = 0x0;
+		if(fel_spi_xfer(ctx, swapbuf, swaplen, cmdlen, tx, 5, rx, 8))
+		{
+			sprintf(sid, "%02x%02x%02x%02x%02x%02x%02x%02x", rx[0], rx[1], rx[2], rx[3], rx[4], rx[5], rx[6], rx[7]);
+			return 1;
+		}
+	}
 	return 0;
 }
 
