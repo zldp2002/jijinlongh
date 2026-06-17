@@ -12,7 +12,7 @@ static int chip_reset(struct xfel_ctx_t * ctx)
 	return 1;
 }
 
-static void fel_read32_array(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t * val, size_t count)
+static uint32_t fel_read32_fixed(struct xfel_ctx_t * ctx, uint32_t addr)
 {
 	uint32_t payload[] = {
 		cpu_to_le32(0xe59f0020),		/* ldr r0, [pc, #32] ; ldr r0,[read_addr]  */
@@ -27,24 +27,25 @@ static void fel_read32_array(struct xfel_ctx_t * ctx, uint32_t addr, uint32_t * 
 		cpu_to_le32(0xe4813004),		/* str r3, [r1], #4  ; store and post-inc  */
 		cpu_to_le32(0xeafffffa),		/* b read_loop                             */
 		cpu_to_le32(addr),				/* read_addr */
-		cpu_to_le32(count)				/* read_count */
+		cpu_to_le32(0x1)				/* read_count */
 		/* read_data values go here */
 	};
-	uint32_t buf[count];
-	size_t i;
+	uint32_t val;
 
 	fel_write(ctx, ctx->version.scratchpad, (void *)payload, sizeof(payload));
 	fel_exec(ctx, ctx->version.scratchpad);
-	fel_read(ctx, ctx->version.scratchpad + sizeof(payload), (void *)buf, sizeof(buf));
-	for(i = 0; i < count; i++)
-		val[i] = le32_to_cpu(buf[i]);
+	fel_read(ctx, ctx->version.scratchpad + sizeof(payload), (void *)&val, sizeof(val));
+	return le32_to_cpu(val);
 }
 
 static int chip_sid(struct xfel_ctx_t * ctx, char * sid)
 {
 	uint32_t id[4];
 
-	fel_read32_array(ctx, 0x01c23800, id, 4);
+	id[0] = fel_read32_fixed(ctx, 0x01c23800 + 0x0);
+	id[1] = fel_read32_fixed(ctx, 0x01c23800 + 0x4);
+	id[2] = fel_read32_fixed(ctx, 0x01c23800 + 0x8);
+	id[3] = fel_read32_fixed(ctx, 0x01c23800 + 0xc);
 	sprintf(sid, "%08x%08x%08x%08x", id[0], id[1], id[2], id[3]);
 	return 1;
 }
