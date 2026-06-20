@@ -718,8 +718,8 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 1;
 }
 
-struct chip_t h3 = {
-	.name = "H3",
+struct chip_t h3_h2 = {
+	.name = "H3/H2+",
 	.id = 0x00168000,
 	.reset = chip_reset,
 	.sid = chip_sid,

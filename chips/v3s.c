@@ -666,8 +666,8 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 1;
 }
 
-struct chip_t v3s = {
-	.name = "V3S",
+struct chip_t v3s_s3 = {
+	.name = "V3S/S3",
 	.id = 0x00168100,
 	.reset = chip_reset,
 	.sid = chip_sid,

@@ -1,22 +1,46 @@
 #include <fel.h>
 
-extern struct chip_t a40i;
+extern struct chip_t a10;
+extern struct chip_t a13_a10s_r8;
+extern struct chip_t a20;
+extern struct chip_t a23;
+extern struct chip_t a31;
+extern struct chip_t a33_r16;
+extern struct chip_t a40i_r40;
+extern struct chip_t a64;
+extern struct chip_t a80;
+extern struct chip_t a83t;
 extern struct chip_t d1;
-extern struct chip_t f1c100s;
-extern struct chip_t h3;
+extern struct chip_t f1c100s_f1c200s_f1c500s;
+extern struct chip_t h3_h2;
+extern struct chip_t h5;
+extern struct chip_t h6;
+extern struct chip_t h616;
 extern struct chip_t r329;
 extern struct chip_t t507;
-extern struct chip_t v3s;
+extern struct chip_t v3s_s3;
 extern struct chip_t v831;
 
 static struct chip_t * chips[] = {
-	&a40i,
+	&a10,
+	&a13_a10s_r8,
+	&a20,
+	&a23,
+	&a31,
+	&a33_r16,
+	&a40i_r40,
+	&a64,
+	&a80,
+	&a83t,
 	&d1,
-	&f1c100s,
-	&h3,
+	&f1c100s_f1c200s_f1c500s,
+	&h3_h2,
+	&h5,
+	&h6,
+	&h616,
 	&r329,
 	&t507,
-	&v3s,
+	&v3s_s3,
 	&v831,
 };
 

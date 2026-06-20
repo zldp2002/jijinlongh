@@ -30,9 +30,9 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 0;
 }
 
-struct chip_t a40i_r40 = {
-	.name = "A40I/R40",
-	.id = 0x00170100,
+struct chip_t a10 = {
+	.name = "A10",
+	.id = 0x00162300,
 	.reset = chip_reset,
 	.sid = chip_sid,
 	.jtag = chip_jtag,

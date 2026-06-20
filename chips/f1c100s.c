@@ -530,8 +530,8 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 1;
 }
 
-struct chip_t f1c100s = {
-	.name = "F1C100S",
+struct chip_t f1c100s_f1c200s_f1c500s = {
+	.name = "F1C100S/F1C200S/F1C500S",
 	.id = 0x00166300,
 	.reset = chip_reset,
 	.sid = chip_sid,
