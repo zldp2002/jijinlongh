@@ -491,7 +491,7 @@ void sys_dram_init(void)
 	u32_t * dsz = (void *)0x0000005c;
 
 	para.base = 0x80000000;
-	para.size = 32;
+	para.size = 0;
 	para.clk = PLL_DDR_CLK / 1000000;
 	para.access_mode = 1;
 	para.cs_num = 1;
