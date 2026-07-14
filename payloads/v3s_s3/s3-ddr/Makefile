@@ -3,7 +3,7 @@
 #
 
 CROSS		?= arm-linux-gnueabihf-
-NAME		:= ddr
+NAME		:= s3-ddr
 
 #
 # System environment variable.
