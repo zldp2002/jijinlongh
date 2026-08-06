@@ -22,7 +22,7 @@ sudo make install
 ## Usage
 
 ```
-xfel(v1.1.1) - https://github.com/xboot/xfel
+xfel(v1.1.2) - https://github.com/xboot/xfel
 usage:
     xfel version                                - Show chip version
     xfel hexdump <address> <length>             - Dumps memory region in hex
