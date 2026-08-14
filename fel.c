@@ -10,7 +10,7 @@ extern struct chip_t a40i_r40;
 extern struct chip_t a64;
 extern struct chip_t a80;
 extern struct chip_t a83t;
-extern struct chip_t d1;
+extern struct chip_t d1_f133;
 extern struct chip_t f1c100s_f1c200s_f1c500s;
 extern struct chip_t h2_h3;
 extern struct chip_t h5;
@@ -33,7 +33,7 @@ static struct chip_t * chips[] = {
 	&a64,
 	&a80,
 	&a83t,
-	&d1,
+	&d1_f133,
 	&f1c100s_f1c200s_f1c500s,
 	&h2_h3,
 	&h5,

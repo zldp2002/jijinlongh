@@ -1,5 +1,33 @@
 #include <fel.h>
 
+struct ddr2_param_t {
+	uint32_t dram_clk;
+	uint32_t dram_type;
+	uint32_t dram_zq;
+	uint32_t dram_odt_en;
+	uint32_t dram_para1;
+	uint32_t dram_para2;
+	uint32_t dram_mr0;
+	uint32_t dram_mr1;
+	uint32_t dram_mr2;
+	uint32_t dram_mr3;
+	uint32_t dram_tpr0;
+	uint32_t dram_tpr1;
+	uint32_t dram_tpr2;
+	uint32_t dram_tpr3;
+	uint32_t dram_tpr4;
+	uint32_t dram_tpr5;
+	uint32_t dram_tpr6;
+	uint32_t dram_tpr7;
+	uint32_t dram_tpr8;
+	uint32_t dram_tpr9;
+	uint32_t dram_tpr10;
+	uint32_t dram_tpr11;
+	uint32_t dram_tpr12;
+	uint32_t dram_tpr13;
+	uint32_t reserve[8];
+};
+
 struct ddr3_param_t {
 	uint32_t dram_clk;
 	uint32_t dram_type;
@@ -1492,7 +1520,40 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 
 	if(type)
 	{
-		if(strcmp(type, "ddr3") == 0)
+		if(strcmp(type, "ddr2") == 0)
+		{
+			const struct ddr2_param_t ddr2 = {
+				.dram_clk = 528,
+				.dram_type = 2,
+				.dram_zq = 0x07b7bf9,
+				.dram_odt_en = 0x00,
+				.dram_para1 = 0x000000d2,
+				.dram_para2 = 0x00000000,
+				.dram_mr0 = 0x00000e73,
+				.dram_mr1 = 0x02,
+				.dram_mr2 = 0x0,
+				.dram_mr3 = 0x0,
+				.dram_tpr0 = 0x00471992,
+				.dram_tpr1 = 0x0131a10c,
+				.dram_tpr2 = 0x00057041,
+				.dram_tpr3 = 0xb4787896,
+				.dram_tpr4 = 0x0,
+				.dram_tpr5 = 0x48484848,
+				.dram_tpr6 = 0x48,
+				.dram_tpr7 = 0x1621121e,
+				.dram_tpr8 = 0x0,
+				.dram_tpr9 = 0x0,
+				.dram_tpr10 = 0x00000000,
+				.dram_tpr11 = 0x00030010,
+				.dram_tpr12 = 0x00000035,
+				.dram_tpr13 = 0x34000000,
+			};
+			fel_write(ctx, 0x00020000, (void *)&ddr_bin[0], sizeof(ddr_bin));
+			fel_write(ctx, 0x00020018, (void *)&ddr2, sizeof(ddr2));
+			fel_exec(ctx, 0x00020000);
+			return 1;
+		}
+		else if(strcmp(type, "ddr3") == 0)
 		{
 			const struct ddr3_param_t ddr3 = {
 				.dram_clk = 792,
@@ -1567,6 +1628,7 @@ static int chip_ddr(struct xfel_ctx_t * ctx, const char * type)
 			return 1;
 		}
 	}
+	printf("xfel ddr ddr2	- Initial ddr controller with ddr2(F133)\r\n");
 	printf("xfel ddr ddr3	- Initial ddr controller with ddr3\r\n");
 	printf("xfel ddr lpddr3	- Initial ddr controller with lpddr3\r\n");
 	return 0;
@@ -1698,8 +1760,8 @@ static int chip_spi_run(struct xfel_ctx_t * ctx, uint8_t * cbuf, uint32_t clen)
 	return 1;
 }
 
-struct chip_t d1 = {
-	.name = "D1",
+struct chip_t d1_f133 = {
+	.name = "D1/F133",
 	.id = 0x00185900,
 	.reset = chip_reset,
 	.sid = chip_sid,
