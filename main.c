@@ -59,7 +59,7 @@ static void hexdump(uint32_t addr, void * buf, size_t len)
 
 	for(j = 0; j < len; j += 16)
 	{
-		printf("%08zx: ", addr + j);
+		printf("%08x: ", (uint32_t)(addr + j));
 		for(i = 0; i < 16; i++)
 		{
 			if(j + i < len)

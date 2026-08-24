@@ -6,7 +6,10 @@ Tiny FEL tools for allwinner SOC, support RISC-V D1 chip.
 
 ## How to build
 
+### Linux platform
+
 The xfel tools depends on the `libusb-1.0` library, you need to install `libusb-1.0-0-dev` before compile, for example in ubuntu:
+
 ```shell
 sudo apt install libusb-1.0-0-dev
 ```
@@ -19,9 +22,39 @@ make
 sudo make install
 ```
 
+### Window platform
+
+Install some build tools
+
+```shell
+sudo apt install mingw-w64
+sudo apt install autoconf
+sudo apt install libtool-bin
+```
+
+
+```shell
+git clone https://github.com/libusb/libusb.git
+cd libusb
+./autogen.sh
+./configure --host=i686-w64-mingw32 --prefix=/usr/i686-w64-mingw32/
+make
+sudo make install
+```
+
+Build xfel source code
+
+```shell
+cd xfel
+CROSS=i686-w64-mingw32- make
+```
+
+For 64-bits windows, you can using `x86_64-w64-mingw32-` instead of `i686-w64-mingw32` above.
+
+
 ## Usage
 
-```
+```shell
 xfel(v1.1.3) - https://github.com/xboot/xfel
 usage:
     xfel version                                - Show chip version

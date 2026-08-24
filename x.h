@@ -15,6 +15,7 @@ extern "C" {
 #elif defined(__WINDOWS__)
 # include <winsock2.h>
 # include <sys/param.h>
+# include <sys/time.h>
 #else
 # error "platform not supported!"
 #endif
