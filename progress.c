@@ -1,13 +1,13 @@
 #include <progress.h>
 
-static inline double gettime(void)
+static double gettime(void)
 {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	return tv.tv_sec + (double)tv.tv_usec / 1000000.0;
 }
 
-static inline const char * format_eta(double remaining)
+static const char * format_eta(double remaining)
 {
 	static char result[6] = "";
 	int seconds = remaining + 0.5;
@@ -17,6 +17,20 @@ static inline const char * format_eta(double remaining)
 		return result;
 	}
 	return "--:--";
+}
+
+static char * ssize(char * buf, double size)
+{
+	const char * unit[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
+	int count = 0;
+
+	while((size > 1000) && (count < 8))
+	{
+		size /= 1000;
+		count++;
+	}
+	sprintf(buf, "%5.3f %s", size, unit[count]);
+	return buf;
 }
 
 void progress_start(struct progress_t * p, size_t total)
@@ -31,6 +45,8 @@ void progress_start(struct progress_t * p, size_t total)
 
 void progress_update(struct progress_t * p, size_t bytes)
 {
+	char buf1[32], buf2[32];
+
 	if(p)
 	{
 		p->done += bytes;
@@ -44,9 +60,9 @@ void progress_update(struct progress_t * p, size_t bytes)
 		for(i = pos; i < 48; i++)
 			putchar(' ');
 		if(p->done < p->total)
-			printf("]%6.1f kB/s, ETA %s ", speed / 1000.0, format_eta(eta));
+			printf("] %s/s, ETA %s", ssize(buf1, speed), format_eta(eta));
 		else
-			printf("] %5.0f kB, %6.1f kB/s", p->done / 1000.0, speed / 1000.0);
+			printf("] %s, %s/s        ", ssize(buf1, p->done), ssize(buf2, speed));
 		fflush(stdout);
 	}
 }

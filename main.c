@@ -375,9 +375,7 @@ int main(int argc, char * argv[])
 		}
 	}
 	else
-	{
 		usage();
-	}
 	if(ctx.hdl)
 		libusb_close(ctx.hdl);
 	libusb_exit(NULL);
