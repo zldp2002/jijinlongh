@@ -73,4 +73,4 @@ install:
 	install -Dm0644 LICENSE /usr/share/licenses/xfel/LICENSE
 
 clean:
-	@$(RM) $(DEPS) $(OBJS) $(NAME).map $(NAME) *~
+	@$(RM) $(DEPS) $(OBJS) $(NAME).map $(NAME).exe $(NAME) *~
