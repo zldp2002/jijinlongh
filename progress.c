@@ -33,7 +33,7 @@ static char * ssize(char * buf, double size)
 	return buf;
 }
 
-void progress_start(struct progress_t * p, size_t total)
+void progress_start(struct progress_t * p, uint64_t total)
 {
 	if(p && (total > 0))
 	{
@@ -43,7 +43,7 @@ void progress_start(struct progress_t * p, size_t total)
 	}
 }
 
-void progress_update(struct progress_t * p, size_t bytes)
+void progress_update(struct progress_t * p, uint64_t bytes)
 {
 	char buf1[32], buf2[32];
 

@@ -8,13 +8,13 @@ extern "C" {
 #include <x.h>
 
 struct progress_t {
-	size_t total;
-	size_t done;
+	uint64_t total;
+	uint64_t done;
 	double start;
 };
 
-void progress_start(struct progress_t * p, size_t total);
-void progress_update(struct progress_t * p, size_t bytes);
+void progress_start(struct progress_t * p, uint64_t total);
+void progress_update(struct progress_t * p, uint64_t bytes);
 void progress_stop(struct progress_t * p);
 
 #ifdef __cplusplus
