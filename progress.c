@@ -24,9 +24,9 @@ static char * ssize(char * buf, double size)
 	const char * unit[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
 	int count = 0;
 
-	while((size > 1000) && (count < 8))
+	while((size > 1024) && (count < 8))
 	{
-		size /= 1000;
+		size /= 1024;
 		count++;
 	}
 	sprintf(buf, "%5.3f %s", size, unit[count]);
