@@ -288,7 +288,7 @@ int main(int argc, char * argv[])
 			if(cap > 0)
 				printf("Found spi nor flash with %lld bytes\r\n", (long long)cap);
 			else
-				printf("Not found any spi nor flash\r\n");
+				printf("Can't detect any spi nor flash\r\n");
 		}
 		else
 		{
@@ -304,7 +304,7 @@ int main(int argc, char * argv[])
 					if(spinor_read(&ctx, addr, buf, len))
 						file_save(argv[2], buf, len);
 					else
-						printf("Not found any spi nor flash\r\n");
+						printf("Can't read spi nor flash\r\n");
 					free(buf);
 				}
 			}
@@ -318,7 +318,7 @@ int main(int argc, char * argv[])
 				if(buf)
 				{
 					if(!spinor_write(&ctx, addr, buf, len))
-						printf("Not found any spi nor flash\r\n");
+						printf("Can't write spi nor flash\r\n");
 					free(buf);
 				}
 			}
@@ -336,7 +336,7 @@ int main(int argc, char * argv[])
 			if(cap > 0)
 				printf("Found spi nand flash with %lld bytes\r\n", (long long)cap);
 			else
-				printf("Not found any spi nand flash\r\n");
+				printf("Can't detect any spi nand flash\r\n");
 		}
 		else
 		{
@@ -352,7 +352,7 @@ int main(int argc, char * argv[])
 					if(spinand_read(&ctx, addr, buf, len))
 						file_save(argv[2], buf, len);
 					else
-						printf("Not found any spi nand flash\r\n");
+						printf("Can't read spi nand flash\r\n");
 					free(buf);
 				}
 			}
@@ -366,7 +366,7 @@ int main(int argc, char * argv[])
 				if(buf)
 				{
 					if(!spinand_write(&ctx, addr, buf, len))
-						printf("Not found any spi nand flash\r\n");
+						printf("Can't write spi nand flash\r\n");
 					free(buf);
 				}
 			}
