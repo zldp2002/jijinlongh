@@ -148,9 +148,9 @@ static void spinand_helper_read(struct xfel_ctx_t * ctx, struct spinand_pdata_t 
 
 	while(count > 0)
 	{
-		n = count > pdat->info.page_size ? pdat->info.page_size : count;
 		pa = addr / pdat->info.page_size;
 		ca = addr & (pdat->info.page_size - 1);
+		n = count > (pdat->info.page_size - ca) ? (pdat->info.page_size - ca) : count;
 		tx[0] = OPCODE_READ_PAGE_TO_CACHE;
 		tx[1] = (uint8_t)(pa >> 16);
 		tx[2] = (uint8_t)(pa >> 8);
