@@ -135,10 +135,14 @@ static inline int spinand_wait_for_busy(struct xfel_ctx_t * ctx, struct spinand_
 
 static int spinand_helper_init(struct xfel_ctx_t * ctx, struct spinand_pdata_t * pdat)
 {
+	uint8_t val;
+
 	if(fel_spi_init(ctx, &pdat->swapbuf, &pdat->swaplen, &pdat->cmdlen) && spinand_info(ctx, pdat))
 	{
 		spinand_reset(ctx, pdat);
 		spinand_wait_for_busy(ctx, pdat);
+		if(spinand_get_feature(ctx, pdat, OPCODE_FEATURE_LOCK, &val) && (val & 0x38))
+			spinand_set_feature(ctx, pdat, OPCODE_FEATURE_LOCK, val & ~0x38);
 		return 1;
 	}
 	return 0;
@@ -166,6 +170,83 @@ static void spinand_helper_read(struct xfel_ctx_t * ctx, struct spinand_pdata_t 
 		tx[2] = (uint8_t)(ca >> 0);
 		tx[3] = 0x0;
 		fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 4, buf, n);
+		addr += n;
+		buf += n;
+		count -= n;
+	}
+}
+
+static void spinand_helper_erase(struct xfel_ctx_t * ctx, struct spinand_pdata_t * pdat, uint64_t addr, uint64_t count)
+{
+	uint64_t base = addr;
+	int64_t cnt = count;
+	uint32_t esize = pdat->info.page_size * pdat->info.pages_per_block;
+	uint32_t emask = esize - 1;
+	uint8_t cbuf[256];
+	uint32_t clen;
+	uint32_t pa;
+
+	cnt += (base & emask);
+	base &= (~emask);
+	while(cnt > 0)
+	{
+		pa = base / pdat->info.page_size;
+		clen = 0;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 1;
+		cbuf[clen++] = OPCODE_WRITE_ENABLE;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_FAST;
+		cbuf[clen++] = 4;
+		cbuf[clen++] = OPCODE_BLOCK_ERASE;
+		cbuf[clen++] = (uint8_t)(pa >> 16);
+		cbuf[clen++] = (uint8_t)(pa >> 8);
+		cbuf[clen++] = (uint8_t)(pa >> 0);
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_SELECT;
+		cbuf[clen++] = SPI_CMD_SPINAND_WAIT;
+		cbuf[clen++] = SPI_CMD_DESELECT;
+		cbuf[clen++] = SPI_CMD_END;
+		if(clen <= pdat->cmdlen)
+			fel_chip_spi_run(ctx, cbuf, clen);
+		base += esize;
+		cnt -= esize;
+	}
+}
+
+static void spinand_helper_write(struct xfel_ctx_t * ctx, struct spinand_pdata_t * pdat, uint32_t addr, uint8_t * buf, uint32_t count)
+{
+	uint32_t pa, ca;
+	uint32_t n;
+	uint8_t tx[4049];
+
+	while(count > 0)
+	{
+		pa = addr / pdat->info.page_size;
+		ca = addr & (pdat->info.page_size - 1);
+		n = count > (pdat->info.page_size - ca) ? (pdat->info.page_size - ca) : count;
+
+		tx[0] = OPCODE_WRITE_ENABLE;
+		fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 1, 0, 0);
+
+		tx[0] = OPCODE_PROGRAM_LOAD;
+		tx[1] = (uint8_t)(ca >> 8);
+		tx[2] = (uint8_t)(ca >> 0);
+		memcpy(&tx[3], buf, n);
+		fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 3 + n, 0, 0);
+
+		spinand_wait_for_busy(ctx, pdat);
+
+		tx[0] = OPCODE_PROGRAM_EXECUTE;
+		tx[1] = (uint8_t)(pa >> 16);
+		tx[2] = (uint8_t)(pa >> 8);
+		tx[3] = (uint8_t)(pa >> 0);
+		fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 4, 0, 0);
+
+		spinand_wait_for_busy(ctx, pdat);
+
 		addr += n;
 		buf += n;
 		count -= n;
@@ -207,6 +288,25 @@ int spinand_read(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t le
 
 int spinand_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t len)
 {
-	//TODO
+	struct spinand_pdata_t pdat;
+	struct progress_t p;
+	uint64_t n;
+
+	if(spinand_helper_init(ctx, &pdat))
+	{
+		progress_start(&p, len);
+		spinand_helper_erase(ctx, &pdat, addr, len);
+		while(len > 0)
+		{
+			n = len > 65536 ? 65536 : len;
+			spinand_helper_write(ctx, &pdat, addr, buf, n);
+			addr += n;
+			buf += n;
+			len -= n;
+			progress_update(&p, n);
+		}
+		progress_stop(&p);
+		return 1;
+	}
 	return 0;
 }
