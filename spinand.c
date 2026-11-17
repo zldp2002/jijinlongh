@@ -218,39 +218,74 @@ static void spinand_helper_erase(struct xfel_ctx_t * ctx, struct spinand_pdata_t
 
 static void spinand_helper_write(struct xfel_ctx_t * ctx, struct spinand_pdata_t * pdat, uint32_t addr, uint8_t * buf, uint32_t count)
 {
-	uint32_t pa, ca;
+	uint8_t * cbuf;
+	uint32_t clen;
+	uint8_t * txbuf;
+	uint32_t txlen;
 	uint32_t n;
-	uint8_t tx[4049];
+	uint32_t pa, ca;
 
-	while(count > 0)
+	cbuf = malloc(pdat->cmdlen);
+	txbuf = malloc(pdat->swaplen);
+	if(cbuf && txbuf)
 	{
-		pa = addr / pdat->info.page_size;
-		ca = addr & (pdat->info.page_size - 1);
-		n = count > (pdat->info.page_size - ca) ? (pdat->info.page_size - ca) : count;
-
-		tx[0] = OPCODE_WRITE_ENABLE;
-		fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 1, 0, 0);
-
-		tx[0] = OPCODE_PROGRAM_LOAD;
-		tx[1] = (uint8_t)(ca >> 8);
-		tx[2] = (uint8_t)(ca >> 0);
-		memcpy(&tx[3], buf, n);
-		fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 3 + n, 0, 0);
-
-		spinand_wait_for_busy(ctx, pdat);
-
-		tx[0] = OPCODE_PROGRAM_EXECUTE;
-		tx[1] = (uint8_t)(pa >> 16);
-		tx[2] = (uint8_t)(pa >> 8);
-		tx[3] = (uint8_t)(pa >> 0);
-		fel_spi_xfer(ctx, pdat->swapbuf, pdat->swaplen, pdat->cmdlen, tx, 4, 0, 0);
-
-		spinand_wait_for_busy(ctx, pdat);
-
-		addr += n;
-		buf += n;
-		count -= n;
+		while(count > 0)
+		{
+			clen = 0;
+			txlen = 0;
+			while((clen < (pdat->cmdlen - 30 - 1)) && (txlen < (pdat->swaplen - 4096 - 3)))
+			{
+				pa = addr / pdat->info.page_size;
+				ca = addr & (pdat->info.page_size - 1);
+				n = count > pdat->info.page_size ? pdat->info.page_size : count;
+				cbuf[clen++] = SPI_CMD_SELECT;
+				cbuf[clen++] = SPI_CMD_FAST;
+				cbuf[clen++] = 1;
+				cbuf[clen++] = OPCODE_WRITE_ENABLE;
+				cbuf[clen++] = SPI_CMD_DESELECT;
+				cbuf[clen++] = SPI_CMD_SELECT;
+				cbuf[clen++] = SPI_CMD_TXBUF;
+				cbuf[clen++] = ((pdat->swapbuf + txlen) >>  0) & 0xff;
+				cbuf[clen++] = ((pdat->swapbuf + txlen) >>  8) & 0xff;
+				cbuf[clen++] = ((pdat->swapbuf + txlen) >> 16) & 0xff;
+				cbuf[clen++] = ((pdat->swapbuf + txlen) >> 24) & 0xff;
+				cbuf[clen++] = ((n + 3) >>  0) & 0xff;
+				cbuf[clen++] = ((n + 3) >>  8) & 0xff;
+				cbuf[clen++] = ((n + 3) >> 16) & 0xff;
+				cbuf[clen++] = ((n + 3) >> 24) & 0xff;
+				cbuf[clen++] = SPI_CMD_DESELECT;
+				cbuf[clen++] = SPI_CMD_SELECT;
+				cbuf[clen++] = SPI_CMD_SPINAND_WAIT;
+				cbuf[clen++] = SPI_CMD_DESELECT;
+				cbuf[clen++] = SPI_CMD_SELECT;
+				cbuf[clen++] = SPI_CMD_FAST;
+				cbuf[clen++] = 4;
+				cbuf[clen++] = OPCODE_PROGRAM_EXECUTE;
+				cbuf[clen++] = (uint8_t)(pa >> 16);
+				cbuf[clen++] = (uint8_t)(pa >> 8);
+				cbuf[clen++] = (uint8_t)(pa >> 0);
+				cbuf[clen++] = SPI_CMD_DESELECT;
+				cbuf[clen++] = SPI_CMD_SELECT;
+				cbuf[clen++] = SPI_CMD_SPINAND_WAIT;
+				cbuf[clen++] = SPI_CMD_DESELECT;
+				txbuf[txlen++] = OPCODE_PROGRAM_LOAD;
+				txbuf[txlen++] = (uint8_t)(ca >> 8);
+				txbuf[txlen++] = (uint8_t)(ca >> 0);
+				memcpy(&txbuf[txlen], buf, n);
+				txlen += n;
+				addr += n;
+				buf += n;
+				count -= n;
+			}
+			cbuf[clen++] = SPI_CMD_END;
+			fel_write(ctx, pdat->swapbuf, txbuf, txlen);
+			fel_chip_spi_run(ctx, cbuf, clen);
+		}
 	}
+	if(cbuf)
+		free(cbuf);
+	if(txbuf)
+		free(txbuf);
 }
 
 uint64_t spinand_detect(struct xfel_ctx_t * ctx)
