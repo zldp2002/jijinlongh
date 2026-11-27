@@ -29,7 +29,7 @@ enum {
 	OPCODE_WRITE_ENABLE			= 0x06,
 	OPCODE_BLOCK_ERASE			= 0xd8,
 	OPCODE_PROGRAM_LOAD			= 0x02,
-	OPCODE_PROGRAM_EXECUTE		= 0x10,
+	OPCODE_PROGRAM_EXEC			= 0x10,
 	OPCODE_RESET				= 0xff,
 };
 
@@ -219,10 +219,10 @@ static void spinand_helper_erase(struct xfel_ctx_t * ctx, struct spinand_pdata_t
 static void spinand_helper_write(struct xfel_ctx_t * ctx, struct spinand_pdata_t * pdat, uint32_t addr, uint8_t * buf, uint32_t count)
 {
 	uint8_t * cbuf;
-	uint32_t clen;
+	int32_t clen;
 	uint8_t * txbuf;
-	uint32_t txlen;
-	uint32_t n;
+	int32_t txlen;
+	int32_t t, n;
 	uint32_t pa, ca;
 
 	cbuf = malloc(pdat->cmdlen);
@@ -233,15 +233,21 @@ static void spinand_helper_write(struct xfel_ctx_t * ctx, struct spinand_pdata_t
 		{
 			clen = 0;
 			txlen = 0;
-			while((clen < (pdat->cmdlen - 30 - 1)) && (txlen < (pdat->swaplen - 4096 - 3)))
+			while(clen < (pdat->cmdlen - 33 - 1))
 			{
+				t = count > pdat->info.page_size ? pdat->info.page_size : count;
+				n = t > ((int32_t)pdat->swaplen - txlen - 3) ? (int32_t)pdat->swaplen - txlen - 3 : t;
+				if(n <= 0)
+					break;
 				pa = addr / pdat->info.page_size;
 				ca = addr & (pdat->info.page_size - 1);
-				n = count > pdat->info.page_size ? pdat->info.page_size : count;
 				cbuf[clen++] = SPI_CMD_SELECT;
 				cbuf[clen++] = SPI_CMD_FAST;
 				cbuf[clen++] = 1;
 				cbuf[clen++] = OPCODE_WRITE_ENABLE;
+				cbuf[clen++] = SPI_CMD_DESELECT;
+				cbuf[clen++] = SPI_CMD_SELECT;
+				cbuf[clen++] = SPI_CMD_SPINAND_WAIT;
 				cbuf[clen++] = SPI_CMD_DESELECT;
 				cbuf[clen++] = SPI_CMD_SELECT;
 				cbuf[clen++] = SPI_CMD_TXBUF;
@@ -260,7 +266,7 @@ static void spinand_helper_write(struct xfel_ctx_t * ctx, struct spinand_pdata_t
 				cbuf[clen++] = SPI_CMD_SELECT;
 				cbuf[clen++] = SPI_CMD_FAST;
 				cbuf[clen++] = 4;
-				cbuf[clen++] = OPCODE_PROGRAM_EXECUTE;
+				cbuf[clen++] = OPCODE_PROGRAM_EXEC;
 				cbuf[clen++] = (uint8_t)(pa >> 16);
 				cbuf[clen++] = (uint8_t)(pa >> 8);
 				cbuf[clen++] = (uint8_t)(pa >> 0);
