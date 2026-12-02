@@ -285,7 +285,8 @@ static void spinand_helper_write(struct xfel_ctx_t * ctx, struct spinand_pdata_t
 			}
 			cbuf[clen++] = SPI_CMD_END;
 			fel_write(ctx, pdat->swapbuf, txbuf, txlen);
-			fel_chip_spi_run(ctx, cbuf, clen);
+			if(clen <= pdat->cmdlen)
+				fel_chip_spi_run(ctx, cbuf, clen);
 		}
 	}
 	if(cbuf)
@@ -317,8 +318,8 @@ int spinand_read(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t le
 			n = len > 65536 ? 65536 : len;
 			spinand_helper_read(ctx, &pdat, addr, buf, n);
 			addr += n;
-			buf += n;
 			len -= n;
+			buf += n;
 			progress_update(&p, n);
 		}
 		progress_stop(&p);
@@ -331,19 +332,35 @@ int spinand_write(struct xfel_ctx_t * ctx, uint64_t addr, void * buf, uint64_t l
 {
 	struct spinand_pdata_t pdat;
 	struct progress_t p;
+	uint32_t esize, emask;
+	uint64_t base, cnt;
 	uint64_t n;
 
 	if(spinand_helper_init(ctx, &pdat))
 	{
-		progress_start(&p, len);
-		spinand_helper_erase(ctx, &pdat, addr, len);
-		while(len > 0)
+		esize = pdat.info.page_size * pdat.info.pages_per_block;
+		emask = esize - 1;
+		base = addr & ~emask;
+		cnt = len + (addr & emask);
+		progress_start(&p, cnt);
+		while(cnt > 0)
 		{
-			n = len > 65536 ? 65536 : len;
-			spinand_helper_write(ctx, &pdat, addr, buf, n);
-			addr += n;
+			n = cnt > esize ? esize : cnt;
+			spinand_helper_erase(ctx, &pdat, base, cnt);
+			base += n;
+			cnt -= n;
+			progress_update(&p, n);
+		}
+		base = addr;
+		cnt = len;
+		progress_start(&p, cnt);
+		while(cnt > 0)
+		{
+			n = cnt > 65536 ? 65536 : cnt;
+			spinand_helper_write(ctx, &pdat, base, buf, n);
+			base += n;
+			cnt -= n;
 			buf += n;
-			len -= n;
 			progress_update(&p, n);
 		}
 		progress_stop(&p);
